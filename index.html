@@ -26,7 +26,6 @@
             padding: 15px;
         }
 
-        /* Фиксированный баланс */
         .balance-container {
             position: fixed;
             top: 15px;
@@ -131,7 +130,6 @@
             background: linear-gradient(135deg, #9c27b0, #7b1fa2);
         }
 
-        /* Нижнее меню */
         .bottom-menu {
             position: fixed;
             bottom: 0;
@@ -183,7 +181,6 @@
             color: #64b5f6;
         }
 
-        /* Контент вкладок */
         .tab-content {
             display: none;
         }
@@ -246,7 +243,6 @@
             font-weight: bold;
         }
 
-        /* Окно рулетки */
         .roulette-modal {
             position: fixed;
             top: 0;
@@ -361,7 +357,6 @@
             display: inline-block;
         }
 
-        /* Инвентарь */
         .nft-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -400,10 +395,9 @@
             margin: 5px 0;
         }
 
-        /* Магазин */
         .shop-grid {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-top: 10px;
         }
@@ -411,31 +405,33 @@
         .shop-card {
             background: rgba(50, 50, 70, 0.8);
             border-radius: 10px;
-            padding: 15px;
+            padding: 12px;
             text-align: center;
             border: 2px solid #9c27b0;
+            min-height: 180px;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            justify-content: space-between;
         }
 
         .shop-icon {
-            font-size: 32px;
-            margin-bottom: 10px;
+            font-size: 24px;
+            margin-bottom: 8px;
         }
 
         .payment-methods {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin: 10px 0;
+            gap: 5px;
+            margin: 8px 0;
+            flex-wrap: wrap;
         }
 
         .payment-method {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 5px 10px;
-            font-size: 10px;
+            border-radius: 6px;
+            padding: 3px 6px;
+            font-size: 9px;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
@@ -473,7 +469,6 @@
     </style>
 </head>
 <body>
-    <!-- Контейнер для баланса и уведомлений -->
     <div class="balance-container">
         <div id="balanceEarned"></div>
         <div class="top-balance">
@@ -481,7 +476,6 @@
         </div>
     </div>
 
-    <!-- Окно рулетки -->
     <div class="roulette-modal" id="rouletteModal">
         <div class="roulette-container">
             <h2>Крутим рулетку!</h2>
@@ -495,7 +489,6 @@
     </div>
 
     <div class="container" style="margin-top: 70px;">
-        <!-- Основной контент -->
         <div id="main-tab" class="tab-content active">
             <div class="welcome-message">
                 <div class="welcome-title">Добро пожаловать!</div>
@@ -516,7 +509,6 @@
             </div>
         </div>
 
-        <!-- Вкладка Задания -->
         <div id="tasks-tab" class="tab-content">
             <div class="section">
                 <h2>Доступные задания</h2>
@@ -535,7 +527,6 @@
             </div>
         </div>
 
-        <!-- Вкладка Рулетка -->
         <div id="roulette-tab" class="tab-content">
             <div class="section">
                 <h2>Телеграм рулетка</h2>
@@ -566,7 +557,6 @@
             </div>
         </div>
 
-        <!-- Вкладка Инвентарь -->
         <div id="inventory-tab" class="tab-content">
             <div class="section">
                 <h2>Мои коллекции</h2>
@@ -595,7 +585,6 @@
             </div>
         </div>
 
-        <!-- Вкладка Магазин -->
         <div id="shop-tab" class="tab-content">
             <div class="section">
                 <h2>🛒 Покупка звезд</h2>
@@ -655,4 +644,14 @@
                         <strong>X2 Шанс на NFT</strong>
                         <div>Увеличивает шанс выпадения NFT в 2 раза на 24 часа</div>
                         <div class="price">⭐ 300</div>
-                       
+                        <button class="btn btn-buy" onclick="buyBoost('x2')">Купить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-menu">
+        <div class="menu-items">
+            <div class="menu-item active" onclick="switchTab('main-tab', this)">
+                <div class=
