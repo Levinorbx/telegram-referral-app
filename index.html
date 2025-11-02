@@ -27,16 +27,41 @@
         }
 
         /* Фиксированный баланс */
-        .top-balance {
+        .balance-container {
             position: fixed;
             top: 15px;
-            right: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+        }
+
+        .balance-earned {
+            background: rgba(76, 175, 80, 0.9);
+            border-radius: 15px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            animation: fadeUp 2s ease-out;
+        }
+
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(10px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        .top-balance {
             background: rgba(30, 30, 46, 0.95);
             border-radius: 20px;
             padding: 8px 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
-            z-index: 1000;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
@@ -260,7 +285,6 @@
             border-radius: 50%;
             position: relative;
             overflow: hidden;
-            transition: transform 4s cubic-bezier(0.1, 0.1, 0.1, 1);
             border: 3px solid #ffd700;
             background: conic-gradient(
                 #ff6b6b 0deg 60deg,
@@ -270,6 +294,7 @@
                 #feca57 240deg 300deg,
                 #ff9ff3 300deg 360deg
             );
+            transform: rotate(0deg);
         }
 
         .roulette-pointer {
@@ -387,9 +412,12 @@
     </style>
 </head>
 <body>
-    <!-- Фиксированный баланс -->
-    <div class="top-balance">
-        <div class="balance-amount">⭐ 1000</div>
+    <!-- Контейнер для баланса и уведомлений -->
+    <div class="balance-container">
+        <div id="balanceEarned"></div>
+        <div class="top-balance">
+            <div class="balance-amount">⭐ 1000</div>
+        </div>
     </div>
 
     <!-- Окно рулетки -->
@@ -405,7 +433,7 @@
         </div>
     </div>
 
-    <div class="container" style="margin-top: 60px;">
+    <div class="container" style="margin-top: 70px;">
         <!-- Основной контент -->
         <div id="main-tab" class="tab-content active">
             <div class="welcome-message">
@@ -458,21 +486,21 @@
                         <span class="available-now">Доступно сейчас</span>
                         <span id="timer" style="display: none;"></span>
                     </div>
-                    <button class="btn btn-success" id="freeSpinBtn" onclick="spinRoulette('free')">Крутить бесплатно</button>
+                    <button class="btn btn-success" id="freeSpinBtn" onclick="spinRoulette(0)">Крутить бесплатно</button>
                 </div>
 
                 <div class="roulette-item">
                     <strong>Рулетка за 200 звезд</strong>
                     <div>Большие призы за звезды!</div>
                     <div class="price">Стоимость: ⭐ 200</div>
-                    <button class="btn" id="paidSpinBtn" onclick="spinRoulette('paid')">Крутить за звезды</button>
+                    <button class="btn" id="paidSpinBtn" onclick="spinRoulette(200)">Крутить за 200 ⭐</button>
                 </div>
 
                 <div class="roulette-item">
                     <strong>Премиум рулетка</strong>
                     <div>Эксклюзивные призы для чемпионов!</div>
                     <div class="price">Стоимость: ⭐ 500</div>
-                    <button class="btn btn-premium" id="premiumSpinBtn" onclick="spinRoulette('premium')">Крутить премиум</button>
+                    <button class="btn btn-premium" id="premiumSpinBtn" onclick="spinRoulette(500)">Крутить за 500 ⭐</button>
                 </div>
             </div>
         </div>
@@ -563,31 +591,44 @@
 
         // Призы для рулеток (6 равных секторов)
         const roulettePrizes = {
-            free: [
-                { type: 'stars', amount: 5, name: '5 звезд', emoji: '⭐', index: 0 },
-                { type: 'stars', amount: 5, name: '5 звезд', emoji: '⭐', index: 1 },
-                { type: 'stars', amount: 10, name: '10 звезд', emoji: '⭐', index: 2 },
-                { type: 'stars', amount: 10, name: '10 звезд', emoji: '⭐', index: 3 },
-                { type: 'item', name: 'LoliPop', emoji: '🍭', image: '🍭', rarity: 'rare', price: 100, index: 4 },
-                { type: 'item', name: 'SnoopDog', emoji: '🐶', image: '🐶', rarity: 'rare', price: 150, index: 5 }
+            0: [ // Бесплатная
+                { type: 'stars', amount: 5, name: '5 звезд', emoji: '⭐' },
+                { type: 'stars', amount: 5, name: '5 звезд', emoji: '⭐' },
+                { type: 'stars', amount: 10, name: '10 звезд', emoji: '⭐' },
+                { type: 'stars', amount: 10, name: '10 звезд', emoji: '⭐' },
+                { type: 'item', name: 'LoliPop', emoji: '🍭', image: '🍭', rarity: 'rare', price: 100 },
+                { type: 'item', name: 'SnoopDog', emoji: '🐶', image: '🐶', rarity: 'rare', price: 150 }
             ],
-            paid: [
-                { type: 'stars', amount: 50, name: '50 звезд', emoji: '⭐', index: 0 },
-                { type: 'stars', amount: 100, name: '100 звезд', emoji: '⭐', index: 1 },
-                { type: 'stars', amount: 200, name: '200 звезд', emoji: '⭐', index: 2 },
-                { type: 'item', name: 'CryptoPunk', emoji: '👾', image: '👾', rarity: 'rare', price: 300, index: 3 },
-                { type: 'item', name: 'MoonCat', emoji: '🐱', image: '🐱', rarity: 'epic', price: 500, index: 4 },
-                { type: 'item', name: 'CyberApe', emoji: '🐵', image: '🐵', rarity: 'epic', price: 700, index: 5 }
+            200: [ // За 200 звезд
+                { type: 'stars', amount: 50, name: '50 звезд', emoji: '⭐' },
+                { type: 'stars', amount: 100, name: '100 звезд', emoji: '⭐' },
+                { type: 'stars', amount: 200, name: '200 звезд', emoji: '⭐' },
+                { type: 'item', name: 'CryptoPunk', emoji: '👾', image: '👾', rarity: 'rare', price: 300 },
+                { type: 'item', name: 'MoonCat', emoji: '🐱', image: '🐱', rarity: 'epic', price: 500 },
+                { type: 'item', name: 'CyberApe', emoji: '🐵', image: '🐵', rarity: 'epic', price: 700 }
             ],
-            premium: [
-                { type: 'stars', amount: 100, name: '100 звезд', emoji: '⭐', index: 0 },
-                { type: 'stars', amount: 200, name: '200 звезд', emoji: '⭐', index: 1 },
-                { type: 'stars', amount: 500, name: '500 звезд', emoji: '⭐', index: 2 },
-                { type: 'item', name: 'GoldenBitcoin', emoji: '💰', image: '💰', rarity: 'epic', price: 800, index: 3 },
-                { type: 'item', name: 'SpaceAstro', emoji: '🧑‍🚀', image: '🧑‍🚀', rarity: 'legendary', price: 1200, index: 4 },
-                { type: 'item', name: 'DragonEgg', emoji: '🐲', image: '🐲', rarity: 'legendary', price: 1500, index: 5 }
+            500: [ // За 500 звезд
+                { type: 'stars', amount: 100, name: '100 звезд', emoji: '⭐' },
+                { type: 'stars', amount: 200, name: '200 звезд', emoji: '⭐' },
+                { type: 'stars', amount: 500, name: '500 звезд', emoji: '⭐' },
+                { type: 'item', name: 'GoldenBitcoin', emoji: '💰', image: '💰', rarity: 'epic', price: 800 },
+                { type: 'item', name: 'SpaceAstro', emoji: '🧑‍🚀', image: '🧑‍🚀', rarity: 'legendary', price: 1200 },
+                { type: 'item', name: 'DragonEgg', emoji: '🐲', image: '🐲', rarity: 'legendary', price: 1500 }
             ]
         };
+
+        // Показать уведомление о заработке
+        function showEarnedNotification(amount) {
+            const earnedElement = document.getElementById('balanceEarned');
+            earnedElement.textContent = `+${amount} ⭐`;
+            earnedElement.className = 'balance-earned';
+            
+            // Убираем уведомление через 2 секунды
+            setTimeout(() => {
+                earnedElement.textContent = '';
+                earnedElement.className = '';
+            }, 2000);
+        }
 
         // Таймер обратного отсчета
         function startTimer() {
@@ -595,7 +636,6 @@
             const freeCooldown = document.getElementById('freeCooldown');
             const freeSpinBtn = document.getElementById('freeSpinBtn');
             
-            // Если бесплатное вращение недоступно, запускаем таймер
             if (!userData.freeSpinAvailable && userData.freeSpinTime) {
                 const updateTimer = () => {
                     const now = new Date().getTime();
@@ -644,27 +684,19 @@
         }
 
         // Функция рулетки
-        function spinRoulette(type) {
+        function spinRoulette(cost) {
             const modal = document.getElementById('rouletteModal');
             const sections = document.getElementById('rouletteSections');
             const prizeElement = document.getElementById('roulettePrize');
             const closeBtn = document.getElementById('closeRouletteBtn');
             
-            // Стоимость вращения
-            let cost = 0;
-            if (type === 'free') {
-                if (!userData.freeSpinAvailable) {
-                    return;
-                }
-                cost = 0;
-            } else if (type === 'paid') {
-                cost = 200;
-            } else if (type === 'premium') {
-                cost = 500;
+            // Проверка для бесплатной рулетки
+            if (cost === 0 && !userData.freeSpinAvailable) {
+                return;
             }
             
-            // Проверка баланса
-            if (type !== 'free' && userData.balance < cost) {
+            // Проверка баланса для платных рулеток
+            if (cost > 0 && userData.balance < cost) {
                 return;
             }
             
@@ -679,78 +711,85 @@
             document.getElementById('paidSpinBtn').disabled = true;
             document.getElementById('premiumSpinBtn').disabled = true;
             
-            // Выбираем случайный приз (6 равных секторов)
-            const prizes = roulettePrizes[type];
+            // Выбираем случайный приз
+            const prizes = roulettePrizes[cost];
             const selectedIndex = Math.floor(Math.random() * 6);
             const selectedPrize = prizes[selectedIndex];
             
-            // Вращение рулетки - полные обороты + остановка на выбранном секторе
-            const fullRotations = 5; // 5 полных оборотов
-            const degreesPerSection = 60;
-            const targetRotation = 360 * fullRotations + (selectedIndex * degreesPerSection) + 30; // +30 чтобы остановиться в середине сектора
+            // Сбрасываем трансформацию перед каждым вращением
+            sections.style.transition = 'none';
+            sections.style.transform = 'rotate(0deg)';
             
-            // Сбрасываем трансформацию и запускаем анимацию
-            sections.style.transition = 'transform 4s cubic-bezier(0.1, 0.1, 0.1, 1)';
-            sections.style.transform = `rotate(${-targetRotation}deg)`;
-            
-            // Обработка выигрыша
+            // Даем время для сброса
             setTimeout(() => {
-                // Списание стоимости
-                if (type !== 'free') {
-                    userData.balance -= cost;
-                }
+                // Вращение рулетки
+                const fullRotations = 5;
+                const degreesPerSection = 60;
+                const targetRotation = 360 * fullRotations + (selectedIndex * degreesPerSection) + 30;
                 
-                let winText = '';
-                let earned = 0;
+                sections.style.transition = 'transform 4s cubic-bezier(0.2, 0.8, 0.2, 1)';
+                sections.style.transform = `rotate(${-targetRotation}deg)`;
                 
-                if (selectedPrize.type === 'stars') {
-                    userData.balance += selectedPrize.amount;
-                    earned = selectedPrize.amount;
-                    winText = `🎉 Вы выиграли ${selectedPrize.emoji} ${selectedPrize.name}!`;
-                    prizeElement.className = 'roulette-prize win';
-                } else if (selectedPrize.type === 'item') {
-                    userData.inventory.push({
-                        ...selectedPrize,
-                        id: Date.now() + Math.random()
+                // Обработка выигрыша
+                setTimeout(() => {
+                    // Списание стоимости
+                    if (cost > 0) {
+                        userData.balance -= cost;
+                    }
+                    
+                    let winText = '';
+                    let earned = 0;
+                    
+                    if (selectedPrize.type === 'stars') {
+                        userData.balance += selectedPrize.amount;
+                        earned = selectedPrize.amount;
+                        winText = `🎉 Вы выиграли ${selectedPrize.emoji} ${selectedPrize.name}!`;
+                        prizeElement.className = 'roulette-prize win';
+                        showEarnedNotification(selectedPrize.amount);
+                    } else if (selectedPrize.type === 'item') {
+                        userData.inventory.push({
+                            ...selectedPrize,
+                            id: Date.now() + Math.random()
+                        });
+                        winText = `🎊 Вы выиграли ${selectedPrize.emoji} ${selectedPrize.name}!`;
+                        prizeElement.className = 'roulette-prize win';
+                        showEarnedNotification(selectedPrize.price);
+                    }
+                    
+                    prizeElement.textContent = winText;
+                    
+                    // Добавляем в историю
+                    userData.history.unshift({
+                        cost: cost,
+                        prize: selectedPrize.name,
+                        emoji: selectedPrize.emoji,
+                        date: new Date().toLocaleString(),
+                        earned: earned
                     });
-                    winText = `🎊 Вы выиграли ${selectedPrize.emoji} ${selectedPrize.name}!`;
-                    prizeElement.className = 'roulette-prize win';
-                }
-                
-                prizeElement.textContent = winText;
-                
-                // Добавляем в историю
-                userData.history.unshift({
-                    type: type,
-                    prize: selectedPrize.name,
-                    emoji: selectedPrize.emoji,
-                    date: new Date().toLocaleString(),
-                    cost: cost,
-                    earned: earned
-                });
-                
-                // Обновляем статистику
-                if (earned > 0) {
-                    userData.stats.totalEarned += earned;
-                }
-                
-                // Обновляем баланс и кнопки
-                updateBalance();
-                updateStats();
-                
-                // Блокировка бесплатного вращения на 24 часа
-                if (type === 'free') {
-                    userData.freeSpinAvailable = false;
-                    userData.freeSpinTime = new Date().getTime() + 24 * 60 * 60 * 1000;
-                    document.getElementById('freeSpinBtn').disabled = true;
-                    document.getElementById('freeSpinBtn').classList.remove('btn-success');
-                    startTimer();
-                }
-                
-                // Показ кнопки закрытия
-                closeBtn.classList.add('active');
-                
-            }, 4000); // Увеличил время до 4 секунд для полной анимации
+                    
+                    // Обновляем статистику
+                    if (earned > 0) {
+                        userData.stats.totalEarned += earned;
+                    }
+                    
+                    // Обновляем баланс и кнопки
+                    updateBalance();
+                    updateStats();
+                    
+                    // Блокировка бесплатного вращения на 24 часа
+                    if (cost === 0) {
+                        userData.freeSpinAvailable = false;
+                        userData.freeSpinTime = new Date().getTime() + 24 * 60 * 60 * 1000;
+                        document.getElementById('freeSpinBtn').disabled = true;
+                        document.getElementById('freeSpinBtn').classList.remove('btn-success');
+                        startTimer();
+                    }
+                    
+                    // Показ кнопки закрытия
+                    closeBtn.classList.add('active');
+                    
+                }, 4000);
+            }, 50);
         }
 
         // Обновление баланса и кнопок
@@ -758,7 +797,6 @@
             const balanceElement = document.querySelector('.balance-amount');
             balanceElement.textContent = `⭐ ${userData.balance}`;
             
-            // Обновляем состояние кнопок
             document.getElementById('freeSpinBtn').disabled = !userData.freeSpinAvailable;
             document.getElementById('paidSpinBtn').disabled = userData.balance < 200;
             document.getElementById('premiumSpinBtn').disabled = userData.balance < 500;
@@ -779,10 +817,8 @@
 
         // Задание: Подписка на канал
         function completeChannelTask() {
-            // Открываем канал в Telegram
             tg.openTelegramLink('https://t.me/GiftForceNews');
             
-            // Помечаем задание как выполненное через 2 секунды
             setTimeout(() => {
                 if (!userData.completedTasks.channel) {
                     userData.completedTasks.channel = true;
@@ -797,19 +833,17 @@
                     
                     updateBalance();
                     updateStats();
+                    showEarnedNotification(50);
                 }
             }, 2000);
         }
 
         // Задание: Пригласить друга
         function shareWithFriend() {
-            // Открываем диалог выбора контакта в Telegram
-            tg.shareApp({
-                text: '🎁 Присоединяйся к Gift Force и зарабатывай звезды! Крути рулетку, собирай коллекции и получай крутые призы!',
-                url: window.location.href // Отправляем ссылку на текущее приложение
-            });
+            // Создаем ссылку для приглашения
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('https://t.me/YourBotName')}&text=${encodeURIComponent('🎁 Присоединяйся к Gift Force! Крути рулетку и зарабатывай звезды!')}`;
+            tg.openLink(shareUrl);
             
-            // Имитируем выполнение задания через 2 секунды
             setTimeout(() => {
                 userData.completedTasks.friends++;
                 userData.stats.invitedFriends++;
@@ -822,6 +856,7 @@
                 
                 updateBalance();
                 updateStats();
+                showEarnedNotification(100);
             }, 2000);
         }
 
@@ -866,6 +901,7 @@
             
             updateBalance();
             updateInventory();
+            showEarnedNotification(item.price);
         }
 
         // Обновление истории
@@ -892,8 +928,7 @@
                 historyItem.innerHTML = `
                     <strong>${entry.emoji} ${entry.prize}</strong>
                     <div style="color: #888; font-size: 12px;">
-                        ${entry.type} рулетка • ${entry.date}
-                        ${entry.cost > 0 ? ` • Стоимость: ⭐ ${entry.cost}` : ''}
+                        ${entry.cost === 0 ? 'Бесплатно' : `⭐ ${entry.cost}`} • ${entry.date}
                         ${entry.earned > 0 ? ` • Выигрыш: ⭐ ${entry.earned}` : ''}
                     </div>
                 `;
