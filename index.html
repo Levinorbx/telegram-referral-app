@@ -265,20 +265,22 @@
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 14px;
             text-align: center;
+            left: 0;
+            top: 0;
         }
 
         .roulette-pointer {
             position: absolute;
-            top: -10px;
+            top: -15px;
             left: 50%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
-            border-top: 25px solid #ff6b6b;
+            border-top: 25px solid #ff0000;
             z-index: 10;
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
         }
@@ -370,6 +372,11 @@
             background: linear-gradient(45deg, #64b5f6, #2196f3);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        .prize-emoji {
+            font-size: 20px;
+            margin-right: 5px;
         }
     </style>
 </head>
@@ -538,28 +545,28 @@
         // Призы для рулеток (6 равных секторов)
         const roulettePrizes = {
             free: [
-                { type: 'stars', amount: 5, name: '⭐ 5', color: '#ff6b6b' },
-                { type: 'stars', amount: 5, name: '⭐ 5', color: '#ff9ff3' },
-                { type: 'stars', amount: 10, name: '⭐ 10', color: '#f368e0' },
-                { type: 'stars', amount: 10, name: '⭐ 10', color: '#a55eea' },
-                { type: 'item', name: 'LoliPop', image: '🍭', rarity: 'rare', price: 100, color: '#26de81' },
-                { type: 'item', name: 'SnoopDog', image: '🐶', rarity: 'rare', price: 150, color: '#fed330' }
+                { type: 'stars', amount: 5, name: '⭐ 5', emoji: '⭐', color: '#ff6b6b' },
+                { type: 'stars', amount: 5, name: '⭐ 5', emoji: '⭐', color: '#4ecdc4' },
+                { type: 'stars', amount: 10, name: '⭐ 10', emoji: '⭐', color: '#45b7d1' },
+                { type: 'stars', amount: 10, name: '⭐ 10', emoji: '⭐', color: '#96ceb4' },
+                { type: 'item', name: 'LoliPop', emoji: '🍭', image: '🍭', rarity: 'rare', price: 100, color: '#feca57' },
+                { type: 'item', name: 'SnoopDog', emoji: '🐶', image: '🐶', rarity: 'rare', price: 150, color: '#ff9ff3' }
             ],
             paid: [
-                { type: 'stars', amount: 50, name: '⭐ 50', color: '#ff6b6b' },
-                { type: 'stars', amount: 100, name: '⭐ 100', color: '#ff9ff3' },
-                { type: 'stars', amount: 200, name: '⭐ 200', color: '#f368e0' },
-                { type: 'item', name: 'CryptoPunk', image: '👾', rarity: 'rare', price: 300, color: '#a55eea' },
-                { type: 'item', name: 'MoonCat', image: '🐱', rarity: 'epic', price: 500, color: '#26de81' },
-                { type: 'item', name: 'CyberApe', image: '🐵', rarity: 'epic', price: 700, color: '#fed330' }
+                { type: 'stars', amount: 50, name: '⭐ 50', emoji: '⭐', color: '#ff6b6b' },
+                { type: 'stars', amount: 100, name: '⭐ 100', emoji: '⭐', color: '#4ecdc4' },
+                { type: 'stars', amount: 200, name: '⭐ 200', emoji: '⭐', color: '#45b7d1' },
+                { type: 'item', name: 'CryptoPunk', emoji: '👾', image: '👾', rarity: 'rare', price: 300, color: '#96ceb4' },
+                { type: 'item', name: 'MoonCat', emoji: '🐱', image: '🐱', rarity: 'epic', price: 500, color: '#feca57' },
+                { type: 'item', name: 'CyberApe', emoji: '🐵', image: '🐵', rarity: 'epic', price: 700, color: '#ff9ff3' }
             ],
             premium: [
-                { type: 'stars', amount: 100, name: '⭐ 100', color: '#ff6b6b' },
-                { type: 'stars', amount: 200, name: '⭐ 200', color: '#ff9ff3' },
-                { type: 'stars', amount: 500, name: '⭐ 500', color: '#f368e0' },
-                { type: 'item', name: 'GoldenBitcoin', image: '💰', rarity: 'epic', price: 800, color: '#a55eea' },
-                { type: 'item', name: 'SpaceAstro', image: '🧑‍🚀', rarity: 'legendary', price: 1200, color: '#26de81' },
-                { type: 'item', name: 'DragonEgg', image: '🐲', rarity: 'legendary', price: 1500, color: '#fed330' }
+                { type: 'stars', amount: 100, name: '⭐ 100', emoji: '⭐', color: '#ff6b6b' },
+                { type: 'stars', amount: 200, name: '⭐ 200', emoji: '⭐', color: '#4ecdc4' },
+                { type: 'stars', amount: 500, name: '⭐ 500', emoji: '⭐', color: '#45b7d1' },
+                { type: 'item', name: 'GoldenBitcoin', emoji: '💰', image: '💰', rarity: 'epic', price: 800, color: '#96ceb4' },
+                { type: 'item', name: 'SpaceAstro', emoji: '🧑‍🚀', image: '🧑‍🚀', rarity: 'legendary', price: 1200, color: '#feca57' },
+                { type: 'item', name: 'DragonEgg', emoji: '🐲', image: '🐲', rarity: 'legendary', price: 1500, color: '#ff9ff3' }
             ]
         };
 
@@ -593,9 +600,14 @@
             prizes.forEach((prize, index) => {
                 const section = document.createElement('div');
                 section.className = 'roulette-section';
+                // Каждая секция 60 градусов, начинаем с 0
                 section.style.transform = `rotate(${index * 60}deg)`;
                 section.style.background = prize.color;
-                section.innerHTML = `<div style="transform: rotate(30deg); width: 80px;">${prize.name}</div>`;
+                // Поворачиваем текст обратно чтобы он был читаемым
+                section.innerHTML = `<div style="transform: rotate(30deg); text-align: center;">
+                    <div class="prize-emoji">${prize.emoji}</div>
+                    <div style="font-size: 12px;">${prize.name}</div>
+                </div>`;
                 sections.appendChild(section);
             });
         }
@@ -645,8 +657,11 @@
             const selectedIndex = Math.floor(Math.random() * 6);
             const selectedPrize = prizes[selectedIndex];
             
-            // Вращение рулетки (точно на выбранный сектор)
-            const targetRotation = 360 * 5 + (selectedIndex * 60);
+            // Вращение рулетки - точно рассчитываем остановку на выбранном секторе
+            // Стрелка указывает на 0 градусов (верх), поэтому нужно чтобы сектор оказался под стрелкой
+            const degreesPerSection = 60;
+            // Сектор под стрелкой имеет индекс 0, поэтому вычисляем смещение
+            const targetRotation = 360 * 5 + (selectedIndex * degreesPerSection);
             
             sections.style.transform = `rotate(${-targetRotation}deg)`;
             
@@ -667,7 +682,7 @@
                         ...selectedPrize,
                         id: Date.now() + Math.random()
                     });
-                    winText = `🎊 Вы выиграли ${selectedPrize.name}!`;
+                    winText = `🎊 Вы выиграли ${selectedPrize.emoji} ${selectedPrize.name}!`;
                     prizeElement.className = 'roulette-prize win';
                 }
                 
@@ -677,6 +692,7 @@
                 userData.history.unshift({
                     type: type,
                     prize: selectedPrize.name,
+                    emoji: selectedPrize.emoji,
                     date: new Date().toLocaleString(),
                     cost: cost
                 });
@@ -786,7 +802,7 @@
                 const historyItem = document.createElement('div');
                 historyItem.className = 'history-item';
                 historyItem.innerHTML = `
-                    <strong>${entry.prize}</strong>
+                    <strong>${entry.emoji} ${entry.prize}</strong>
                     <div style="color: #888; font-size: 12px;">
                         ${entry.type} рулетка • ${entry.date}
                         ${entry.cost > 0 ? ` • Стоимость: ⭐ ${entry.cost}` : ''}
