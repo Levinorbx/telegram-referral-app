@@ -89,6 +89,10 @@
             box-shadow: none;
         }
 
+        .btn-success {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+        }
+
         .btn-premium {
             background: linear-gradient(135deg, #ff9800, #f57c00);
         }
@@ -210,6 +214,11 @@
             margin-top: 5px;
         }
 
+        .available-now {
+            color: #4caf50 !important;
+            font-weight: bold;
+        }
+
         /* Окно рулетки */
         .roulette-modal {
             position: fixed;
@@ -253,22 +262,14 @@
             overflow: hidden;
             transition: transform 3s cubic-bezier(0.2, 0.8, 0.2, 1);
             border: 3px solid #ffd700;
-        }
-
-        .roulette-section {
-            position: absolute;
-            width: 50%;
-            height: 50%;
-            transform-origin: 100% 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
-            left: 0;
-            top: 0;
+            background: conic-gradient(
+                #ff6b6b 0deg 60deg,
+                #4ecdc4 60deg 120deg,
+                #45b7d1 120deg 180deg,
+                #96ceb4 180deg 240deg,
+                #feca57 240deg 300deg,
+                #ff9ff3 300deg 360deg
+            );
         }
 
         .roulette-pointer {
@@ -374,16 +375,21 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .prize-emoji {
-            font-size: 20px;
-            margin-right: 5px;
+        .task-completed {
+            background: rgba(76, 175, 80, 0.2) !important;
+            border-left-color: #4caf50 !important;
+        }
+
+        .task-completed .btn {
+            background: #455a64;
+            cursor: not-allowed;
         }
     </style>
 </head>
 <body>
     <!-- Фиксированный баланс -->
     <div class="top-balance">
-        <div class="balance-amount">⭐ 1,000</div>
+        <div class="balance-amount">⭐ 1000</div>
     </div>
 
     <!-- Окно рулетки -->
@@ -410,13 +416,13 @@
             <div class="section">
                 <h2>Статистика</h2>
                 <div class="task-item">
-                    <strong>Выполнено заданий:</strong> 0
+                    <strong>Выполнено заданий:</strong> <span id="completedTasks">0</span>
                 </div>
                 <div class="task-item">
-                    <strong>Всего заработано:</strong> ⭐ 0
+                    <strong>Всего заработано:</strong> ⭐ <span id="totalEarned">0</span>
                 </div>
                 <div class="task-item">
-                    <strong>Приглашено друзей:</strong> 0
+                    <strong>Приглашено друзей:</strong> <span id="invitedFriends">0</span>
                 </div>
             </div>
         </div>
@@ -426,16 +432,16 @@
             <div class="section">
                 <h2>Доступные задания</h2>
                 
-                <div class="task-item">
+                <div class="task-item" id="channelTask">
                     <strong>Подпишись на канал</strong>
                     <div class="reward">+⭐ 50</div>
-                    <button class="btn" onclick="openChannel()">Перейти в канал</button>
+                    <button class="btn" onclick="completeChannelTask()">Перейти в канал</button>
                 </div>
 
-                <div class="task-item">
+                <div class="task-item" id="friendTask">
                     <strong>Пригласи друга</strong>
                     <div class="reward">+⭐ 100 за каждого</div>
-                    <button class="btn">Поделиться</button>
+                    <button class="btn" onclick="shareWithFriend()">Поделиться</button>
                 </div>
             </div>
         </div>
@@ -447,21 +453,24 @@
                 
                 <div class="roulette-item">
                     <strong>Бесплатная рулетка</strong>
-                    <div>6 призов: ⭐5, ⭐10, LoliPop, SnoopDog</div>
-                    <div class="cooldown" id="freeCooldown">Доступно сейчас</div>
-                    <button class="btn" id="freeSpinBtn" onclick="spinRoulette('free')">Крутить бесплатно</button>
+                    <div>Крути каждый день и выигрывай призы!</div>
+                    <div class="cooldown" id="freeCooldown">
+                        <span class="available-now">Доступно сейчас</span>
+                        <span id="timer" style="display: none;"></span>
+                    </div>
+                    <button class="btn btn-success" id="freeSpinBtn" onclick="spinRoulette('free')">Крутить бесплатно</button>
                 </div>
 
                 <div class="roulette-item">
                     <strong>Рулетка за 200 звезд</strong>
-                    <div>6 призов: ⭐50-200, CryptoPunk, MoonCat, CyberApe</div>
+                    <div>Большие призы за звезды!</div>
                     <div class="price">Стоимость: ⭐ 200</div>
                     <button class="btn" id="paidSpinBtn" onclick="spinRoulette('paid')">Крутить за звезды</button>
                 </div>
 
                 <div class="roulette-item">
                     <strong>Премиум рулетка</strong>
-                    <div>6 призов: ⭐100-500, GoldenBitcoin, SpaceAstro, DragonEgg</div>
+                    <div>Эксклюзивные призы для чемпионов!</div>
                     <div class="price">Стоимость: ⭐ 500</div>
                     <button class="btn btn-premium" id="premiumSpinBtn" onclick="spinRoulette('premium')">Крутить премиум</button>
                 </div>
@@ -538,37 +547,82 @@
         let userData = {
             balance: 1000,
             freeSpinAvailable: true,
+            freeSpinTime: null,
             inventory: [],
-            history: []
+            history: [],
+            completedTasks: {
+                channel: false,
+                friends: 0
+            },
+            stats: {
+                completedTasks: 0,
+                totalEarned: 0,
+                invitedFriends: 0
+            }
         };
 
         // Призы для рулеток (6 равных секторов)
         const roulettePrizes = {
             free: [
-                { type: 'stars', amount: 5, name: '⭐ 5', emoji: '⭐', color: '#ff6b6b' },
-                { type: 'stars', amount: 5, name: '⭐ 5', emoji: '⭐', color: '#4ecdc4' },
-                { type: 'stars', amount: 10, name: '⭐ 10', emoji: '⭐', color: '#45b7d1' },
-                { type: 'stars', amount: 10, name: '⭐ 10', emoji: '⭐', color: '#96ceb4' },
-                { type: 'item', name: 'LoliPop', emoji: '🍭', image: '🍭', rarity: 'rare', price: 100, color: '#feca57' },
-                { type: 'item', name: 'SnoopDog', emoji: '🐶', image: '🐶', rarity: 'rare', price: 150, color: '#ff9ff3' }
+                { type: 'stars', amount: 5, name: '5 звезд', emoji: '⭐', index: 0 },
+                { type: 'stars', amount: 5, name: '5 звезд', emoji: '⭐', index: 1 },
+                { type: 'stars', amount: 10, name: '10 звезд', emoji: '⭐', index: 2 },
+                { type: 'stars', amount: 10, name: '10 звезд', emoji: '⭐', index: 3 },
+                { type: 'item', name: 'LoliPop', emoji: '🍭', image: '🍭', rarity: 'rare', price: 100, index: 4 },
+                { type: 'item', name: 'SnoopDog', emoji: '🐶', image: '🐶', rarity: 'rare', price: 150, index: 5 }
             ],
             paid: [
-                { type: 'stars', amount: 50, name: '⭐ 50', emoji: '⭐', color: '#ff6b6b' },
-                { type: 'stars', amount: 100, name: '⭐ 100', emoji: '⭐', color: '#4ecdc4' },
-                { type: 'stars', amount: 200, name: '⭐ 200', emoji: '⭐', color: '#45b7d1' },
-                { type: 'item', name: 'CryptoPunk', emoji: '👾', image: '👾', rarity: 'rare', price: 300, color: '#96ceb4' },
-                { type: 'item', name: 'MoonCat', emoji: '🐱', image: '🐱', rarity: 'epic', price: 500, color: '#feca57' },
-                { type: 'item', name: 'CyberApe', emoji: '🐵', image: '🐵', rarity: 'epic', price: 700, color: '#ff9ff3' }
+                { type: 'stars', amount: 50, name: '50 звезд', emoji: '⭐', index: 0 },
+                { type: 'stars', amount: 100, name: '100 звезд', emoji: '⭐', index: 1 },
+                { type: 'stars', amount: 200, name: '200 звезд', emoji: '⭐', index: 2 },
+                { type: 'item', name: 'CryptoPunk', emoji: '👾', image: '👾', rarity: 'rare', price: 300, index: 3 },
+                { type: 'item', name: 'MoonCat', emoji: '🐱', image: '🐱', rarity: 'epic', price: 500, index: 4 },
+                { type: 'item', name: 'CyberApe', emoji: '🐵', image: '🐵', rarity: 'epic', price: 700, index: 5 }
             ],
             premium: [
-                { type: 'stars', amount: 100, name: '⭐ 100', emoji: '⭐', color: '#ff6b6b' },
-                { type: 'stars', amount: 200, name: '⭐ 200', emoji: '⭐', color: '#4ecdc4' },
-                { type: 'stars', amount: 500, name: '⭐ 500', emoji: '⭐', color: '#45b7d1' },
-                { type: 'item', name: 'GoldenBitcoin', emoji: '💰', image: '💰', rarity: 'epic', price: 800, color: '#96ceb4' },
-                { type: 'item', name: 'SpaceAstro', emoji: '🧑‍🚀', image: '🧑‍🚀', rarity: 'legendary', price: 1200, color: '#feca57' },
-                { type: 'item', name: 'DragonEgg', emoji: '🐲', image: '🐲', rarity: 'legendary', price: 1500, color: '#ff9ff3' }
+                { type: 'stars', amount: 100, name: '100 звезд', emoji: '⭐', index: 0 },
+                { type: 'stars', amount: 200, name: '200 звезд', emoji: '⭐', index: 1 },
+                { type: 'stars', amount: 500, name: '500 звезд', emoji: '⭐', index: 2 },
+                { type: 'item', name: 'GoldenBitcoin', emoji: '💰', image: '💰', rarity: 'epic', price: 800, index: 3 },
+                { type: 'item', name: 'SpaceAstro', emoji: '🧑‍🚀', image: '🧑‍🚀', rarity: 'legendary', price: 1200, index: 4 },
+                { type: 'item', name: 'DragonEgg', emoji: '🐲', image: '🐲', rarity: 'legendary', price: 1500, index: 5 }
             ]
         };
+
+        // Таймер обратного отсчета
+        function startTimer() {
+            const timerElement = document.getElementById('timer');
+            const freeCooldown = document.getElementById('freeCooldown');
+            const freeSpinBtn = document.getElementById('freeSpinBtn');
+            
+            // Если бесплатное вращение недоступно, запускаем таймер
+            if (!userData.freeSpinAvailable && userData.freeSpinTime) {
+                const updateTimer = () => {
+                    const now = new Date().getTime();
+                    const targetTime = userData.freeSpinTime;
+                    const timeLeft = targetTime - now;
+                    
+                    if (timeLeft <= 0) {
+                        userData.freeSpinAvailable = true;
+                        freeCooldown.innerHTML = '<span class="available-now">Доступно сейчас</span>';
+                        freeSpinBtn.disabled = false;
+                        freeSpinBtn.classList.add('btn-success');
+                        return;
+                    }
+                    
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                    
+                    timerElement.textContent = `Доступно через: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    timerElement.style.display = 'block';
+                    freeCooldown.querySelector('.available-now').style.display = 'none';
+                };
+                
+                updateTimer();
+                setInterval(updateTimer, 1000);
+            }
+        }
 
         // Функция переключения вкладок
         function showTab(tabName) {
@@ -589,42 +643,17 @@
             }
         }
 
-        // Создание рулетки
-        function createRoulette(type) {
-            const sections = document.getElementById('rouletteSections');
-            sections.innerHTML = '';
-            sections.style.transform = 'rotate(0deg)';
-            
-            const prizes = roulettePrizes[type];
-            
-            prizes.forEach((prize, index) => {
-                const section = document.createElement('div');
-                section.className = 'roulette-section';
-                // Каждая секция 60 градусов, начинаем с 0
-                section.style.transform = `rotate(${index * 60}deg)`;
-                section.style.background = prize.color;
-                // Поворачиваем текст обратно чтобы он был читаемым
-                section.innerHTML = `<div style="transform: rotate(30deg); text-align: center;">
-                    <div class="prize-emoji">${prize.emoji}</div>
-                    <div style="font-size: 12px;">${prize.name}</div>
-                </div>`;
-                sections.appendChild(section);
-            });
-        }
-
         // Функция рулетки
         function spinRoulette(type) {
             const modal = document.getElementById('rouletteModal');
             const sections = document.getElementById('rouletteSections');
             const prizeElement = document.getElementById('roulettePrize');
             const closeBtn = document.getElementById('closeRouletteBtn');
-            const balanceElement = document.querySelector('.balance-amount');
             
             // Стоимость вращения
             let cost = 0;
             if (type === 'free') {
                 if (!userData.freeSpinAvailable) {
-                    tg.showAlert('Бесплатное вращение будет доступно позже!');
                     return;
                 }
                 cost = 0;
@@ -636,12 +665,10 @@
             
             // Проверка баланса
             if (type !== 'free' && userData.balance < cost) {
-                tg.showAlert('Недостаточно звезд!');
                 return;
             }
             
-            // Создаем рулетку и показываем модальное окно
-            createRoulette(type);
+            // Показываем модальное окно
             modal.classList.add('active');
             closeBtn.classList.remove('active');
             prizeElement.textContent = 'Крутим...';
@@ -657,11 +684,8 @@
             const selectedIndex = Math.floor(Math.random() * 6);
             const selectedPrize = prizes[selectedIndex];
             
-            // Вращение рулетки - точно рассчитываем остановку на выбранном секторе
-            // Стрелка указывает на 0 градусов (верх), поэтому нужно чтобы сектор оказался под стрелкой
-            const degreesPerSection = 60;
-            // Сектор под стрелкой имеет индекс 0, поэтому вычисляем смещение
-            const targetRotation = 360 * 5 + (selectedIndex * degreesPerSection);
+            // Вращение рулетки
+            const targetRotation = 360 * 5 + (selectedIndex * 60) + Math.floor(Math.random() * 60);
             
             sections.style.transform = `rotate(${-targetRotation}deg)`;
             
@@ -673,9 +697,12 @@
                 }
                 
                 let winText = '';
+                let earned = 0;
+                
                 if (selectedPrize.type === 'stars') {
                     userData.balance += selectedPrize.amount;
-                    winText = `🎉 Вы выиграли ${selectedPrize.name} звезд!`;
+                    earned = selectedPrize.amount;
+                    winText = `🎉 Вы выиграли ${selectedPrize.emoji} ${selectedPrize.name}!`;
                     prizeElement.className = 'roulette-prize win';
                 } else if (selectedPrize.type === 'item') {
                     userData.inventory.push({
@@ -694,17 +721,26 @@
                     prize: selectedPrize.name,
                     emoji: selectedPrize.emoji,
                     date: new Date().toLocaleString(),
-                    cost: cost
+                    cost: cost,
+                    earned: earned
                 });
+                
+                // Обновляем статистику
+                if (earned > 0) {
+                    userData.stats.totalEarned += earned;
+                }
                 
                 // Обновляем баланс и кнопки
                 updateBalance();
+                updateStats();
                 
-                // Блокировка бесплатного вращения
+                // Блокировка бесплатного вращения на 24 часа
                 if (type === 'free') {
                     userData.freeSpinAvailable = false;
-                    document.getElementById('freeCooldown').textContent = 'Доступно через 24 часа';
+                    userData.freeSpinTime = new Date().getTime() + 24 * 60 * 60 * 1000;
                     document.getElementById('freeSpinBtn').disabled = true;
+                    document.getElementById('freeSpinBtn').classList.remove('btn-success');
+                    startTimer();
                 }
                 
                 // Показ кнопки закрытия
@@ -724,15 +760,63 @@
             document.getElementById('premiumSpinBtn').disabled = userData.balance < 500;
         }
 
+        // Обновление статистики
+        function updateStats() {
+            document.getElementById('completedTasks').textContent = userData.stats.completedTasks;
+            document.getElementById('totalEarned').textContent = userData.stats.totalEarned;
+            document.getElementById('invitedFriends').textContent = userData.stats.invitedFriends;
+        }
+
         // Закрытие рулетки
         function closeRoulette() {
             document.getElementById('rouletteModal').classList.remove('active');
-            updateBalance(); // Обновляем кнопки при закрытии
+            updateBalance();
         }
 
-        // Открытие канала
-        function openChannel() {
-            tg.openLink('https://t.me/levinocheat');
+        // Задание: Подписка на канал
+        function completeChannelTask() {
+            tg.openLink('https://t.me/GiftForceNews');
+            
+            // Помечаем задание как выполненное через 2 секунды (имитация проверки)
+            setTimeout(() => {
+                if (!userData.completedTasks.channel) {
+                    userData.completedTasks.channel = true;
+                    userData.stats.completedTasks++;
+                    userData.balance += 50;
+                    userData.stats.totalEarned += 50;
+                    
+                    const taskElement = document.getElementById('channelTask');
+                    taskElement.classList.add('task-completed');
+                    taskElement.querySelector('.btn').textContent = '✅ Выполнено';
+                    taskElement.querySelector('.btn').disabled = true;
+                    
+                    updateBalance();
+                    updateStats();
+                }
+            }, 2000);
+        }
+
+        // Задание: Пригласить друга
+        function shareWithFriend() {
+            tg.shareApp({
+                text: 'Присоединяйся к Gift Force и зарабатывай звезды! 🎁',
+                url: 'https://t.me/YourBotName' // Замени на имя твоего бота
+            });
+            
+            // Имитируем выполнение задания
+            setTimeout(() => {
+                userData.completedTasks.friends++;
+                userData.stats.invitedFriends++;
+                userData.stats.completedTasks++;
+                userData.balance += 100;
+                userData.stats.totalEarned += 100;
+                
+                const taskElement = document.getElementById('friendTask');
+                taskElement.querySelector('.reward').textContent = `+⭐ 100 за каждого (${userData.completedTasks.friends} приглашено)`;
+                
+                updateBalance();
+                updateStats();
+            }, 2000);
         }
 
         // Обновление инвентаря
@@ -774,10 +858,8 @@
             userData.balance += item.price;
             userData.inventory.splice(index, 1);
             
-            updateBalance(); // Обновляем баланс и кнопки
+            updateBalance();
             updateInventory();
-            
-            tg.showAlert(`✅ ${item.name} продан за ⭐ ${item.price}`);
         }
 
         // Обновление истории
@@ -806,6 +888,7 @@
                     <div style="color: #888; font-size: 12px;">
                         ${entry.type} рулетка • ${entry.date}
                         ${entry.cost > 0 ? ` • Стоимость: ⭐ ${entry.cost}` : ''}
+                        ${entry.earned > 0 ? ` • Выигрыш: ⭐ ${entry.earned}` : ''}
                     </div>
                 `;
                 container.appendChild(historyItem);
@@ -815,8 +898,10 @@
         // Скрываем главную кнопку Telegram
         tg.MainButton.hide();
 
-        // Инициализация кнопок
+        // Инициализация
         updateBalance();
+        updateStats();
+        startTimer();
     </script>
 </body>
 </html>
