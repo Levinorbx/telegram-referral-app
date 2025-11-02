@@ -14,8 +14,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-            color: #333;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e0e0;
             min-height: 100vh;
             padding-bottom: 70px;
         }
@@ -23,81 +23,74 @@
         .container {
             max-width: 400px;
             margin: 0 auto;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px 0;
-        }
-
-        .header h1 {
-            font-size: 32px;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 5px;
-        }
-
-        .bot-name {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
-        }
-
-        .section {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .section h2 {
-            font-size: 18px;
-            margin-bottom: 15px;
-            color: #007bff;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 5px;
+            padding: 15px;
         }
 
         .balance-card {
-            background: linear-gradient(135deg, #007bff, #0056b3);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
-            border-radius: 15px;
+            border-radius: 20px;
             padding: 25px;
             text-align: center;
-            margin: 20px 0;
+            margin: 10px 0 20px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 
         .balance-amount {
-            font-size: 36px;
+            font-size: 42px;
             font-weight: bold;
             margin: 10px 0;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .stars {
+            color: #ffd700;
+            font-size: 20px;
+            margin: 5px 0;
+        }
+
+        .section {
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .section h2 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #64b5f6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .btn {
-            background: #007bff;
+            background: linear-gradient(135deg, #2196f3, #1976d2);
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            font-size: 16px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
             cursor: pointer;
             margin: 5px;
             transition: all 0.3s ease;
+            width: 100%;
+            font-weight: 500;
         }
 
         .btn:hover {
-            background: #0056b3;
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
         }
 
         .btn-secondary {
-            background: #6c757d;
+            background: linear-gradient(135deg, #455a64, #37474f);
         }
 
-        .btn-success {
-            background: #28a745;
+        .btn-premium {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
         }
 
         /* Нижнее меню */
@@ -106,10 +99,10 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: white;
-            border-top: 2px solid #007bff;
-            padding: 10px 0;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            background: rgba(13, 13, 23, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 0;
         }
 
         .menu-items {
@@ -123,25 +116,33 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 8px 15px;
-            border-radius: 10px;
+            padding: 8px 12px;
+            border-radius: 12px;
             transition: all 0.3s ease;
             cursor: pointer;
+            flex: 1;
+            margin: 0 2px;
         }
 
         .menu-item.active {
-            background: #007bff;
-            color: white;
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid rgba(33, 150, 243, 0.5);
         }
 
         .menu-icon {
-            font-size: 20px;
+            font-size: 18px;
             margin-bottom: 4px;
         }
 
         .menu-text {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .menu-item.active .menu-text {
+            opacity: 1;
+            color: #64b5f6;
         }
 
         /* Контент вкладок */
@@ -153,65 +154,72 @@
             display: block;
         }
 
-        .task-item {
-            background: #f8f9fa;
-            border-radius: 10px;
+        .task-item, .roulette-item, .shop-item, .stat-item {
+            background: rgba(40, 40, 60, 0.6);
+            border-radius: 12px;
             padding: 15px;
             margin: 10px 0;
-            border-left: 4px solid #007bff;
+            border-left: 4px solid #2196f3;
+        }
+
+        .roulette-item {
+            border-left-color: #ff9800;
         }
 
         .shop-item {
-            background: white;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 10px 0;
-            text-align: center;
+            border-left-color: #4caf50;
         }
 
-        .history-item {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 12px;
-            margin: 8px 0;
-            font-size: 14px;
+        .stat-item {
+            border-left-color: #9c27b0;
+        }
+
+        .price {
+            color: #ffd700;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .reward {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .cooldown {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Заголовок -->
-        <div class="header">
-            <h1>Gift Force</h1>
-            <div class="bot-name">@GiftForceBot</div>
-        </div>
-
         <!-- Основной контент -->
         <div id="main-tab" class="tab-content active">
             <div class="balance-card">
-                <div>Ваш баланс</div>
-                <div class="balance-amount">1 250 ₽</div>
-                <div>Доступно для вывода</div>
+                <div style="font-size: 14px; opacity: 0.9;">ВАШ БАЛАНС</div>
+                <div class="balance-amount">⭐ 1,250</div>
+                <div class="stars">🎯 Доступно для вывода</div>
             </div>
 
             <div class="section">
-                <h2>БЫСТРЫЕ ДЕЙСТВИЯ</h2>
-                <button class="btn" onclick="tg.showAlert('🎁 Бонус активирован!')">Получить бонус</button>
-                <button class="btn btn-success" onclick="showTab('tasks')">Выполнить задания</button>
-                <button class="btn btn-secondary" onclick="showTab('shop')">Магазин призов</button>
+                <h2>🚀 Быстрые действия</h2>
+                <button class="btn" onclick="showTab('tasks')">🎯 Выполнить задания</button>
+                <button class="btn" onclick="showTab('roulette')">🎰 Испытать удачу</button>
+                <button class="btn" onclick="showTab('shop')">🛒 Улучшить шансы</button>
+                <button class="btn" onclick="showTab('stats')">📊 Моя статистика</button>
             </div>
 
             <div class="section">
-                <h2>СТАТИСТИКА</h2>
-                <div class="task-item">
+                <h2>📈 Быстрая статистика</h2>
+                <div class="stat-item">
                     <strong>Выполнено заданий:</strong> 12
                 </div>
-                <div class="task-item">
-                    <strong>Приглашено друзей:</strong> 5
+                <div class="stat-item">
+                    <strong>Всего заработано:</strong> ⭐ 2,500
                 </div>
-                <div class="task-item">
-                    <strong>Всего заработано:</strong> 2 500 ₽
+                <div class="stat-item">
+                    <strong>Приглашено друзей:</strong> 5
                 </div>
             </div>
         </div>
@@ -219,23 +227,23 @@
         <!-- Вкладка Задания -->
         <div id="tasks-tab" class="tab-content">
             <div class="section">
-                <h2>🎯 ДОСТУПНЫЕ ЗАДАНИЯ</h2>
+                <h2>🎯 Доступные задания</h2>
                 
                 <div class="task-item">
-                    <strong>Подпишись на канал</strong>
-                    <p>+50 ₽ за подписку</p>
+                    <strong>📹 Подпишись на канал</strong>
+                    <div class="reward">+⭐ 50</div>
                     <button class="btn">Выполнить</button>
                 </div>
 
                 <div class="task-item">
-                    <strong>Пригласи друга</strong>
-                    <p>+100 ₽ за каждого друга</p>
+                    <strong>👥 Пригласи друга</strong>
+                    <div class="reward">+⭐ 100 за каждого</div>
                     <button class="btn">Поделиться</button>
                 </div>
 
                 <div class="task-item">
-                    <strong>Оставь отзыв</strong>
-                    <p>+30 ₽ за отзыв</p>
+                    <strong>💬 Оставь отзыв</strong>
+                    <div class="reward">+⭐ 30</div>
                     <button class="btn">Написать</button>
                 </div>
             </div>
@@ -244,15 +252,27 @@
         <!-- Вкладка Рулетка -->
         <div id="roulette-tab" class="tab-content">
             <div class="section">
-                <h2>🎰 ЕЖЕДНЕВНАЯ РУЛЕТКА</h2>
-                <div style="text-align: center; padding: 30px 0;">
-                    <div style="font-size: 48px; margin: 20px 0;">🎁</div>
-                    <button class="btn" style="padding: 15px 30px; font-size: 18px;">
-                        КРУТИТЬ РУЛЕТКУ
-                    </button>
-                    <div style="margin-top: 15px; color: #666;">
-                        Бесплатное вращение каждый день
-                    </div>
+                <h2>🎰 Телеграм рулетка</h2>
+                
+                <div class="roulette-item">
+                    <strong>🆓 Бесплатная рулетка</strong>
+                    <div class="reward">Шанс выиграть до ⭐ 100</div>
+                    <div class="cooldown">Доступно через: 12:34:56</div>
+                    <button class="btn">Крутить бесплатно</button>
+                </div>
+
+                <div class="roulette-item">
+                    <strong>⚡ Рулетка за 200 звезд</strong>
+                    <div class="reward">Шанс выиграть до ⭐ 500</div>
+                    <div class="price">Стоимость: ⭐ 200</div>
+                    <button class="btn">Крутить за звезды</button>
+                </div>
+
+                <div class="roulette-item">
+                    <strong>💎 Премиум рулетка</strong>
+                    <div class="reward">Шанс выиграть до ⭐ 1,500</div>
+                    <div class="price">Стоимость: ⭐ 500</div>
+                    <button class="btn btn-premium">Крутить премиум</button>
                 </div>
             </div>
         </div>
@@ -260,24 +280,53 @@
         <!-- Вкладка Магазин -->
         <div id="shop-tab" class="tab-content">
             <div class="section">
-                <h2>🛒 МАГАЗИН ПРИЗОВ</h2>
+                <h2>🛒 Улучшения шансов</h2>
                 
                 <div class="shop-item">
-                    <strong>Amazon Gift Card</strong>
-                    <p>500 ₽</p>
-                    <button class="btn">Купить</button>
+                    <strong>🎯 Удвоитель шансов</strong>
+                    <div>Х2 к шансу выигрыша на 24 часа</div>
+                    <div class="price">⭐ 300</div>
+                    <button class="btn">Купить Х2</button>
                 </div>
 
                 <div class="shop-item">
-                    <strong>Steam Gift Card</strong>
-                    <p>1000 ₽</p>
-                    <button class="btn">Купить</button>
+                    <strong>🚀 Усилитель х5</strong>
+                    <div>Х5 к шансу выигрыша на 12 часов</div>
+                    <div class="price">⭐ 600</div>
+                    <button class="btn">Купить Х5</button>
                 </div>
 
                 <div class="shop-item">
-                    <strong>PayPal Вывод</strong>
-                    <p>от 100 ₽</p>
-                    <button class="btn">Вывести</button>
+                    <strong>💎 Максимальный буст</strong>
+                    <div>Х10 к шансу выигрыша на 6 часов</div>
+                    <div class="price">⭐ 1,000</div>
+                    <button class="btn btn-premium">Купить Х10</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка Статистика -->
+        <div id="stats-tab" class="tab-content">
+            <div class="section">
+                <h2>📊 Детальная статистика</h2>
+                
+                <div class="stat-item">
+                    <strong>Общий заработок:</strong> ⭐ 2,500
+                </div>
+                <div class="stat-item">
+                    <strong>Потрачено звезд:</strong> ⭐ 800
+                </div>
+                <div class="stat-item">
+                    <strong>Выполнено заданий:</strong> 12
+                </div>
+                <div class="stat-item">
+                    <strong>Приглашено друзей:</strong> 5
+                </div>
+                <div class="stat-item">
+                    <strong>Победы в рулетке:</strong> 8
+                </div>
+                <div class="stat-item">
+                    <strong>Уровень активности:</strong> 85%
                 </div>
             </div>
         </div>
@@ -285,21 +334,26 @@
         <!-- Вкладка История -->
         <div id="history-tab" class="tab-content">
             <div class="section">
-                <h2>📊 ИСТОРИЯ ОПЕРАЦИЙ</h2>
+                <h2>📋 История операций</h2>
                 
-                <div class="history-item">
-                    <strong>+50 ₽</strong> - Выполнение задания
-                    <div style="color: #666; font-size: 12px;">Сегодня, 14:30</div>
+                <div class="stat-item">
+                    <strong>+⭐ 50</strong> - Выполнение задания
+                    <div style="color: #888; font-size: 12px;">Сегодня, 14:30</div>
                 </div>
 
-                <div class="history-item">
-                    <strong>+100 ₽</strong> - Приглашение друга
-                    <div style="color: #666; font-size: 12px;">Вчера, 18:15</div>
+                <div class="stat-item">
+                    <strong>+⭐ 100</strong> - Приглашение друга
+                    <div style="color: #888; font-size: 12px;">Вчера, 18:15</div>
                 </div>
 
-                <div class="history-item">
-                    <strong>-500 ₽</strong> - Покупка в магазине
-                    <div style="color: #666; font-size: 12px;">2 дня назад</div>
+                <div class="stat-item">
+                    <strong>-⭐ 200</strong> - Рулетка
+                    <div style="color: #888; font-size: 12px;">2 дня назад</div>
+                </div>
+
+                <div class="stat-item">
+                    <strong>+⭐ 150</strong> - Выигрыш в рулетке
+                    <div style="color: #888; font-size: 12px;">3 дня назад</div>
                 </div>
             </div>
         </div>
@@ -313,7 +367,7 @@
                 <div class="menu-text">Главная</div>
             </div>
             <div class="menu-item" onclick="showTab('tasks')">
-                <div class="menu-icon">✅</div>
+                <div class="menu-icon">🎯</div>
                 <div class="menu-text">Задания</div>
             </div>
             <div class="menu-item" onclick="showTab('roulette')">
@@ -324,8 +378,12 @@
                 <div class="menu-icon">🛒</div>
                 <div class="menu-text">Магазин</div>
             </div>
-            <div class="menu-item" onclick="showTab('history')">
+            <div class="menu-item" onclick="showTab('stats')">
                 <div class="menu-icon">📊</div>
+                <div class="menu-text">Статистика</div>
+            </div>
+            <div class="menu-item" onclick="showTab('history')">
+                <div class="menu-icon">📋</div>
                 <div class="menu-text">История</div>
             </div>
         </div>
@@ -335,8 +393,8 @@
         // Инициализация Telegram Web App
         let tg = window.Telegram.WebApp;
         tg.expand();
-        tg.setHeaderColor('#007bff');
-        tg.setBackgroundColor('#007bff');
+        tg.setHeaderColor('#0a0a0a');
+        tg.setBackgroundColor('#0a0a0a');
 
         // Функция переключения вкладок
         function showTab(tabName) {
@@ -355,7 +413,7 @@
             event.currentTarget.classList.add('active');
         }
 
-        // Убираем главную кнопку Telegram (бонус)
+        // Скрываем главную кнопку Telegram
         tg.MainButton.hide();
     </script>
 </body>
