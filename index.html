@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REFERRAL</title>
+    <title>Gift Force</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -14,8 +14,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: #333;
             min-height: 100vh;
             padding-bottom: 70px;
         }
@@ -29,89 +29,75 @@
         .header {
             text-align: center;
             margin-bottom: 30px;
+            padding: 20px 0;
         }
 
         .header h1 {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: bold;
-            background: linear-gradient(45deg, #ff6b6b, #feca57);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .bot-name {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
         }
 
         .section {
-            background: rgba(255, 255, 255, 0.1);
+            background: white;
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .section h2 {
             font-size: 18px;
             margin-bottom: 15px;
-            color: #feca57;
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
         }
 
-        .inventory-item {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .roulette {
-            text-align: center;
+        .balance-card {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border-radius: 15px;
             padding: 25px;
-        }
-
-        .roulette-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .free-spin {
-            background: linear-gradient(45deg, #ff9ff3, #f368e0);
-            border-radius: 25px;
-            padding: 12px 25px;
-            font-weight: bold;
-            margin: 15px 0;
-            display: inline-block;
-        }
-
-        .timer {
-            font-size: 14px;
-            opacity: 0.8;
-            margin-top: 10px;
-        }
-
-        .rules-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .rule-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin: 20px 0;
         }
 
-        .new-badge {
-            background: #ff6b6b;
-            border-radius: 12px;
-            padding: 2px 8px;
-            font-size: 10px;
-            margin-left: 5px;
+        .balance-amount {
+            font-size: 36px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-success {
+            background: #28a745;
         }
 
         /* Нижнее меню */
@@ -120,10 +106,10 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(26, 26, 46, 0.95);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: white;
+            border-top: 2px solid #007bff;
             padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .menu-items {
@@ -144,11 +130,8 @@
         }
 
         .menu-item.active {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .menu-item:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: #007bff;
+            color: white;
         }
 
         .menu-icon {
@@ -158,12 +141,41 @@
 
         .menu-text {
             font-size: 12px;
-            opacity: 0.8;
+            font-weight: 500;
         }
 
-        .menu-item.active .menu-text {
-            opacity: 1;
-            color: #feca57;
+        /* Контент вкладок */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .task-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+
+        .shop-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -172,40 +184,123 @@
         <!-- Заголовок -->
         <div class="header">
             <h1>Gift Force</h1>
+            <div class="bot-name">@GiftForceBot</div>
         </div>
 
-        <!-- Инвентарь -->
-        <div class="section">
-            <h2>ИНВЕНТАРЬ</h2>
-            
-            <!-- Рулетка -->
-            <div class="inventory-item">
-                <div>
-                    <div class="roulette-title">РУЛЕТКА</div>
-                    <div class="free-spin">БЕСПЛАТНОЕ ВРАЩЕНИЕ</div>
-                    <div class="timer">ЧЕРЕЗ: <span id="timer">23:59:59</span></div>
+        <!-- Основной контент -->
+        <div id="main-tab" class="tab-content active">
+            <div class="balance-card">
+                <div>Ваш баланс</div>
+                <div class="balance-amount">1 250 ₽</div>
+                <div>Доступно для вывода</div>
+            </div>
+
+            <div class="section">
+                <h2>БЫСТРЫЕ ДЕЙСТВИЯ</h2>
+                <button class="btn" onclick="tg.showAlert('🎁 Бонус активирован!')">Получить бонус</button>
+                <button class="btn btn-success" onclick="showTab('tasks')">Выполнить задания</button>
+                <button class="btn btn-secondary" onclick="showTab('shop')">Магазин призов</button>
+            </div>
+
+            <div class="section">
+                <h2>СТАТИСТИКА</h2>
+                <div class="task-item">
+                    <strong>Выполнено заданий:</strong> 12
+                </div>
+                <div class="task-item">
+                    <strong>Приглашено друзей:</strong> 5
+                </div>
+                <div class="task-item">
+                    <strong>Всего заработано:</strong> 2 500 ₽
                 </div>
             </div>
         </div>
 
-        <!-- Правила -->
-        <div class="section">
-            <h2>ПРАВИЛА</h2>
-            <div class="rules-grid">
-                <div class="rule-card">
-                    Не быть геем. <span class="new-badge">NEW</span>
+        <!-- Вкладка Задания -->
+        <div id="tasks-tab" class="tab-content">
+            <div class="section">
+                <h2>🎯 ДОСТУПНЫЕ ЗАДАНИЯ</h2>
+                
+                <div class="task-item">
+                    <strong>Подпишись на канал</strong>
+                    <p>+50 ₽ за подписку</p>
+                    <button class="btn">Выполнить</button>
                 </div>
-                <div class="rule-card">
-                    Быть не геем. <span class="new-badge">NEW</span>
+
+                <div class="task-item">
+                    <strong>Пригласи друга</strong>
+                    <p>+100 ₽ за каждого друга</p>
+                    <button class="btn">Поделиться</button>
+                </div>
+
+                <div class="task-item">
+                    <strong>Оставь отзыв</strong>
+                    <p>+30 ₽ за отзыв</p>
+                    <button class="btn">Написать</button>
                 </div>
             </div>
         </div>
 
-        <!-- Конкурсы -->
-        <div class="section">
-            <h2>КОНКУРСЫ</h2>
-            <div style="text-align: center; padding: 20px; opacity: 0.7;">
-                Угадай кто гей или кто не гей.
+        <!-- Вкладка Рулетка -->
+        <div id="roulette-tab" class="tab-content">
+            <div class="section">
+                <h2>🎰 ЕЖЕДНЕВНАЯ РУЛЕТКА</h2>
+                <div style="text-align: center; padding: 30px 0;">
+                    <div style="font-size: 48px; margin: 20px 0;">🎁</div>
+                    <button class="btn" style="padding: 15px 30px; font-size: 18px;">
+                        КРУТИТЬ РУЛЕТКУ
+                    </button>
+                    <div style="margin-top: 15px; color: #666;">
+                        Бесплатное вращение каждый день
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка Магазин -->
+        <div id="shop-tab" class="tab-content">
+            <div class="section">
+                <h2>🛒 МАГАЗИН ПРИЗОВ</h2>
+                
+                <div class="shop-item">
+                    <strong>Amazon Gift Card</strong>
+                    <p>500 ₽</p>
+                    <button class="btn">Купить</button>
+                </div>
+
+                <div class="shop-item">
+                    <strong>Steam Gift Card</strong>
+                    <p>1000 ₽</p>
+                    <button class="btn">Купить</button>
+                </div>
+
+                <div class="shop-item">
+                    <strong>PayPal Вывод</strong>
+                    <p>от 100 ₽</p>
+                    <button class="btn">Вывести</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка История -->
+        <div id="history-tab" class="tab-content">
+            <div class="section">
+                <h2>📊 ИСТОРИЯ ОПЕРАЦИЙ</h2>
+                
+                <div class="history-item">
+                    <strong>+50 ₽</strong> - Выполнение задания
+                    <div style="color: #666; font-size: 12px;">Сегодня, 14:30</div>
+                </div>
+
+                <div class="history-item">
+                    <strong>+100 ₽</strong> - Приглашение друга
+                    <div style="color: #666; font-size: 12px;">Вчера, 18:15</div>
+                </div>
+
+                <div class="history-item">
+                    <strong>-500 ₽</strong> - Покупка в магазине
+                    <div style="color: #666; font-size: 12px;">2 дня назад</div>
+                </div>
             </div>
         </div>
     </div>
@@ -213,24 +308,24 @@
     <!-- Нижнее меню -->
     <div class="bottom-menu">
         <div class="menu-items">
-            <div class="menu-item active" onclick="changeTab('main')">
+            <div class="menu-item active" onclick="showTab('main')">
                 <div class="menu-icon">🏠</div>
                 <div class="menu-text">Главная</div>
             </div>
-            <div class="menu-item" onclick="changeTab('tasks')">
-                <div class="menu-icon">📝</div>
+            <div class="menu-item" onclick="showTab('tasks')">
+                <div class="menu-icon">✅</div>
                 <div class="menu-text">Задания</div>
             </div>
-            <div class="menu-item" onclick="changeTab('roulette')">
+            <div class="menu-item" onclick="showTab('roulette')">
                 <div class="menu-icon">🎰</div>
                 <div class="menu-text">Рулетка</div>
             </div>
-            <div class="menu-item" onclick="changeTab('shop')">
+            <div class="menu-item" onclick="showTab('shop')">
                 <div class="menu-icon">🛒</div>
                 <div class="menu-text">Магазин</div>
             </div>
-            <div class="menu-item" onclick="changeTab('history')">
-                <div class="menu-icon">🗓️</div>
+            <div class="menu-item" onclick="showTab('history')">
+                <div class="menu-icon">📊</div>
                 <div class="menu-text">История</div>
             </div>
         </div>
@@ -239,74 +334,29 @@
     <script>
         // Инициализация Telegram Web App
         let tg = window.Telegram.WebApp;
-        
-        // Расширяем на весь экран
         tg.expand();
-        
-        // Устанавливаем цвет фона
-        tg.setHeaderColor('#1a1a2e');
-        tg.setBackgroundColor('#1a1a2e');
+        tg.setHeaderColor('#007bff');
+        tg.setBackgroundColor('#007bff');
 
-        // Таймер обратного отсчета
-        function startTimer() {
-            let timerElement = document.getElementById('timer');
-            let time = 17 * 3600 + 37 * 60 + 2; // 17:37:02 в секундах
+        // Функция переключения вкладок
+        function showTab(tabName) {
+            // Скрываем все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
             
-            setInterval(() => {
-                time--;
-                if (time < 0) time = 24 * 3600 - 1;
-                
-                let hours = Math.floor(time / 3600);
-                let minutes = Math.floor((time % 3600) / 60);
-                let seconds = time % 60;
-                
-                timerElement.textContent = 
-                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            }, 1000);
-        }
-
-        // Смена вкладок
-        function changeTab(tabName) {
-            // Убираем активный класс у всех кнопок
+            // Показываем выбранную вкладку
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Обновляем активную кнопку меню
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.classList.remove('active');
             });
-            
-            // Добавляем активный класс к выбранной кнопке
             event.currentTarget.classList.add('active');
-            
-            // Здесь можно добавить логику смены контента
-            console.log('Переключено на вкладку:', tabName);
-            
-            // Пример: показываем уведомление
-            tg.showPopup({
-                title: 'Переход',
-                message: `Вы перешли в раздел: ${getTabName(tabName)}`,
-                buttons: [{type: 'ok'}]
-            });
         }
 
-        function getTabName(tab) {
-            const names = {
-                'main': 'Главная',
-                'tasks': 'Задания', 
-                'roulette': 'Рулетка',
-                'shop': 'Магазин',
-                'history': 'История'
-            };
-            return names[tab] || tab;
-        }
-
-        // Запускаем таймер при загрузке
-        startTimer();
-
-        // Обработчик для главной кнопки Telegram
-        tg.MainButton.setText("Получить бонус");
-        tg.MainButton.show();
-        
-        tg.MainButton.onClick(() => {
-            tg.showAlert("🎉 Бонус активирован! Зайдите позже для нового бонуса.");
-        });
+        // Убираем главную кнопку Telegram (бонус)
+        tg.MainButton.hide();
     </script>
 </body>
 </html>
