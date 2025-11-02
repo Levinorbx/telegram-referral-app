@@ -26,27 +26,28 @@
             padding: 15px;
         }
 
-        .balance-card {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            margin: 10px 0 20px 0;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        /* Баланс сверху */
+        .top-balance {
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .balance-text {
+            font-size: 14px;
+            opacity: 0.8;
         }
 
         .balance-amount {
-            font-size: 42px;
+            font-size: 18px;
             font-weight: bold;
-            margin: 10px 0;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .stars {
             color: #ffd700;
-            font-size: 20px;
-            margin: 5px 0;
         }
 
         .section {
@@ -154,7 +155,7 @@
             display: block;
         }
 
-        .task-item, .roulette-item, .shop-item, .stat-item {
+        .task-item, .roulette-item, .inventory-item, .stat-item {
             background: rgba(40, 40, 60, 0.6);
             border-radius: 12px;
             padding: 15px;
@@ -166,7 +167,7 @@
             border-left-color: #ff9800;
         }
 
-        .shop-item {
+        .inventory-item {
             border-left-color: #4caf50;
         }
 
@@ -190,24 +191,50 @@
             font-size: 12px;
             margin-top: 5px;
         }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .inventory-card {
+            background: rgba(50, 50, 70, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .inventory-card.active {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .boost-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
+    <!-- Баланс сверху -->
+    <div class="top-balance">
+        <div class="balance-text">Ваш баланс:</div>
+        <div class="balance-amount">⭐ 1,250</div>
+    </div>
+
     <div class="container">
         <!-- Основной контент -->
         <div id="main-tab" class="tab-content active">
-            <div class="balance-card">
-                <div style="font-size: 14px; opacity: 0.9;">ВАШ БАЛАНС</div>
-                <div class="balance-amount">⭐ 1,250</div>
-                <div class="stars">🎯 Доступно для вывода</div>
-            </div>
-
             <div class="section">
                 <h2>🚀 Быстрые действия</h2>
                 <button class="btn" onclick="showTab('tasks')">🎯 Выполнить задания</button>
                 <button class="btn" onclick="showTab('roulette')">🎰 Испытать удачу</button>
-                <button class="btn" onclick="showTab('shop')">🛒 Улучшить шансы</button>
-                <button class="btn" onclick="showTab('stats')">📊 Моя статистика</button>
+                <button class="btn" onclick="showTab('inventory')">🎒 Мой инвентарь</button>
             </div>
 
             <div class="section">
@@ -277,56 +304,51 @@
             </div>
         </div>
 
-        <!-- Вкладка Магазин -->
-        <div id="shop-tab" class="tab-content">
+        <!-- Вкладка Инвентарь -->
+        <div id="inventory-tab" class="tab-content">
             <div class="section">
-                <h2>🛒 Улучшения шансов</h2>
+                <h2>🎒 Активные бусты</h2>
                 
-                <div class="shop-item">
-                    <strong>🎯 Удвоитель шансов</strong>
-                    <div>Х2 к шансу выигрыша на 24 часа</div>
-                    <div class="price">⭐ 300</div>
-                    <button class="btn">Купить Х2</button>
+                <div class="inventory-item">
+                    <strong>🎯 Удвоитель шансов Х2</strong>
+                    <div>Активно еще: 5 часов 23 минуты</div>
+                    <div class="cooldown">Увеличивает шансы в 2 раза</div>
                 </div>
 
-                <div class="shop-item">
-                    <strong>🚀 Усилитель х5</strong>
-                    <div>Х5 к шансу выигрыша на 12 часов</div>
-                    <div class="price">⭐ 600</div>
-                    <button class="btn">Купить Х5</button>
-                </div>
-
-                <div class="shop-item">
-                    <strong>💎 Максимальный буст</strong>
-                    <div>Х10 к шансу выигрыша на 6 часов</div>
-                    <div class="price">⭐ 1,000</div>
-                    <button class="btn btn-premium">Купить Х10</button>
+                <div class="inventory-item">
+                    <strong>💎 Максимальный буст Х10</strong>
+                    <div>Активно еще: 1 час 15 минут</div>
+                    <div class="cooldown">Увеличивает шансы в 10 раз</div>
                 </div>
             </div>
-        </div>
 
-        <!-- Вкладка Статистика -->
-        <div id="stats-tab" class="tab-content">
             <div class="section">
-                <h2>📊 Детальная статистика</h2>
-                
-                <div class="stat-item">
-                    <strong>Общий заработок:</strong> ⭐ 2,500
-                </div>
-                <div class="stat-item">
-                    <strong>Потрачено звезд:</strong> ⭐ 800
-                </div>
-                <div class="stat-item">
-                    <strong>Выполнено заданий:</strong> 12
-                </div>
-                <div class="stat-item">
-                    <strong>Приглашено друзей:</strong> 5
-                </div>
-                <div class="stat-item">
-                    <strong>Победы в рулетке:</strong> 8
-                </div>
-                <div class="stat-item">
-                    <strong>Уровень активности:</strong> 85%
+                <h2>🛒 Доступные улучшения</h2>
+                <div class="inventory-grid">
+                    <div class="inventory-card">
+                        <strong>Х2 Шанс</strong>
+                        <div class="boost-value">Х2</div>
+                        <div class="price">⭐ 300</div>
+                        <button class="btn" style="padding: 8px 12px; font-size: 12px;">Купить</button>
+                    </div>
+                    <div class="inventory-card">
+                        <strong>Х5 Шанс</strong>
+                        <div class="boost-value">Х5</div>
+                        <div class="price">⭐ 600</div>
+                        <button class="btn" style="padding: 8px 12px; font-size: 12px;">Купить</button>
+                    </div>
+                    <div class="inventory-card">
+                        <strong>Х10 Шанс</strong>
+                        <div class="boost-value">Х10</div>
+                        <div class="price">⭐ 1,000</div>
+                        <button class="btn" style="padding: 8px 12px; font-size: 12px;">Купить</button>
+                    </div>
+                    <div class="inventory-card">
+                        <strong>Х3 Время</strong>
+                        <div class="boost-value">Х3</div>
+                        <div class="price">⭐ 400</div>
+                        <button class="btn" style="padding: 8px 12px; font-size: 12px;">Купить</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -355,6 +377,11 @@
                     <strong>+⭐ 150</strong> - Выигрыш в рулетке
                     <div style="color: #888; font-size: 12px;">3 дня назад</div>
                 </div>
+
+                <div class="stat-item">
+                    <strong>-⭐ 300</strong> - Покупка буста Х2
+                    <div style="color: #888; font-size: 12px;">3 дня назад</div>
+                </div>
             </div>
         </div>
     </div>
@@ -374,13 +401,9 @@
                 <div class="menu-icon">🎰</div>
                 <div class="menu-text">Рулетка</div>
             </div>
-            <div class="menu-item" onclick="showTab('shop')">
-                <div class="menu-icon">🛒</div>
-                <div class="menu-text">Магазин</div>
-            </div>
-            <div class="menu-item" onclick="showTab('stats')">
-                <div class="menu-icon">📊</div>
-                <div class="menu-text">Статистика</div>
+            <div class="menu-item" onclick="showTab('inventory')">
+                <div class="menu-icon">🎒</div>
+                <div class="menu-text">Инвентарь</div>
             </div>
             <div class="menu-item" onclick="showTab('history')">
                 <div class="menu-icon">📋</div>
