@@ -30,19 +30,17 @@
         .balance-container {
             position: fixed;
             top: 15px;
-            left: 0;
-            right: 0;
+            right: 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 0 20px;
+            gap: 10px;
             z-index: 1000;
         }
 
         .balance-earned {
             background: rgba(76, 175, 80, 0.9);
-            border-radius: 15px;
-            padding: 5px 10px;
+            border-radius: 12px;
+            padding: 6px 10px;
             font-size: 12px;
             font-weight: bold;
             color: white;
@@ -297,6 +295,35 @@
             transform: rotate(0deg);
         }
 
+        .roulette-section-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .prize-list {
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
+        .prize-item {
+            margin: 2px 0;
+        }
+
         .roulette-pointer {
             position: absolute;
             top: -15px;
@@ -425,7 +452,13 @@
         <div class="roulette-container">
             <h2>Крутим рулетку!</h2>
             <div class="roulette-wheel">
-                <div class="roulette-sections" id="rouletteSections"></div>
+                <div class="roulette-sections" id="rouletteSections">
+                    <div class="roulette-section-text">
+                        <div class="prize-list" id="prizeList">
+                            <!-- Призы будут добавлены через JS -->
+                        </div>
+                    </div>
+                </div>
                 <div class="roulette-pointer"></div>
             </div>
             <div class="roulette-prize" id="roulettePrize">Крутим...</div>
@@ -623,11 +656,23 @@
             earnedElement.textContent = `+${amount} ⭐`;
             earnedElement.className = 'balance-earned';
             
-            // Убираем уведомление через 2 секунды
             setTimeout(() => {
                 earnedElement.textContent = '';
                 earnedElement.className = '';
             }, 2000);
+        }
+
+        // Показать список призов в рулетке
+        function showPrizeList(cost) {
+            const prizeList = document.getElementById('prizeList');
+            const prizes = roulettePrizes[cost];
+            
+            let html = '<div style="font-size: 10px; margin-bottom: 5px;">Возможные призы:</div>';
+            prizes.forEach(prize => {
+                html += `<div class="prize-item">${prize.emoji} ${prize.name}</div>`;
+            });
+            
+            prizeList.innerHTML = html;
         }
 
         // Таймер обратного отсчета
@@ -699,6 +744,9 @@
             if (cost > 0 && userData.balance < cost) {
                 return;
             }
+            
+            // Показываем список призов
+            showPrizeList(cost);
             
             // Показываем модальное окно
             modal.classList.add('active');
@@ -840,7 +888,6 @@
 
         // Задание: Пригласить друга
         function shareWithFriend() {
-            // Создаем ссылку для приглашения
             const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('https://t.me/YourBotName')}&text=${encodeURIComponent('🎁 Присоединяйся к Gift Force! Крути рулетку и зарабатывай звезды!')}`;
             tg.openLink(shareUrl);
             
