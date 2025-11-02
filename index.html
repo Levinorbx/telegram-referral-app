@@ -28,24 +28,19 @@
 
         /* Баланс сверху */
         .top-balance {
-            background: rgba(30, 30, 46, 0.8);
-            border-radius: 12px;
-            padding: 12px 15px;
-            margin-bottom: 15px;
+            position: absolute;
+            top: 15px;
+            right: 80px;
+            background: rgba(30, 30, 46, 0.9);
+            border-radius: 20px;
+            padding: 8px 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             backdrop-filter: blur(10px);
-        }
-
-        .balance-text {
-            font-size: 14px;
-            opacity: 0.8;
+            z-index: 1000;
         }
 
         .balance-amount {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: #ffd700;
         }
@@ -86,8 +81,11 @@
             box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
         }
 
-        .btn-secondary {
-            background: linear-gradient(135deg, #455a64, #37474f);
+        .btn:disabled {
+            background: #455a64;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .btn-premium {
@@ -155,7 +153,7 @@
             display: block;
         }
 
-        .task-item, .roulette-item, .inventory-item, .stat-item {
+        .task-item, .roulette-item, .inventory-item, .history-item {
             background: rgba(40, 40, 60, 0.6);
             border-radius: 12px;
             padding: 15px;
@@ -171,8 +169,16 @@
             border-left-color: #4caf50;
         }
 
-        .stat-item {
-            border-left-color: #9c27b0;
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
         }
 
         .price {
@@ -192,61 +198,71 @@
             margin-top: 5px;
         }
 
-        .inventory-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
+        /* Рулетка */
+        .roulette-wheel {
+            width: 200px;
+            height: 200px;
+            border: 8px solid #ffd700;
+            border-radius: 50%;
+            margin: 20px auto;
+            position: relative;
+            background: conic-gradient(
+                #ff6b6b, #ff9ff3, #f368e0, #a55eea,
+                #8854d0, #3867d6, #2d98da, #26de81,
+                #20bf6b, #fed330, #fd9644, #fc5c65
+            );
+            transition: transform 3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        .inventory-card {
-            background: rgba(50, 50, 70, 0.8);
-            border-radius: 10px;
-            padding: 15px;
+        .roulette-pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 15px solid #ff6b6b;
+            z-index: 10;
+        }
+
+        .roulette-result {
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .inventory-card.active {
-            border-color: #4caf50;
-            background: rgba(76, 175, 80, 0.1);
-        }
-
-        .boost-value {
-            font-size: 20px;
+            margin: 15px 0;
+            font-size: 18px;
             font-weight: bold;
-            color: #ffd700;
-            margin: 5px 0;
+            min-height: 27px;
+        }
+
+        .win {
+            color: #26de81;
+        }
+
+        .lose {
+            color: #ff6b6b;
         }
     </style>
 </head>
 <body>
     <!-- Баланс сверху -->
     <div class="top-balance">
-        <div class="balance-text">Ваш баланс:</div>
-        <div class="balance-amount">⭐ 1,250</div>
+        <div class="balance-amount">⭐ 1,000</div>
     </div>
 
-    <div class="container">
+    <div class="container" style="margin-top: 50px;">
         <!-- Основной контент -->
         <div id="main-tab" class="tab-content active">
             <div class="section">
-                <h2>🚀 Быстрые действия</h2>
-                <button class="btn" onclick="showTab('tasks')">🎯 Выполнить задания</button>
-                <button class="btn" onclick="showTab('roulette')">🎰 Испытать удачу</button>
-                <button class="btn" onclick="showTab('inventory')">🎒 Мой инвентарь</button>
-            </div>
-
-            <div class="section">
-                <h2>📈 Быстрая статистика</h2>
-                <div class="stat-item">
-                    <strong>Выполнено заданий:</strong> 12
+                <h2>📊 Статистика</h2>
+                <div class="task-item">
+                    <strong>Выполнено заданий:</strong> 0
                 </div>
-                <div class="stat-item">
-                    <strong>Всего заработано:</strong> ⭐ 2,500
+                <div class="task-item">
+                    <strong>Всего заработано:</strong> ⭐ 0
                 </div>
-                <div class="stat-item">
-                    <strong>Приглашено друзей:</strong> 5
+                <div class="task-item">
+                    <strong>Приглашено друзей:</strong> 0
                 </div>
             </div>
         </div>
@@ -281,25 +297,33 @@
             <div class="section">
                 <h2>🎰 Телеграм рулетка</h2>
                 
+                <div class="roulette-wheel" id="rouletteWheel">
+                    <div class="roulette-pointer"></div>
+                </div>
+                
+                <div class="roulette-result" id="rouletteResult">
+                    Крутите рулетку!
+                </div>
+
                 <div class="roulette-item">
                     <strong>🆓 Бесплатная рулетка</strong>
                     <div class="reward">Шанс выиграть до ⭐ 100</div>
-                    <div class="cooldown">Доступно через: 12:34:56</div>
-                    <button class="btn">Крутить бесплатно</button>
+                    <div class="cooldown" id="freeCooldown">Доступно сейчас</div>
+                    <button class="btn" id="freeSpinBtn" onclick="spinRoulette('free')">Крутить бесплатно</button>
                 </div>
 
                 <div class="roulette-item">
                     <strong>⚡ Рулетка за 200 звезд</strong>
                     <div class="reward">Шанс выиграть до ⭐ 500</div>
                     <div class="price">Стоимость: ⭐ 200</div>
-                    <button class="btn">Крутить за звезды</button>
+                    <button class="btn" id="paidSpinBtn" onclick="spinRoulette('paid')">Крутить за звезды</button>
                 </div>
 
                 <div class="roulette-item">
                     <strong>💎 Премиум рулетка</strong>
                     <div class="reward">Шанс выиграть до ⭐ 1,500</div>
                     <div class="price">Стоимость: ⭐ 500</div>
-                    <button class="btn btn-premium">Крутить премиум</button>
+                    <button class="btn btn-premium" id="premiumSpinBtn" onclick="spinRoulette('premium')">Крутить премиум</button>
                 </div>
             </div>
         </div>
@@ -308,47 +332,22 @@
         <div id="inventory-tab" class="tab-content">
             <div class="section">
                 <h2>🎒 Активные бусты</h2>
-                
-                <div class="inventory-item">
-                    <strong>🎯 Удвоитель шансов Х2</strong>
-                    <div>Активно еще: 5 часов 23 минуты</div>
-                    <div class="cooldown">Увеличивает шансы в 2 раза</div>
-                </div>
-
-                <div class="inventory-item">
-                    <strong>💎 Максимальный буст Х10</strong>
-                    <div>Активно еще: 1 час 15 минут</div>
-                    <div class="cooldown">Увеличивает шансы в 10 раз</div>
+                <div class="empty-state">
+                    <div class="empty-icon">🎒</div>
+                    <div>Инвентарь пуст</div>
+                    <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
+                        Бусты появятся здесь после покупки
+                    </div>
                 </div>
             </div>
 
             <div class="section">
                 <h2>🛒 Доступные улучшения</h2>
-                <div class="inventory-grid">
-                    <div class="inventory-card">
-                        <strong>Х2 Шанс</strong>
-                        <div class="boost-value">Х2</div>
-                        <div class="price">⭐ 300</div>
-                        <button class="btn" style="padding: 8px 12px; font-size: 12px;">Купить</button>
-                    </div>
-                    <div class="inventory-card">
-                        <strong>Х5 Шанс</strong>
-                        <div class="boost-value">Х5</div>
-                        <div class="price">⭐ 600</div>
-                        <button class="btn" style="padding: 8px 12px; font-size: 12px;">Купить</button>
-                    </div>
-                    <div class="inventory-card">
-                        <strong>Х10 Шанс</strong>
-                        <div class="boost-value">Х10</div>
-                        <div class="price">⭐ 1,000</div>
-                        <button class="btn" style="padding: 8px 12px; font-size: 12px;">Купить</button>
-                    </div>
-                    <div class="inventory-card">
-                        <strong>Х3 Время</strong>
-                        <div class="boost-value">Х3</div>
-                        <div class="price">⭐ 400</div>
-                        <button class="btn" style="padding: 8px 12px; font-size: 12px;">Купить</button>
-                    </div>
+                <div class="inventory-item">
+                    <strong>🎯 Удвоитель шансов Х2</strong>
+                    <div>Увеличивает шансы в 2 раза на 24 часа</div>
+                    <div class="price">⭐ 300</div>
+                    <button class="btn">Купить</button>
                 </div>
             </div>
         </div>
@@ -357,30 +356,12 @@
         <div id="history-tab" class="tab-content">
             <div class="section">
                 <h2>📋 История операций</h2>
-                
-                <div class="stat-item">
-                    <strong>+⭐ 50</strong> - Выполнение задания
-                    <div style="color: #888; font-size: 12px;">Сегодня, 14:30</div>
-                </div>
-
-                <div class="stat-item">
-                    <strong>+⭐ 100</strong> - Приглашение друга
-                    <div style="color: #888; font-size: 12px;">Вчера, 18:15</div>
-                </div>
-
-                <div class="stat-item">
-                    <strong>-⭐ 200</strong> - Рулетка
-                    <div style="color: #888; font-size: 12px;">2 дня назад</div>
-                </div>
-
-                <div class="stat-item">
-                    <strong>+⭐ 150</strong> - Выигрыш в рулетке
-                    <div style="color: #888; font-size: 12px;">3 дня назад</div>
-                </div>
-
-                <div class="stat-item">
-                    <strong>-⭐ 300</strong> - Покупка буста Х2
-                    <div style="color: #888; font-size: 12px;">3 дня назад</div>
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <div>История пуста</div>
+                    <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
+                        Здесь появятся ваши операции
+                    </div>
                 </div>
             </div>
         </div>
@@ -419,25 +400,134 @@
         tg.setHeaderColor('#0a0a0a');
         tg.setBackgroundColor('#0a0a0a');
 
+        // Данные пользователя
+        let userData = {
+            balance: 1000,
+            freeSpinAvailable: true,
+            lastFreeSpin: 0
+        };
+
         // Функция переключения вкладок
         function showTab(tabName) {
-            // Скрываем все вкладки
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
-            
-            // Показываем выбранную вкладку
             document.getElementById(tabName + '-tab').classList.add('active');
             
-            // Обновляем активную кнопку меню
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.classList.remove('active');
             });
             event.currentTarget.classList.add('active');
         }
 
+        // Функция рулетки
+        function spinRoulette(type) {
+            const wheel = document.getElementById('rouletteWheel');
+            const result = document.getElementById('rouletteResult');
+            const balanceElement = document.querySelector('.balance-amount');
+            
+            // Стоимость вращения
+            let cost = 0;
+            let maxWin = 0;
+            
+            if (type === 'free') {
+                if (!userData.freeSpinAvailable) {
+                    tg.showAlert('Бесплатное вращение будет доступно позже!');
+                    return;
+                }
+                cost = 0;
+                maxWin = 100;
+            } else if (type === 'paid') {
+                cost = 200;
+                maxWin = 500;
+            } else if (type === 'premium') {
+                cost = 500;
+                maxWin = 1500;
+            }
+            
+            // Проверка баланса для платных вращений
+            if (type !== 'free' && userData.balance < cost) {
+                tg.showAlert('Недостаточно звезд!');
+                return;
+            }
+            
+            // Блокируем кнопки
+            document.getElementById('freeSpinBtn').disabled = true;
+            document.getElementById('paidSpinBtn').disabled = true;
+            document.getElementById('premiumSpinBtn').disabled = true;
+            
+            // Спин рулетки
+            const spins = 3 + Math.random() * 2; // 3-5 полных оборотов
+            const degrees = 360 * spins + Math.random() * 360;
+            
+            wheel.style.transform = `rotate(${degrees}deg)`;
+            result.textContent = 'Крутим...';
+            result.className = 'roulette-result';
+            
+            // Имитация вычисления выигрыша
+            setTimeout(() => {
+                let winAmount = 0;
+                const chance = Math.random();
+                
+                if (type === 'free') {
+                    // 70% шанс выигрыша в бесплатной рулетке
+                    if (chance < 0.7) {
+                        winAmount = Math.floor(Math.random() * 50) + 10; // 10-60 звезд
+                    }
+                } else if (type === 'paid') {
+                    // 50% шанс выигрыша
+                    if (chance < 0.5) {
+                        winAmount = Math.floor(Math.random() * 300) + 50; // 50-350 звезд
+                    }
+                } else if (type === 'premium') {
+                    // 30% шанс выигрыша но больше награда
+                    if (chance < 0.3) {
+                        winAmount = Math.floor(Math.random() * 1000) + 100; // 100-1100 звезд
+                    }
+                }
+                
+                // Обновление баланса
+                if (type !== 'free') {
+                    userData.balance -= cost;
+                }
+                userData.balance += winAmount;
+                
+                // Обновление интерфейса
+                balanceElement.textContent = `⭐ ${userData.balance}`;
+                
+                if (winAmount > 0) {
+                    result.textContent = `🎉 Поздравляем! Вы выиграли ⭐ ${winAmount}`;
+                    result.className = 'roulette-result win';
+                    tg.showAlert(`🎊 Вы выиграли ${winAmount} звезд!`);
+                } else {
+                    result.textContent = '😔 Повезет в следующий раз!';
+                    result.className = 'roulette-result lose';
+                    tg.showAlert('💫 Повезет в следующий раз!');
+                }
+                
+                // Блокировка бесплатного вращения на 24 часа
+                if (type === 'free') {
+                    userData.freeSpinAvailable = false;
+                    document.getElementById('freeCooldown').textContent = 'Доступно через 24 часа';
+                    document.getElementById('freeSpinBtn').disabled = true;
+                }
+                
+                // Разблокировка кнопок
+                setTimeout(() => {
+                    document.getElementById('freeSpinBtn').disabled = !userData.freeSpinAvailable;
+                    document.getElementById('paidSpinBtn').disabled = userData.balance < 200;
+                    document.getElementById('premiumSpinBtn').disabled = userData.balance < 500;
+                }, 1000);
+                
+            }, 3000);
+        }
+
         // Скрываем главную кнопку Telegram
         tg.MainButton.hide();
+
+        // Инициализация кнопок
+        document.getElementById('paidSpinBtn').disabled = userData.balance < 200;
+        document.getElementById('premiumSpinBtn').disabled = userData.balance < 500;
     </script>
 </body>
 </html>
