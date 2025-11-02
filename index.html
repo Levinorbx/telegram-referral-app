@@ -127,6 +127,10 @@
             width: auto;
         }
 
+        .btn-buy {
+            background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+        }
+
         /* Нижнее меню */
         .bottom-menu {
             position: fixed;
@@ -188,7 +192,7 @@
             display: block;
         }
 
-        .task-item, .roulette-item, .inventory-item, .history-item {
+        .task-item, .roulette-item, .inventory-item, .shop-item {
             background: rgba(40, 40, 60, 0.6);
             border-radius: 12px;
             padding: 15px;
@@ -204,7 +208,7 @@
             border-left-color: #4caf50;
         }
 
-        .history-item {
+        .shop-item {
             border-left-color: #9c27b0;
         }
 
@@ -284,44 +288,30 @@
             position: relative;
             overflow: hidden;
             border: 3px solid #ffd700;
-            background: conic-gradient(
-                #ff6b6b 0deg 60deg,
-                #4ecdc4 60deg 120deg,
-                #45b7d1 120deg 180deg,
-                #96ceb4 180deg 240deg,
-                #feca57 240deg 300deg,
-                #ff9ff3 300deg 360deg
-            );
             transform: rotate(0deg);
         }
 
-        .roulette-section-text {
+        .roulette-section {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
-            height: 80%;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.7);
+            width: 50%;
+            height: 50%;
+            transform-origin: 100% 100%;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             color: white;
             font-weight: bold;
+            font-size: 10px;
             text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
+            left: 0;
+            top: 0;
         }
 
-        .prize-list {
-            font-size: 12px;
-            line-height: 1.3;
-        }
-
-        .prize-item {
-            margin: 2px 0;
+        .section-content {
+            transform: rotate(30deg);
+            width: 80px;
+            text-align: center;
+            line-height: 1.2;
         }
 
         .roulette-pointer {
@@ -410,6 +400,42 @@
             margin: 5px 0;
         }
 
+        /* Магазин */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .shop-card {
+            background: rgba(50, 50, 70, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #9c27b0;
+        }
+
+        .shop-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .payment-methods {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .payment-method {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
         .welcome-message {
             text-align: center;
             padding: 20px;
@@ -436,6 +462,11 @@
             background: #455a64;
             cursor: not-allowed;
         }
+
+        .boost-active {
+            border-color: #4caf50 !important;
+            background: rgba(76, 175, 80, 0.2) !important;
+        }
     </style>
 </head>
 <body>
@@ -452,13 +483,7 @@
         <div class="roulette-container">
             <h2>Крутим рулетку!</h2>
             <div class="roulette-wheel">
-                <div class="roulette-sections" id="rouletteSections">
-                    <div class="roulette-section-text">
-                        <div class="prize-list" id="prizeList">
-                            <!-- Призы будут добавлены через JS -->
-                        </div>
-                    </div>
-                </div>
+                <div class="roulette-sections" id="rouletteSections"></div>
                 <div class="roulette-pointer"></div>
             </div>
             <div class="roulette-prize" id="roulettePrize">Крутим...</div>
@@ -552,19 +577,89 @@
                     </div>
                 </div>
             </div>
+
+            <div class="section">
+                <h2>Активные бусты</h2>
+                <div id="boostsContainer">
+                    <div class="empty-state">
+                        <div class="empty-icon">⚡</div>
+                        <div>Бустов нет</div>
+                        <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
+                            Купите бусты в магазине
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Вкладка История -->
-        <div id="history-tab" class="tab-content">
+        <!-- Вкладка Магазин -->
+        <div id="shop-tab" class="tab-content">
             <div class="section">
-                <h2>История прокрутов</h2>
-                <div id="historyContainer">
-                    <div class="empty-state">
-                        <div class="empty-icon">📋</div>
-                        <div>История пуста</div>
-                        <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
-                            Здесь появятся ваши прокруты рулетки
+                <h2>🛒 Покупка звезд</h2>
+                <div class="shop-grid">
+                    <div class="shop-card">
+                        <div class="shop-icon">⭐</div>
+                        <strong>100 звезд</strong>
+                        <div class="price">$1.99</div>
+                        <div class="payment-methods">
+                            <div class="payment-method">TON</div>
+                            <div class="payment-method">Stars</div>
+                            <div class="payment-method">NFT</div>
                         </div>
+                        <button class="btn btn-buy" onclick="buyStars(100)">Купить</button>
+                    </div>
+                    <div class="shop-card">
+                        <div class="shop-icon">⭐⭐</div>
+                        <strong>500 звезд</strong>
+                        <div class="price">$8.99</div>
+                        <div class="payment-methods">
+                            <div class="payment-method">TON</div>
+                            <div class="payment-method">Stars</div>
+                            <div class="payment-method">NFT</div>
+                        </div>
+                        <button class="btn btn-buy" onclick="buyStars(500)">Купить</button>
+                    </div>
+                    <div class="shop-card">
+                        <div class="shop-icon">⭐⭐⭐</div>
+                        <strong>1000 звезд</strong>
+                        <div class="price">$15.99</div>
+                        <div class="payment-methods">
+                            <div class="payment-method">TON</div>
+                            <div class="payment-method">Stars</div>
+                            <div class="payment-method">NFT</div>
+                        </div>
+                        <button class="btn btn-buy" onclick="buyStars(1000)">Купить</button>
+                    </div>
+                    <div class="shop-card">
+                        <div class="shop-icon">💎</div>
+                        <strong>5000 звезд</strong>
+                        <div class="price">$69.99</div>
+                        <div class="payment-methods">
+                            <div class="payment-method">TON</div>
+                            <div class="payment-method">Stars</div>
+                            <div class="payment-method">NFT</div>
+                        </div>
+                        <button class="btn btn-buy" onclick="buyStars(5000)">Купить</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>⚡ Бусты шансов</h2>
+                <div class="shop-grid">
+                    <div class="shop-card" id="x2BoostCard">
+                        <div class="shop-icon">🎯</div>
+                        <strong>X2 Шанс на NFT</strong>
+                        <div>Увеличивает шанс выпадения NFT в 2 раза на 24 часа</div>
+                        <div class="price">⭐ 300</div>
+                        <button class="btn btn-buy" onclick="buyBoost('x2')">Купить</button>
+                    </div>
+                    <div class="shop-card" id="x3BoostCard">
+                        <div class="shop-icon">🚀</div>
+                        <strong>X3 Шанс на NFT</strong>
+                        <div>Увеличивает шанс выпадения NFT в 3 раза на 12 часов</div>
+                        <div class="price">⭐ 500</div>
+                        <button class="btn btn-buy" onclick="buyBoost('x3')">Купить</button>
                     </div>
                 </div>
             </div>
@@ -590,9 +685,9 @@
                 <div class="menu-icon">🎒</div>
                 <div class="menu-text">Коллекции</div>
             </div>
-            <div class="menu-item" onclick="showTab('history')">
-                <div class="menu-icon">📋</div>
-                <div class="menu-text">История</div>
+            <div class="menu-item" onclick="showTab('shop')">
+                <div class="menu-icon">🛒</div>
+                <div class="menu-text">Магазин</div>
             </div>
         </div>
     </div>
@@ -610,7 +705,10 @@
             freeSpinAvailable: true,
             freeSpinTime: null,
             inventory: [],
-            history: [],
+            boosts: {
+                x2: { active: false, endTime: null },
+                x3: { active: false, endTime: null }
+            },
             completedTasks: {
                 channel: false,
                 friends: 0
@@ -625,30 +723,53 @@
         // Призы для рулеток (6 равных секторов)
         const roulettePrizes = {
             0: [ // Бесплатная
-                { type: 'stars', amount: 5, name: '5 звезд', emoji: '⭐' },
-                { type: 'stars', amount: 5, name: '5 звезд', emoji: '⭐' },
-                { type: 'stars', amount: 10, name: '10 звезд', emoji: '⭐' },
-                { type: 'stars', amount: 10, name: '10 звезд', emoji: '⭐' },
+                { type: 'stars', amount: 5, name: '5 ⭐', emoji: '⭐' },
+                { type: 'stars', amount: 5, name: '5 ⭐', emoji: '⭐' },
+                { type: 'stars', amount: 10, name: '10 ⭐', emoji: '⭐' },
+                { type: 'stars', amount: 10, name: '10 ⭐', emoji: '⭐' },
                 { type: 'item', name: 'LoliPop', emoji: '🍭', image: '🍭', rarity: 'rare', price: 100 },
                 { type: 'item', name: 'SnoopDog', emoji: '🐶', image: '🐶', rarity: 'rare', price: 150 }
             ],
             200: [ // За 200 звезд
-                { type: 'stars', amount: 50, name: '50 звезд', emoji: '⭐' },
-                { type: 'stars', amount: 100, name: '100 звезд', emoji: '⭐' },
-                { type: 'stars', amount: 200, name: '200 звезд', emoji: '⭐' },
+                { type: 'stars', amount: 50, name: '50 ⭐', emoji: '⭐' },
+                { type: 'stars', amount: 100, name: '100 ⭐', emoji: '⭐' },
+                { type: 'stars', amount: 200, name: '200 ⭐', emoji: '⭐' },
                 { type: 'item', name: 'CryptoPunk', emoji: '👾', image: '👾', rarity: 'rare', price: 300 },
                 { type: 'item', name: 'MoonCat', emoji: '🐱', image: '🐱', rarity: 'epic', price: 500 },
                 { type: 'item', name: 'CyberApe', emoji: '🐵', image: '🐵', rarity: 'epic', price: 700 }
             ],
             500: [ // За 500 звезд
-                { type: 'stars', amount: 100, name: '100 звезд', emoji: '⭐' },
-                { type: 'stars', amount: 200, name: '200 звезд', emoji: '⭐' },
-                { type: 'stars', amount: 500, name: '500 звезд', emoji: '⭐' },
+                { type: 'stars', amount: 100, name: '100 ⭐', emoji: '⭐' },
+                { type: 'stars', amount: 200, name: '200 ⭐', emoji: '⭐' },
+                { type: 'stars', amount: 500, name: '500 ⭐', emoji: '⭐' },
                 { type: 'item', name: 'GoldenBitcoin', emoji: '💰', image: '💰', rarity: 'epic', price: 800 },
                 { type: 'item', name: 'SpaceAstro', emoji: '🧑‍🚀', image: '🧑‍🚀', rarity: 'legendary', price: 1200 },
                 { type: 'item', name: 'DragonEgg', emoji: '🐲', image: '🐲', rarity: 'legendary', price: 1500 }
             ]
         };
+
+        // Создание рулетки с призами в секциях
+        function createRoulette(type) {
+            const sections = document.getElementById('rouletteSections');
+            sections.innerHTML = '';
+            
+            const prizes = roulettePrizes[type];
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
+            
+            prizes.forEach((prize, index) => {
+                const section = document.createElement('div');
+                section.className = 'roulette-section';
+                section.style.transform = `rotate(${index * 60}deg)`;
+                section.style.background = colors[index];
+                
+                const content = document.createElement('div');
+                content.className = 'section-content';
+                content.innerHTML = prize.emoji + '<br>' + prize.name;
+                section.appendChild(content);
+                
+                sections.appendChild(section);
+            });
+        }
 
         // Показать уведомление о заработке
         function showEarnedNotification(amount) {
@@ -660,19 +781,6 @@
                 earnedElement.textContent = '';
                 earnedElement.className = '';
             }, 2000);
-        }
-
-        // Показать список призов в рулетке
-        function showPrizeList(cost) {
-            const prizeList = document.getElementById('prizeList');
-            const prizes = roulettePrizes[cost];
-            
-            let html = '<div style="font-size: 10px; margin-bottom: 5px;">Возможные призы:</div>';
-            prizes.forEach(prize => {
-                html += `<div class="prize-item">${prize.emoji} ${prize.name}</div>`;
-            });
-            
-            prizeList.innerHTML = html;
         }
 
         // Таймер обратного отсчета
@@ -723,15 +831,13 @@
 
             if (tabName === 'inventory') {
                 updateInventory();
-            } else if (tabName === 'history') {
-                updateHistory();
+                updateBoosts();
             }
         }
 
         // Функция рулетки
         function spinRoulette(cost) {
             const modal = document.getElementById('rouletteModal');
-            const sections = document.getElementById('rouletteSections');
             const prizeElement = document.getElementById('roulettePrize');
             const closeBtn = document.getElementById('closeRouletteBtn');
             
@@ -745,8 +851,8 @@
                 return;
             }
             
-            // Показываем список призов
-            showPrizeList(cost);
+            // Создаем рулетку с призами
+            createRoulette(cost);
             
             // Показываем модальное окно
             modal.classList.add('active');
@@ -763,6 +869,8 @@
             const prizes = roulettePrizes[cost];
             const selectedIndex = Math.floor(Math.random() * 6);
             const selectedPrize = prizes[selectedIndex];
+            
+            const sections = document.getElementById('rouletteSections');
             
             // Сбрасываем трансформацию перед каждым вращением
             sections.style.transition = 'none';
@@ -795,25 +903,34 @@
                         prizeElement.className = 'roulette-prize win';
                         showEarnedNotification(selectedPrize.amount);
                     } else if (selectedPrize.type === 'item') {
-                        userData.inventory.push({
-                            ...selectedPrize,
-                            id: Date.now() + Math.random()
-                        });
-                        winText = `🎊 Вы выиграли ${selectedPrize.emoji} ${selectedPrize.name}!`;
-                        prizeElement.className = 'roulette-prize win';
-                        showEarnedNotification(selectedPrize.price);
+                        // Применяем бусты к шансу выпадения NFT
+                        let nftChance = 1;
+                        if (userData.boosts.x2.active) nftChance *= 2;
+                        if (userData.boosts.x3.active) nftChance *= 3;
+                        
+                        // Увеличиваем шанс выпадения NFT при активных бустах
+                        const shouldGetNFT = Math.random() < (0.3 * nftChance);
+                        
+                        if (shouldGetNFT) {
+                            userData.inventory.push({
+                                ...selectedPrize,
+                                id: Date.now() + Math.random()
+                            });
+                            winText = `🎊 Вы выиграли ${selectedPrize.emoji} ${selectedPrize.name}!`;
+                            prizeElement.className = 'roulette-prize win';
+                            showEarnedNotification(selectedPrize.price);
+                        } else {
+                            // Если NFT не выпал, даем звезды вместо него
+                            const starReward = Math.floor(selectedPrize.price * 0.7);
+                            userData.balance += starReward;
+                            earned = starReward;
+                            winText = `⭐ Вы выиграли ${starReward} звезд!`;
+                            prizeElement.className = 'roulette-prize win';
+                            showEarnedNotification(starReward);
+                        }
                     }
                     
                     prizeElement.textContent = winText;
-                    
-                    // Добавляем в историю
-                    userData.history.unshift({
-                        cost: cost,
-                        prize: selectedPrize.name,
-                        emoji: selectedPrize.emoji,
-                        date: new Date().toLocaleString(),
-                        earned: earned
-                    });
                     
                     // Обновляем статистику
                     if (earned > 0) {
@@ -888,7 +1005,7 @@
 
         // Задание: Пригласить друга
         function shareWithFriend() {
-            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('https://t.me/YourBotName')}&text=${encodeURIComponent('🎁 Присоединяйся к Gift Force! Крути рулетку и зарабатывай звезды!')}`;
+            const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('https://t.me/GiftForceBot')}&text=${encodeURIComponent('🎁 Присоединяйся к Gift Force! Крути рулетку и зарабатывай звезды!')}`;
             tg.openLink(shareUrl);
             
             setTimeout(() => {
@@ -905,6 +1022,89 @@
                 updateStats();
                 showEarnedNotification(100);
             }, 2000);
+        }
+
+        // Покупка звезд
+        function buyStars(amount) {
+            // Имитация покупки
+            userData.balance += amount;
+            updateBalance();
+            showEarnedNotification(amount);
+            tg.showAlert(`✅ Успешно куплено ${amount} звезд!`);
+        }
+
+        // Покупка буста
+        function buyBoost(type) {
+            const boost = userData.boosts[type];
+            const cost = type === 'x2' ? 300 : 500;
+            
+            if (userData.balance < cost) {
+                tg.showAlert('❌ Недостаточно звезд!');
+                return;
+            }
+            
+            userData.balance -= cost;
+            boost.active = true;
+            boost.endTime = new Date().getTime() + (type === 'x2' ? 24 * 60 * 60 * 1000 : 12 * 60 * 60 * 1000);
+            
+            updateBalance();
+            updateBoosts();
+            showEarnedNotification(-cost);
+            tg.showAlert(`✅ Буст ${type.toUpperCase()} активирован!`);
+        }
+
+        // Обновление бустов
+        function updateBoosts() {
+            const container = document.getElementById('boostsContainer');
+            const activeBoosts = [];
+            
+            // Проверяем активные бусты
+            Object.keys(userData.boosts).forEach(type => {
+                const boost = userData.boosts[type];
+                if (boost.active && boost.endTime) {
+                    const timeLeft = boost.endTime - new Date().getTime();
+                    if (timeLeft > 0) {
+                        const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                        activeBoosts.push({
+                            type: type,
+                            name: type === 'x2' ? 'X2 Шанс на NFT' : 'X3 Шанс на NFT',
+                            timeLeft: `${hours}ч ${minutes}м`
+                        });
+                    } else {
+                        boost.active = false;
+                    }
+                }
+            });
+            
+            if (activeBoosts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚡</div>
+                        <div>Бустов нет</div>
+                        <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
+                            Купите бусты в магазине
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = '';
+                activeBoosts.forEach(boost => {
+                    const boostItem = document.createElement('div');
+                    boostItem.className = 'inventory-item boost-active';
+                    boostItem.innerHTML = `
+                        <strong>${boost.name}</strong>
+                        <div style="color: #4caf50; font-size: 12px;">
+                            Активно еще: ${boost.timeLeft}
+                        </div>
+                    `;
+                    container.appendChild(boostItem);
+                });
+            }
+            
+            // Обновляем кнопки в магазине
+            document.getElementById('x2BoostCard').classList.toggle('boost-active', userData.boosts.x2.active);
+            document.getElementById('x3BoostCard').classList.toggle('boost-active', userData.boosts.x3.active);
         }
 
         // Обновление инвентаря
@@ -951,44 +1151,13 @@
             showEarnedNotification(item.price);
         }
 
-        // Обновление истории
-        function updateHistory() {
-            const container = document.getElementById('historyContainer');
-            
-            if (userData.history.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">📋</div>
-                        <div>История пуста</div>
-                        <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
-                            Здесь появятся ваши прокруты рулетки
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = '';
-            userData.history.forEach(entry => {
-                const historyItem = document.createElement('div');
-                historyItem.className = 'history-item';
-                historyItem.innerHTML = `
-                    <strong>${entry.emoji} ${entry.prize}</strong>
-                    <div style="color: #888; font-size: 12px;">
-                        ${entry.cost === 0 ? 'Бесплатно' : `⭐ ${entry.cost}`} • ${entry.date}
-                        ${entry.earned > 0 ? ` • Выигрыш: ⭐ ${entry.earned}` : ''}
-                    </div>
-                `;
-                container.appendChild(historyItem);
-            });
-        }
-
         // Скрываем главную кнопку Telegram
         tg.MainButton.hide();
 
         // Инициализация
         updateBalance();
         updateStats();
+        updateBoosts();
         startTimer();
     </script>
 </body>
