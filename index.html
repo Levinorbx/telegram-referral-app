@@ -128,7 +128,9 @@
         }
 
         .btn-buy {
-            background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            color: #000;
+            font-weight: bold;
         }
 
         /* Нижнее меню */
@@ -209,7 +211,7 @@
         }
 
         .shop-item {
-            border-left-color: #9c27b0;
+            border-left-color: #ffd700;
         }
 
         .empty-state {
@@ -246,7 +248,7 @@
             font-weight: bold;
         }
 
-        /* Окно рулетки */
+        /* НОВАЯ ГОРИЗОНТАЛЬНАЯ РУЛЕТКА */
         .roulette-modal {
             position: fixed;
             top: 0;
@@ -269,63 +271,74 @@
             border-radius: 20px;
             padding: 30px;
             text-align: center;
-            max-width: 320px;
+            max-width: 350px;
             width: 90%;
             border: 2px solid #ffd700;
         }
 
-        .roulette-wheel {
-            width: 250px;
-            height: 250px;
-            margin: 20px auto;
-            position: relative;
-        }
-
-        .roulette-sections {
+        .horizontal-roulette {
             width: 100%;
-            height: 100%;
-            border-radius: 50%;
+            height: 120px;
+            background: rgba(50, 50, 70, 0.8);
+            border-radius: 15px;
+            margin: 20px 0;
             position: relative;
             overflow: hidden;
-            border: 3px solid #ffd700;
-            transform: rotate(0deg);
+            border: 2px solid #ff9800;
         }
 
-        .roulette-section {
-            position: absolute;
-            width: 50%;
-            height: 50%;
-            transform-origin: 100% 100%;
+        .roulette-track {
             display: flex;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            transition: transform 0.1s linear;
+        }
+
+        .roulette-item-horizontal {
+            min-width: 100px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 10px;
-            text-align: center;
-            left: 0;
-            top: 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 10px;
         }
 
-        .section-content {
-            transform: rotate(30deg);
-            width: 80px;
+        .roulette-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .roulette-name {
+            font-size: 11px;
+            font-weight: bold;
             text-align: center;
             line-height: 1.2;
         }
 
         .roulette-pointer {
             position: absolute;
-            top: -15px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 3px;
+            height: 100%;
+            background: #ff0000;
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+        }
+
+        .roulette-pointer:before {
+            content: '▼';
+            position: absolute;
+            top: -5px;
             left: 50%;
             transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 25px solid #ff0000;
-            z-index: 10;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            color: #ff0000;
+            font-size: 20px;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
         }
 
         .roulette-prize {
@@ -413,7 +426,7 @@
             border-radius: 10px;
             padding: 12px;
             text-align: center;
-            border: 2px solid #9c27b0;
+            border: 2px solid #ffd700;
             font-size: 13px;
         }
 
@@ -463,11 +476,6 @@
             background: #455a64;
             cursor: not-allowed;
         }
-
-        .boost-active {
-            border-color: #4caf50 !important;
-            background: rgba(76, 175, 80, 0.2) !important;
-        }
     </style>
 </head>
 <body>
@@ -483,8 +491,8 @@
     <div class="roulette-modal" id="rouletteModal">
         <div class="roulette-container">
             <h2>Крутим рулетку!</h2>
-            <div class="roulette-wheel">
-                <div class="roulette-sections" id="rouletteSections"></div>
+            <div class="horizontal-roulette">
+                <div class="roulette-track" id="rouletteTrack"></div>
                 <div class="roulette-pointer"></div>
             </div>
             <div class="roulette-prize" id="roulettePrize">Крутим...</div>
@@ -492,7 +500,7 @@
         </div>
     </div>
 
-    <div class="container" style="margin-top: 70px;">
+    <div class="container">
         <!-- Основной контент -->
         <div id="main-tab" class="tab-content active">
             <div class="welcome-message">
@@ -578,19 +586,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="section">
-                <h2>Активные бусты</h2>
-                <div id="boostsContainer">
-                    <div class="empty-state">
-                        <div class="empty-icon">⚡</div>
-                        <div>Бустов нет</div>
-                        <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
-                            Купите бусты в магазине
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Вкладка Магазин -->
@@ -644,19 +639,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="section">
-                <h2>⚡ Бусты шансов</h2>
-                <div class="shop-grid">
-                    <div class="shop-card" id="x2BoostCard">
-                        <div class="shop-icon">🎯</div>
-                        <strong>X2 Шанс на NFT</strong>
-                        <div>Увеличивает шанс выпадения NFT в 2 раза на 24 часа</div>
-                        <div class="price">⭐ 300</div>
-                        <button class="btn btn-buy" onclick="buyBoost('x2')">Купить</button>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -694,48 +676,41 @@
             totalEarned: 0,
             invitedFriends: 0,
             inventory: [],
-            activeBoosts: [],
             lastFreeSpin: 0
         };
 
         // Призы для рулетки
         const roulettePrizes = [
-            { type: 'stars', amount: 10, name: '10 звезд', color: '#FFD700' },
-            { type: 'stars', amount: 20, name: '20 звезд', color: '#FFA500' },
-            { type: 'stars', amount: 50, name: '50 звезд', color: '#FF6347' },
-            { type: 'nft', rarity: 'common', name: 'Обычный NFT', color: '#4CAF50' },
-            { type: 'stars', amount: 5, name: '5 звезд', color: '#87CEEB' },
-            { type: 'nft', rarity: 'rare', name: 'Редкий NFT', color: '#9C27B0' },
-            { type: 'stars', amount: 100, name: '100 звезд', color: '#E91E63' },
-            { type: 'nft', rarity: 'epic', name: 'Эпический NFT', color: '#FF9800' },
-            { type: 'stars', amount: 200, name: '200 звезд', color: '#F44336' },
-            { type: 'nft', rarity: 'legendary', name: 'Легендарный NFT', color: '#00BCD4' },
-            { type: 'stars', amount: 500, name: '500 звезд', color: '#8BC34A' },
-            { type: 'boost', name: 'Буст X2', color: '#3F51B5' }
+            { type: 'stars', amount: 10, name: '10 звезд', icon: '⭐', color: '#FFD700' },
+            { type: 'stars', amount: 20, name: '20 звезд', icon: '⭐⭐', color: '#FFA500' },
+            { type: 'stars', amount: 50, name: '50 звезд', icon: '⭐⭐⭐', color: '#FF6347' },
+            { type: 'nft', rarity: 'common', name: 'Обычный NFT', icon: '📦', color: '#4CAF50' },
+            { type: 'stars', amount: 5, name: '5 звезд', icon: '⭐', color: '#87CEEB' },
+            { type: 'nft', rarity: 'rare', name: 'Редкий NFT', icon: '🎁', color: '#9C27B0' },
+            { type: 'stars', amount: 100, name: '100 звезд', icon: '💫', color: '#E91E63' },
+            { type: 'nft', rarity: 'epic', name: 'Эпический NFT', icon: '💎', color: '#FF9800' },
+            { type: 'stars', amount: 200, name: '200 звезд', icon: '✨', color: '#F44336' },
+            { type: 'nft', rarity: 'legendary', name: 'Легендарный NFT', icon: '👑', color: '#00BCD4' }
         ];
 
-        // Инициализация рулетки
+        // Инициализация горизонтальной рулетки
         function initRoulette() {
-            const sectionsContainer = document.getElementById('rouletteSections');
-            sectionsContainer.innerHTML = '';
+            const track = document.getElementById('rouletteTrack');
+            track.innerHTML = '';
             
-            const sectionAngle = 360 / roulettePrizes.length;
-            
-            roulettePrizes.forEach((prize, index) => {
-                const section = document.createElement('div');
-                section.className = 'roulette-section';
-                section.style.transform = `rotate(${index * sectionAngle}deg)`;
-                section.style.background = `conic-gradient(${prize.color} 0% ${sectionAngle}deg, transparent ${sectionAngle}deg)`;
-                
-                const content = document.createElement('div');
-                content.className = 'section-content';
-                content.textContent = prize.name;
-                content.style.color = '#000';
-                content.style.fontWeight = 'bold';
-                
-                section.appendChild(content);
-                sectionsContainer.appendChild(section);
-            });
+            // Создаем много копий призов для бесконечного эффекта
+            for (let i = 0; i < 3; i++) {
+                roulettePrizes.forEach(prize => {
+                    const item = document.createElement('div');
+                    item.className = 'roulette-item-horizontal';
+                    item.style.background = prize.color;
+                    item.innerHTML = `
+                        <div class="roulette-icon">${prize.icon}</div>
+                        <div class="roulette-name">${prize.name}</div>
+                    `;
+                    track.appendChild(item);
+                });
+            }
         }
 
         // Вращение рулетки
@@ -753,7 +728,7 @@
             const modal = document.getElementById('rouletteModal');
             const prizeElement = document.getElementById('roulettePrize');
             const closeBtn = document.getElementById('closeRouletteBtn');
-            const wheel = document.getElementById('rouletteSections');
+            const track = document.getElementById('rouletteTrack');
             
             modal.classList.add('active');
             prizeElement.textContent = 'Крутим...';
@@ -764,60 +739,57 @@
             const randomPrizeIndex = Math.floor(Math.random() * roulettePrizes.length);
             const prize = roulettePrizes[randomPrizeIndex];
             
-            // Расчет угла поворота (указываем точно на середину выигранной секции)
-            const sectionAngle = 360 / roulettePrizes.length;
-            const targetAngle = 3600 - (randomPrizeIndex * sectionAngle) - (sectionAngle / 2);
+            // Анимация вращения
+            const itemWidth = 100;
+            const targetPosition = -(randomPrizeIndex * itemWidth + 10 * itemWidth);
             
-            wheel.style.transition = 'transform 4s cubic-bezier(0.2, 0.8, 0.3, 1)';
-            wheel.style.transform = `rotate(${targetAngle}deg)`;
+            let currentPosition = 0;
+            let speed = 50;
+            let deceleration = 0.5;
+            
+            function animate() {
+                currentPosition -= speed;
+                speed *= 0.98; // Замедление
+                
+                track.style.transform = `translateX(${currentPosition}px)`;
+                
+                if (currentPosition > targetPosition && speed > 0.5) {
+                    requestAnimationFrame(animate);
+                } else {
+                    // Финальная позиция
+                    track.style.transform = `translateX(${targetPosition}px)`;
+                    
+                    prizeElement.textContent = prize.name;
+                    prizeElement.classList.add('win');
+                    closeBtn.classList.add('active');
 
-            setTimeout(() => {
-                prizeElement.textContent = prize.name;
-                prizeElement.classList.add('win');
-                closeBtn.classList.add('active');
+                    // Выдача приза
+                    if (prize.type === 'stars') {
+                        userData.balance += prize.amount;
+                        userData.totalEarned += prize.amount;
+                        showBalanceEarned(`+${prize.amount} ⭐`);
+                    } else if (prize.type === 'nft') {
+                        userData.inventory.push({
+                            id: Date.now(),
+                            name: prize.name,
+                            rarity: prize.rarity,
+                            icon: prize.icon
+                        });
+                        showBalanceEarned(`🎉 ${prize.name}!`);
+                    }
 
-                // Выдача приза
-                if (prize.type === 'stars') {
-                    userData.balance += prize.amount;
-                    userData.totalEarned += prize.amount;
-                    showBalanceEarned(`+${prize.amount} ⭐`);
-                } else if (prize.type === 'nft') {
-                    userData.inventory.push({
-                        id: Date.now(),
-                        name: prize.name,
-                        rarity: prize.rarity,
-                        icon: getNFTIcon(prize.rarity)
-                    });
-                    showBalanceEarned(`🎉 ${prize.name}!`);
-                } else if (prize.type === 'boost') {
-                    userData.activeBoosts.push({
-                        type: 'x2',
-                        name: 'Буст X2',
-                        expires: Date.now() + (24 * 60 * 60 * 1000)
-                    });
-                    showBalanceEarned(`⚡ ${prize.name}!`);
+                    updateBalance();
+                    updateStats();
+                    updateInventory();
                 }
-
-                updateBalance();
-                updateStats();
-                updateInventory();
-                updateBoosts();
-            }, 4000);
+            }
+            
+            animate();
         }
 
         function closeRoulette() {
             const modal = document.getElementById('rouletteModal');
             modal.classList.remove('active');
-        }
-
-        function getNFTIcon(rarity) {
-            const icons = {
-                common: '📦',
-                rare: '🎁',
-                epic: '💎',
-                legendary: '👑'
-            };
-            return icons[rarity] || '📦';
         }
 
         function showBalanceEarned(text) {
@@ -872,34 +844,6 @@
             });
         }
 
-        function updateBoosts() {
-            const container = document.getElementById('boostsContainer');
-            
-            if (userData.activeBoosts.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">⚡</div>
-                        <div>Бустов нет</div>
-                        <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
-                            Купите бусты в магазине
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = '';
-            userData.activeBoosts.forEach(boost => {
-                const item = document.createElement('div');
-                item.className = 'task-item boost-active';
-                item.innerHTML = `
-                    <strong>${boost.name}</strong>
-                    <div>Активен до: ${new Date(boost.expires).toLocaleTimeString()}</div>
-                `;
-                container.appendChild(item);
-            });
-        }
-
         function sellNFT(id) {
             const itemIndex = userData.inventory.findIndex(item => item.id === id);
             if (itemIndex !== -1) {
@@ -922,77 +866,19 @@
         }
 
         function completeChannelTask() {
-            if (!userData.channelCompleted) {
-                userData.balance += 50;
-                userData.totalEarned += 50;
-                userData.completedTasks++;
-                userData.channelCompleted = true;
-                
-                document.getElementById('channelTask').classList.add('task-completed');
-                document.querySelector('#channelTask .btn').textContent = 'Выполнено';
-                document.querySelector('#channelTask .btn').disabled = true;
-                
-                updateBalance();
-                updateStats();
-                showBalanceEarned('+50 ⭐');
-                
-                // Открываем канал в новом окне
-                window.open('https://t.me/example_channel', '_blank');
-            }
+            alert('Задание временно недоступно');
         }
 
         function shareWithFriend() {
-            userData.invitedFriends++;
-            userData.balance += 100;
-            userData.totalEarned += 100;
-            userData.completedTasks++;
-            
-            updateBalance();
-            updateStats();
-            showBalanceEarned('+100 ⭐');
-            
-            // Поделиться ссылкой
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Gift Force',
-                    text: 'Присоединяйся к Gift Force и зарабатывай звезды!',
-                    url: window.location.href
-                });
-            } else {
-                alert('Скопируйте ссылку и поделитесь с другом: ' + window.location.href);
-            }
+            alert('Задание временно недоступно');
         }
 
         function buyStars(amount) {
-            alert(`Покупка ${amount} звезд за $${getPrice(amount)}`);
-            // Здесь будет интеграция с платежной системой
-        }
-
-        function getPrice(amount) {
-            const prices = {
-                100: 1.99,
-                500: 8.99,
-                1000: 15.99,
-                5000: 69.99
-            };
-            return prices[amount] || 0;
-        }
-
-        function buyBoost(type) {
-            if (userData.balance >= 300) {
-                userData.balance -= 300;
-                userData.activeBoosts.push({
-                    type: type,
-                    name: 'Буст X2',
-                    expires: Date.now() + (24 * 60 * 60 * 1000)
-                });
-                
-                updateBalance();
-                updateBoosts();
-                showBalanceEarned('⚡ Буст активирован!');
-            } else {
-                alert('Недостаточно звезд!');
-            }
+            userData.balance += amount;
+            userData.totalEarned += amount;
+            updateBalance();
+            updateStats();
+            showBalanceEarned(`+${amount} ⭐`);
         }
 
         function showTab(tabId) {
@@ -1018,7 +904,6 @@
             updateBalance();
             updateStats();
             updateInventory();
-            updateBoosts();
         });
     </script>
 </body>
