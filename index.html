@@ -248,7 +248,7 @@
             font-weight: bold;
         }
 
-        /* НОВАЯ ГОРИЗОНТАЛЬНАЯ РУЛЕТКА */
+        /* ГОРИЗОНТАЛЬНАЯ РУЛЕТКА */
         .roulette-modal {
             position: fixed;
             top: 0;
@@ -292,7 +292,6 @@
             height: 100%;
             position: absolute;
             left: 0;
-            transition: transform 0.1s linear;
         }
 
         .roulette-item-horizontal {
@@ -413,7 +412,7 @@
             margin: 5px 0;
         }
 
-        /* Магазин - исправленная сетка 2x2 */
+        /* Магазин */
         .shop-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -575,11 +574,11 @@
         <!-- Вкладка Инвентарь -->
         <div id="inventory-tab" class="tab-content">
             <div class="section">
-                <h2>Мои коллекции</h2>
+                <h2>Мой инвентарь</h2>
                 <div id="nftContainer">
                     <div class="empty-state">
                         <div class="empty-icon">🎒</div>
-                        <div>Коллекции пусты</div>
+                        <div>Инвентарь пуст</div>
                         <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
                             Крутите рулетку чтобы получить предметы
                         </div>
@@ -693,13 +692,21 @@
             { type: 'nft', rarity: 'legendary', name: 'Легендарный NFT', icon: '👑', color: '#00BCD4' }
         ];
 
+        // Цены NFT для продажи
+        const nftPrices = {
+            common: 50,
+            rare: 100,
+            epic: 250,
+            legendary: 500
+        };
+
         // Инициализация горизонтальной рулетки
         function initRoulette() {
             const track = document.getElementById('rouletteTrack');
             track.innerHTML = '';
             
             // Создаем много копий призов для бесконечного эффекта
-            for (let i = 0; i < 3; i++) {
+            for (let i = 0; i < 5; i++) {
                 roulettePrizes.forEach(prize => {
                     const item = document.createElement('div');
                     item.className = 'roulette-item-horizontal';
@@ -739,22 +746,28 @@
             const randomPrizeIndex = Math.floor(Math.random() * roulettePrizes.length);
             const prize = roulettePrizes[randomPrizeIndex];
             
-            // Анимация вращения
+            // Анимация вращения с плавным замедлением
             const itemWidth = 100;
-            const targetPosition = -(randomPrizeIndex * itemWidth + 10 * itemWidth);
+            const totalItems = roulettePrizes.length * 5;
+            const targetPosition = -(randomPrizeIndex * itemWidth + 15 * itemWidth);
             
-            let currentPosition = 0;
-            let speed = 50;
-            let deceleration = 0.5;
-            
-            function animate() {
-                currentPosition -= speed;
-                speed *= 0.98; // Замедление
+            let startTime = null;
+            const duration = 6000; // 6 секунд
+            let animationFrame;
+
+            function animate(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
                 
+                // Кривая замедления - начинаем быстро, заканчиваем медленно
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                
+                const currentPosition = easeOut * targetPosition;
                 track.style.transform = `translateX(${currentPosition}px)`;
                 
-                if (currentPosition > targetPosition && speed > 0.5) {
-                    requestAnimationFrame(animate);
+                if (progress < 1) {
+                    animationFrame = requestAnimationFrame(animate);
                 } else {
                     // Финальная позиция
                     track.style.transform = `translateX(${targetPosition}px)`;
@@ -773,7 +786,8 @@
                             id: Date.now(),
                             name: prize.name,
                             rarity: prize.rarity,
-                            icon: prize.icon
+                            icon: prize.icon,
+                            price: nftPrices[prize.rarity]
                         });
                         showBalanceEarned(`🎉 ${prize.name}!`);
                     }
@@ -784,7 +798,7 @@
                 }
             }
             
-            animate();
+            animationFrame = requestAnimationFrame(animate);
         }
 
         function closeRoulette() {
@@ -819,7 +833,7 @@
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">🎒</div>
-                        <div>Коллекции пусты</div>
+                        <div>Инвентарь пуст</div>
                         <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
                             Крутите рулетку чтобы получить предметы
                         </div>
@@ -837,6 +851,7 @@
                 card.innerHTML = `
                     <div class="nft-image">${item.icon}</div>
                     <strong>${item.name}</strong>
+                    <div class="nft-price">Цена: ⭐ ${item.price}</div>
                     <div style="font-size: 10px; margin-top: 5px; text-transform: capitalize;">${item.rarity}</div>
                     <button class="btn btn-sell" onclick="sellNFT(${item.id})">Продать</button>
                 `;
@@ -848,14 +863,7 @@
             const itemIndex = userData.inventory.findIndex(item => item.id === id);
             if (itemIndex !== -1) {
                 const item = userData.inventory[itemIndex];
-                const prices = {
-                    common: 50,
-                    rare: 100,
-                    epic: 250,
-                    legendary: 500
-                };
-                
-                const price = prices[item.rarity] || 50;
+                const price = item.price;
                 userData.balance += price;
                 userData.inventory.splice(itemIndex, 1);
                 
