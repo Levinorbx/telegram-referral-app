@@ -17,35 +17,61 @@
             background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
             color: #e0e0e0;
             min-height: 100vh;
-            padding-bottom: 70px;
+        }
+
+        .header {
+            background: rgba(30, 30, 46, 0.95);
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .balance-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .balance-amount {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .stars-add-animation {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            animation: starsFly 1s ease-out forwards;
+            z-index: 1000;
+        }
+
+        @keyframes starsFly {
+            0% {
+                transform: translateX(-100px);
+                opacity: 0;
+            }
+            50% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-100px);
+                opacity: 0;
+            }
         }
 
         .container {
             max-width: 400px;
             margin: 0 auto;
             padding: 15px;
-        }
-
-        .balance-container {
-            position: fixed;
-            top: 10px;
-            right: 15px;
-            z-index: 1000;
-        }
-
-        .top-balance {
-            background: rgba(30, 30, 46, 0.95);
-            border-radius: 18px;
-            padding: 6px 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .balance-amount {
-            font-size: 14px;
-            font-weight: bold;
-            color: #ffd700;
+            padding-bottom: 70px;
         }
 
         .section {
@@ -99,12 +125,6 @@
             font-size: 12px;
             width: auto;
             text-transform: none;
-            transition: all 0.3s ease;
-        }
-
-        .btn-sell:active {
-            transform: scale(0.9);
-            background: linear-gradient(135deg, #ff4757, #ff3838);
         }
 
         .bottom-menu {
@@ -135,11 +155,17 @@
             cursor: pointer;
             flex: 1;
             margin: 0 2px;
+            opacity: 0.5;
         }
 
         .menu-item.active {
             background: rgba(33, 150, 243, 0.2);
             border: 1px solid rgba(33, 150, 243, 0.5);
+            opacity: 1;
+        }
+
+        .menu-item.disabled {
+            pointer-events: none;
         }
 
         .menu-icon {
@@ -255,7 +281,6 @@
             justify-content: center;
             padding: 10px;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(40, 40, 60, 0.7);
         }
 
         .roulette-item-wheel:nth-child(odd) {
@@ -339,26 +364,6 @@
             padding: 15px;
             text-align: center;
             border: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .inventory-item-card.sold {
-            animation: sellAnimation 0.6s ease-out forwards;
-        }
-
-        @keyframes sellAnimation {
-            0% { 
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.1);
-                opacity: 0.7;
-            }
-            100% {
-                transform: scale(0);
-                opacity: 0;
-            }
         }
 
         .inventory-item-card.rare {
@@ -415,6 +420,11 @@
             border-color: #2196f3;
         }
 
+        .roulette-type-btn.disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
         .spin-cost {
             color: #ffd700;
             font-weight: bold;
@@ -429,8 +439,8 @@
     </style>
 </head>
 <body>
-    <div class="balance-container">
-        <div class="top-balance">
+    <div class="header">
+        <div class="balance-container">
             <div class="balance-amount">⭐ 1000</div>
         </div>
     </div>
@@ -438,12 +448,12 @@
     <div class="container">
         <div id="roulette-tab" class="tab-content active">
             <div class="roulette-container">
-                <div class="roulette-title">Telegram Roulette</div>
+                <div class="roulette-title">Roulette</div>
                 
                 <div class="roulette-type-selector">
-                    <button class="roulette-type-btn active" onclick="switchRouletteType('free')">Free</button>
-                    <button class="roulette-type-btn" onclick="switchRouletteType('premium')">Premium</button>
-                    <button class="roulette-type-btn" onclick="switchRouletteType('luxury')">Luxury</button>
+                    <button class="roulette-type-btn active" id="freeTypeBtn" onclick="switchRouletteType('free')">Free</button>
+                    <button class="roulette-type-btn" id="premiumTypeBtn" onclick="switchRouletteType('premium')">Premium</button>
+                    <button class="roulette-type-btn" id="luxuryTypeBtn" onclick="switchRouletteType('luxury')">Luxury</button>
                 </div>
                 
                 <!-- Free Roulette -->
@@ -517,11 +527,11 @@
 
     <div class="bottom-menu">
         <div class="menu-items">
-            <div class="menu-item active" onclick="showTab('roulette-tab')">
+            <div class="menu-item active" id="rouletteMenuItem" onclick="showTab('roulette-tab')">
                 <div class="menu-icon">🎡</div>
                 <div class="menu-text">Roulette</div>
             </div>
-            <div class="menu-item" onclick="showTab('inventory-tab')">
+            <div class="menu-item" id="inventoryMenuItem" onclick="showTab('inventory-tab')">
                 <div class="menu-icon">🎒</div>
                 <div class="menu-text">Inventory</div>
             </div>
@@ -536,38 +546,39 @@
             invitedFriends: 0,
             inventory: [],
             lastFreeSpin: 0,
-            currentRouletteType: 'free'
+            currentRouletteType: 'free',
+            isSpinning: false
         };
 
         const roulettePrizes = {
             free: [
-                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#FF69B4' },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FFD700' },
-                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#4CAF50' },
-                { type: 'stars', name: '150 Stars', icon: '⭐', image: 'stars.webp', stars: 150, color: '#2196F3' },
-                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FF9800' },
-                { type: 'stars', name: '50 Stars', icon: '⭐', image: 'stars.webp', stars: 50, color: '#9C27B0' },
+                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#B0B0B0' },
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FF9800' },
+                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#FFD700' },
+                { type: 'stars', name: '150 Stars', icon: '⭐', image: 'stars.webp', stars: 150, color: '#FFD700' },
+                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FFD700' },
+                { type: 'stars', name: '50 Stars', icon: '⭐', image: 'stars.webp', stars: 50, color: '#FFD700' },
                 { type: 'nft', name: 'Vintage Cigar', icon: '🐶', image: 'cigar.webp', stars: 450, color: '#795548' },
-                { type: 'stars', name: '75 Stars', icon: '⭐', image: 'stars.webp', stars: 75, color: '#00BCD4' }
+                { type: 'stars', name: '75 Stars', icon: '⭐', image: 'stars.webp', stars: 75, color: '#FFD700' }
             ],
             premium: [
                 { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: '#00BCD4' },
                 { type: 'nft', name: 'Vintage Cigar', icon: '🐶', image: 'cigar.webp', stars: 450, color: '#795548' },
-                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#FF69B4' },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FFD700' },
-                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FF9800' },
-                { type: 'stars', name: '50 Stars', icon: '⭐', image: 'stars.webp', stars: 50, color: '#9C27B0' },
-                { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: '#2196F3' },
-                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#4CAF50' }
+                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#B0B0B0' },
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FF9800' },
+                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FFD700' },
+                { type: 'stars', name: '50 Stars', icon: '⭐', image: 'stars.webp', stars: 50, color: '#FFD700' },
+                { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: '#404040' },
+                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#FFD700' }
             ],
             luxury: [
-                { type: 'nft', name: 'Plush Pepe', icon: '🐸', image: 'pepe.webp', stars: 2000, color: '#4CAF50' },
-                { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: '#2196F3' },
+                { type: 'nft', name: 'Plush Pepe', icon: '🐸', image: 'pepe.webp', stars: 2000, color: '#2196F3' },
+                { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: '#404040' },
                 { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: '#00BCD4' },
                 { type: 'nft', name: 'Vintage Cigar', icon: '🐶', image: 'cigar.webp', stars: 450, color: '#795548' },
                 { type: 'stars', name: '250 Stars', icon: '⭐', image: 'stars.webp', stars: 250, color: '#FFD700' },
-                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FF9800' },
-                { type: 'stars', name: '500 Stars', icon: '⭐', image: 'stars.webp', stars: 500, color: '#9C27B0' }
+                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FFD700' },
+                { type: 'stars', name: '500 Stars', icon: '⭐', image: 'stars.webp', stars: 500, color: '#FFD700' }
             ]
         };
 
@@ -580,8 +591,37 @@
             'Happy Birthday': 250
         };
 
-        let freeSpinCooldown = 120; // 2 minutes in seconds
+        let freeSpinCooldown = 120;
         let freeSpinTimer = null;
+
+        function showStarsAnimation(amount) {
+            const animation = document.createElement('div');
+            animation.className = 'stars-add-animation';
+            animation.textContent = `+${amount} ⭐`;
+            document.body.appendChild(animation);
+            
+            setTimeout(() => {
+                animation.remove();
+            }, 1000);
+        }
+
+        function disableNavigation() {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.add('disabled');
+            });
+            document.querySelectorAll('.roulette-type-btn').forEach(btn => {
+                btn.classList.add('disabled');
+            });
+        }
+
+        function enableNavigation() {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('disabled');
+            });
+            document.querySelectorAll('.roulette-type-btn').forEach(btn => {
+                btn.classList.remove('disabled');
+            });
+        }
 
         function initRoulettes() {
             initRoulette('free');
@@ -657,6 +697,8 @@
         }
 
         function switchRouletteType(type) {
+            if (userData.isSpinning) return;
+            
             userData.currentRouletteType = type;
             
             document.querySelectorAll('.roulette-section').forEach(section => {
@@ -672,12 +714,17 @@
         }
 
         function spinRoulette(type) {
+            if (userData.isSpinning) return;
+            
             const cost = type === 'free' ? 0 : type === 'premium' ? 200 : 500;
             
             if (cost > 0 && userData.balance < cost) {
                 alert('Not enough stars!');
                 return;
             }
+
+            userData.isSpinning = true;
+            disableNavigation();
 
             if (type === 'free') {
                 userData.lastFreeSpin = Math.floor(Date.now() / 1000);
@@ -729,6 +776,7 @@
                 if (prize.type === 'stars') {
                     userData.balance += prize.stars;
                     userData.totalEarned += prize.stars;
+                    showStarsAnimation(prize.stars);
                 } else if (prize.type === 'nft') {
                     userData.inventory.push({
                         id: Date.now(),
@@ -741,6 +789,9 @@
 
                 updateBalance();
                 updateInventory();
+                
+                userData.isSpinning = false;
+                enableNavigation();
             }, 8000);
         }
 
@@ -780,41 +831,37 @@
                         <img src="${item.image}" class="item-image-real" alt="${item.name}">
                         <strong>${item.name}</strong>
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
-                        <button class="btn btn-sell" onclick="sellNFT(${item.id}, this)">Sell</button>
+                        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
                     `;
                 } else {
                     card.innerHTML = `
                         <div class="item-image">${item.icon}</div>
                         <strong>${item.name}</strong>
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
-                        <button class="btn btn-sell" onclick="sellNFT(${item.id}, this)">Sell</button>
+                        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
                     `;
                 }
                 grid.appendChild(card);
             });
         }
 
-        function sellNFT(id, button) {
+        function sellNFT(id) {
             const itemIndex = userData.inventory.findIndex(item => item.id === id);
             if (itemIndex !== -1) {
                 const item = userData.inventory[itemIndex];
                 const price = item.price;
+                userData.balance += price;
+                userData.inventory.splice(itemIndex, 1);
                 
-                // Анимация продажи
-                const card = button.parentElement;
-                card.classList.add('sold');
-                
-                setTimeout(() => {
-                    userData.balance += price;
-                    userData.inventory.splice(itemIndex, 1);
-                    
-                    updateBalance();
-                    updateInventory();
-                }, 600); // Время анимации
+                showStarsAnimation(price);
+                updateBalance();
+                updateInventory();
             }
         }
 
         function showTab(tabId) {
+            if (userData.isSpinning) return;
+            
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
             });
