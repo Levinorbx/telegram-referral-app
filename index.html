@@ -400,42 +400,40 @@
             margin: 5px 0;
         }
 
-        /* Магазин */
+        /* Магазин - исправленная сетка 2x2 */
         .shop-grid {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
             margin-top: 10px;
         }
 
         .shop-card {
             background: rgba(50, 50, 70, 0.8);
             border-radius: 10px;
-            padding: 15px;
+            padding: 12px;
             text-align: center;
             border: 2px solid #9c27b0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            font-size: 13px;
         }
 
         .shop-icon {
-            font-size: 32px;
-            margin-bottom: 10px;
+            font-size: 24px;
+            margin-bottom: 8px;
         }
 
         .payment-methods {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin: 10px 0;
+            gap: 6px;
+            margin: 8px 0;
         }
 
         .payment-method {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 5px 10px;
-            font-size: 10px;
+            border-radius: 6px;
+            padding: 3px 6px;
+            font-size: 9px;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
@@ -665,23 +663,23 @@
     <!-- Нижнее меню -->
     <div class="bottom-menu">
         <div class="menu-items">
-            <div class="menu-item active" onclick="switchTab('main-tab', this)">
+            <div class="menu-item active" onclick="showTab('main-tab')">
                 <div class="menu-icon">🏠</div>
                 <div class="menu-text">Главная</div>
             </div>
-            <div class="menu-item" onclick="switchTab('tasks-tab', this)">
+            <div class="menu-item" onclick="showTab('tasks-tab')">
                 <div class="menu-icon">📋</div>
                 <div class="menu-text">Задания</div>
             </div>
-            <div class="menu-item" onclick="switchTab('roulette-tab', this)">
+            <div class="menu-item" onclick="showTab('roulette-tab')">
                 <div class="menu-icon">🎡</div>
                 <div class="menu-text">Рулетка</div>
             </div>
-            <div class="menu-item" onclick="switchTab('inventory-tab', this)">
+            <div class="menu-item" onclick="showTab('inventory-tab')">
                 <div class="menu-icon">🎒</div>
                 <div class="menu-text">Инвентарь</div>
             </div>
-            <div class="menu-item" onclick="switchTab('shop-tab', this)">
+            <div class="menu-item" onclick="showTab('shop-tab')">
                 <div class="menu-icon">🛒</div>
                 <div class="menu-text">Магазин</div>
             </div>
@@ -689,33 +687,315 @@
     </div>
 
     <script>
-        // Переменные состояния
-        let balance = 1000;
-        let completedTasks = 0;
-        let totalEarned = 0;
-        let invitedFriends = 0;
-        let inventory = [];
-        let activeBoosts = [];
-        let freeSpinAvailable = true;
-        let roulettePrizes = [
-            { type: 'stars', value: 10, name: '10 звезд', color: '#FFD700', probability: 30 },
-            { type: 'stars', value: 20, name: '20 звезд', color: '#FFA500', probability: 25 },
-            { type: 'stars', value: 50, name: '50 звезд', color: '#FF8C00', probability: 15 },
-            { type: 'nft', value: 'common', name: 'Обычный NFT', color: '#4CAF50', probability: 10 },
-            { type: 'nft', value: 'rare', name: 'Редкий NFT', color: '#2196F3', probability: 8 },
-            { type: 'nft', value: 'epic', name: 'Эпический NFT', color: '#9C27B0', probability: 5 },
-            { type: 'boost', value: 'x2', name: 'Буст X2', color: '#FF5722', probability: 4 },
-            { type: 'jackpot', value: 1000, name: 'ДЖЕКПОТ 1000 звезд!', color: '#F44336', probability: 3 }
+        // Данные пользователя
+        let userData = {
+            balance: 1000,
+            completedTasks: 0,
+            totalEarned: 0,
+            invitedFriends: 0,
+            inventory: [],
+            activeBoosts: [],
+            lastFreeSpin: 0
+        };
+
+        // Призы для рулетки
+        const roulettePrizes = [
+            { type: 'stars', amount: 10, name: '10 звезд', color: '#FFD700' },
+            { type: 'stars', amount: 20, name: '20 звезд', color: '#FFA500' },
+            { type: 'stars', amount: 50, name: '50 звезд', color: '#FF6347' },
+            { type: 'nft', rarity: 'common', name: 'Обычный NFT', color: '#4CAF50' },
+            { type: 'stars', amount: 5, name: '5 звезд', color: '#87CEEB' },
+            { type: 'nft', rarity: 'rare', name: 'Редкий NFT', color: '#9C27B0' },
+            { type: 'stars', amount: 100, name: '100 звезд', color: '#E91E63' },
+            { type: 'nft', rarity: 'epic', name: 'Эпический NFT', color: '#FF9800' },
+            { type: 'stars', amount: 200, name: '200 звезд', color: '#F44336' },
+            { type: 'nft', rarity: 'legendary', name: 'Легендарный NFT', color: '#00BCD4' },
+            { type: 'stars', amount: 500, name: '500 звезд', color: '#8BC34A' },
+            { type: 'boost', name: 'Буст X2', color: '#3F51B5' }
         ];
 
-        // Инициализация приложения
-        document.addEventListener('DOMContentLoaded', function() {
-            updateUI();
-            createRouletteSections();
-        });
+        // Инициализация рулетки
+        function initRoulette() {
+            const sectionsContainer = document.getElementById('rouletteSections');
+            sectionsContainer.innerHTML = '';
+            
+            const sectionAngle = 360 / roulettePrizes.length;
+            
+            roulettePrizes.forEach((prize, index) => {
+                const section = document.createElement('div');
+                section.className = 'roulette-section';
+                section.style.transform = `rotate(${index * sectionAngle}deg)`;
+                section.style.background = `conic-gradient(${prize.color} 0% ${sectionAngle}deg, transparent ${sectionAngle}deg)`;
+                
+                const content = document.createElement('div');
+                content.className = 'section-content';
+                content.textContent = prize.name;
+                content.style.color = '#000';
+                content.style.fontWeight = 'bold';
+                
+                section.appendChild(content);
+                sectionsContainer.appendChild(section);
+            });
+        }
 
-        // Переключение вкладок
-        function switchTab(tabId, element) {
+        // Вращение рулетки
+        function spinRoulette(cost) {
+            if (cost > 0 && userData.balance < cost) {
+                alert('Недостаточно звезд!');
+                return;
+            }
+
+            if (cost > 0) {
+                userData.balance -= cost;
+                updateBalance();
+            }
+
+            const modal = document.getElementById('rouletteModal');
+            const prizeElement = document.getElementById('roulettePrize');
+            const closeBtn = document.getElementById('closeRouletteBtn');
+            const wheel = document.getElementById('rouletteSections');
+            
+            modal.classList.add('active');
+            prizeElement.textContent = 'Крутим...';
+            prizeElement.className = 'roulette-prize';
+            closeBtn.classList.remove('active');
+
+            // Случайный приз
+            const randomPrizeIndex = Math.floor(Math.random() * roulettePrizes.length);
+            const prize = roulettePrizes[randomPrizeIndex];
+            
+            // Расчет угла поворота (указываем точно на середину выигранной секции)
+            const sectionAngle = 360 / roulettePrizes.length;
+            const targetAngle = 3600 - (randomPrizeIndex * sectionAngle) - (sectionAngle / 2);
+            
+            wheel.style.transition = 'transform 4s cubic-bezier(0.2, 0.8, 0.3, 1)';
+            wheel.style.transform = `rotate(${targetAngle}deg)`;
+
+            setTimeout(() => {
+                prizeElement.textContent = prize.name;
+                prizeElement.classList.add('win');
+                closeBtn.classList.add('active');
+
+                // Выдача приза
+                if (prize.type === 'stars') {
+                    userData.balance += prize.amount;
+                    userData.totalEarned += prize.amount;
+                    showBalanceEarned(`+${prize.amount} ⭐`);
+                } else if (prize.type === 'nft') {
+                    userData.inventory.push({
+                        id: Date.now(),
+                        name: prize.name,
+                        rarity: prize.rarity,
+                        icon: getNFTIcon(prize.rarity)
+                    });
+                    showBalanceEarned(`🎉 ${prize.name}!`);
+                } else if (prize.type === 'boost') {
+                    userData.activeBoosts.push({
+                        type: 'x2',
+                        name: 'Буст X2',
+                        expires: Date.now() + (24 * 60 * 60 * 1000)
+                    });
+                    showBalanceEarned(`⚡ ${prize.name}!`);
+                }
+
+                updateBalance();
+                updateStats();
+                updateInventory();
+                updateBoosts();
+            }, 4000);
+        }
+
+        function closeRoulette() {
+            const modal = document.getElementById('rouletteModal');
+            modal.classList.remove('active');
+        }
+
+        function getNFTIcon(rarity) {
+            const icons = {
+                common: '📦',
+                rare: '🎁',
+                epic: '💎',
+                legendary: '👑'
+            };
+            return icons[rarity] || '📦';
+        }
+
+        function showBalanceEarned(text) {
+            const balanceEarned = document.getElementById('balanceEarned');
+            balanceEarned.textContent = text;
+            balanceEarned.style.display = 'block';
+            
+            setTimeout(() => {
+                balanceEarned.style.display = 'none';
+            }, 2000);
+        }
+
+        function updateBalance() {
+            document.querySelector('.balance-amount').textContent = `⭐ ${userData.balance}`;
+        }
+
+        function updateStats() {
+            document.getElementById('completedTasks').textContent = userData.completedTasks;
+            document.getElementById('totalEarned').textContent = userData.totalEarned;
+            document.getElementById('invitedFriends').textContent = userData.invitedFriends;
+        }
+
+        function updateInventory() {
+            const container = document.getElementById('nftContainer');
+            
+            if (userData.inventory.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🎒</div>
+                        <div>Коллекции пусты</div>
+                        <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
+                            Крутите рулетку чтобы получить предметы
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '<div class="nft-grid"></div>';
+            const grid = container.querySelector('.nft-grid');
+            
+            userData.inventory.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `nft-card ${item.rarity}`;
+                card.innerHTML = `
+                    <div class="nft-image">${item.icon}</div>
+                    <strong>${item.name}</strong>
+                    <div style="font-size: 10px; margin-top: 5px; text-transform: capitalize;">${item.rarity}</div>
+                    <button class="btn btn-sell" onclick="sellNFT(${item.id})">Продать</button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function updateBoosts() {
+            const container = document.getElementById('boostsContainer');
+            
+            if (userData.activeBoosts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">⚡</div>
+                        <div>Бустов нет</div>
+                        <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
+                            Купите бусты в магазине
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            userData.activeBoosts.forEach(boost => {
+                const item = document.createElement('div');
+                item.className = 'task-item boost-active';
+                item.innerHTML = `
+                    <strong>${boost.name}</strong>
+                    <div>Активен до: ${new Date(boost.expires).toLocaleTimeString()}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function sellNFT(id) {
+            const itemIndex = userData.inventory.findIndex(item => item.id === id);
+            if (itemIndex !== -1) {
+                const item = userData.inventory[itemIndex];
+                const prices = {
+                    common: 50,
+                    rare: 100,
+                    epic: 250,
+                    legendary: 500
+                };
+                
+                const price = prices[item.rarity] || 50;
+                userData.balance += price;
+                userData.inventory.splice(itemIndex, 1);
+                
+                updateBalance();
+                updateInventory();
+                showBalanceEarned(`+${price} ⭐`);
+            }
+        }
+
+        function completeChannelTask() {
+            if (!userData.channelCompleted) {
+                userData.balance += 50;
+                userData.totalEarned += 50;
+                userData.completedTasks++;
+                userData.channelCompleted = true;
+                
+                document.getElementById('channelTask').classList.add('task-completed');
+                document.querySelector('#channelTask .btn').textContent = 'Выполнено';
+                document.querySelector('#channelTask .btn').disabled = true;
+                
+                updateBalance();
+                updateStats();
+                showBalanceEarned('+50 ⭐');
+                
+                // Открываем канал в новом окне
+                window.open('https://t.me/example_channel', '_blank');
+            }
+        }
+
+        function shareWithFriend() {
+            userData.invitedFriends++;
+            userData.balance += 100;
+            userData.totalEarned += 100;
+            userData.completedTasks++;
+            
+            updateBalance();
+            updateStats();
+            showBalanceEarned('+100 ⭐');
+            
+            // Поделиться ссылкой
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Gift Force',
+                    text: 'Присоединяйся к Gift Force и зарабатывай звезды!',
+                    url: window.location.href
+                });
+            } else {
+                alert('Скопируйте ссылку и поделитесь с другом: ' + window.location.href);
+            }
+        }
+
+        function buyStars(amount) {
+            alert(`Покупка ${amount} звезд за $${getPrice(amount)}`);
+            // Здесь будет интеграция с платежной системой
+        }
+
+        function getPrice(amount) {
+            const prices = {
+                100: 1.99,
+                500: 8.99,
+                1000: 15.99,
+                5000: 69.99
+            };
+            return prices[amount] || 0;
+        }
+
+        function buyBoost(type) {
+            if (userData.balance >= 300) {
+                userData.balance -= 300;
+                userData.activeBoosts.push({
+                    type: type,
+                    name: 'Буст X2',
+                    expires: Date.now() + (24 * 60 * 60 * 1000)
+                });
+                
+                updateBalance();
+                updateBoosts();
+                showBalanceEarned('⚡ Буст активирован!');
+            } else {
+                alert('Недостаточно звезд!');
+            }
+        }
+
+        function showTab(tabId) {
             // Скрыть все вкладки
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -728,341 +1008,18 @@
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.classList.remove('active');
             });
-            element.classList.add('active');
+            
+            event.currentTarget.classList.add('active');
         }
 
-        // Обновление интерфейса
-        function updateUI() {
-            document.querySelector('.balance-amount').textContent = `⭐ ${balance}`;
-            document.getElementById('completedTasks').textContent = completedTasks;
-            document.getElementById('totalEarned').textContent = totalEarned;
-            document.getElementById('invitedFriends').textContent = invitedFriends;
-            
-            // Обновить инвентарь
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            initRoulette();
+            updateBalance();
+            updateStats();
             updateInventory();
-            
-            // Обновить бусты
             updateBoosts();
-        }
-
-        // Создание секций рулетки
-        function createRouletteSections() {
-            const rouletteSections = document.getElementById('rouletteSections');
-            rouletteSections.innerHTML = '';
-            
-            // Рассчитываем общую вероятность
-            const totalProbability = roulettePrizes.reduce((sum, prize) => sum + prize.probability, 0);
-            
-            // Создаем секции пропорционально вероятности
-            let currentAngle = 0;
-            roulettePrizes.forEach(prize => {
-                const angle = (prize.probability / totalProbability) * 360;
-                const section = document.createElement('div');
-                section.className = 'roulette-section';
-                section.style.backgroundColor = prize.color;
-                section.style.transform = `rotate(${currentAngle}deg) skewY(${90 - angle}deg)`;
-                
-                const content = document.createElement('div');
-                content.className = 'section-content';
-                content.textContent = prize.name;
-                section.appendChild(content);
-                
-                rouletteSections.appendChild(section);
-                currentAngle += angle;
-            });
-        }
-
-        // Вращение рулетки
-        function spinRoulette(cost) {
-            if (cost > 0 && balance < cost) {
-                showNotification('Недостаточно звезд!', 'error');
-                return;
-            }
-            
-            if (cost === 0 && !freeSpinAvailable) {
-                showNotification('Бесплатная рулетка доступна раз в день!', 'error');
-                return;
-            }
-            
-            // Списание стоимости
-            if (cost > 0) {
-                balance -= cost;
-                updateUI();
-            } else {
-                freeSpinAvailable = false;
-                document.getElementById('freeCooldown').innerHTML = '<span id="timer">Доступно через 24 часа</span>';
-                document.getElementById('freeSpinBtn').disabled = true;
-                
-                // Запуск таймера на 24 часа (для демо - 10 секунд)
-                setTimeout(() => {
-                    freeSpinAvailable = true;
-                    document.getElementById('freeCooldown').innerHTML = '<span class="available-now">Доступно сейчас</span>';
-                    document.getElementById('freeSpinBtn').disabled = false;
-                }, 10000); // 10 секунд для демо
-            }
-            
-            // Открыть модальное окно рулетки
-            const modal = document.getElementById('rouletteModal');
-            modal.classList.add('active');
-            
-            // Определяем выигрыш
-            const prize = determinePrize();
-            
-            // Анимация вращения
-            const wheel = document.getElementById('rouletteSections');
-            const prizeElement = document.getElementById('roulettePrize');
-            const closeBtn = document.getElementById('closeRouletteBtn');
-            
-            prizeElement.textContent = 'Крутим...';
-            prizeElement.className = 'roulette-prize';
-            closeBtn.classList.remove('active');
-            
-            // Вращение
-            const spinDuration = 3000; // 3 секунды
-            const rotations = 5; // 5 полных оборотов
-            const targetRotation = rotations * 360 + (360 - (prize.index * (360 / roulettePrizes.length)));
-            
-            wheel.style.transition = `transform ${spinDuration}ms cubic-bezier(0.2, 0.8, 0.3, 1)`;
-            wheel.style.transform = `rotate(${targetRotation}deg)`;
-            
-            // Показываем результат
-            setTimeout(() => {
-                prizeElement.textContent = prize.name;
-                prizeElement.classList.add('win');
-                closeBtn.classList.add('active');
-                
-                // Выдача приза
-                awardPrize(prize);
-            }, spinDuration);
-        }
-
-        // Определение приза
-        function determinePrize() {
-            // Создаем массив с учетом вероятностей
-            let prizePool = [];
-            roulettePrizes.forEach((prize, index) => {
-                for (let i = 0; i < prize.probability; i++) {
-                    prizePool.push({...prize, index});
-                }
-            });
-            
-            // Случайный выбор
-            const randomIndex = Math.floor(Math.random() * prizePool.length);
-            return prizePool[randomIndex];
-        }
-
-        // Выдача приза
-        function awardPrize(prize) {
-            if (prize.type === 'stars') {
-                balance += prize.value;
-                totalEarned += prize.value;
-                showNotification(`+⭐ ${prize.value}`, 'success');
-            } else if (prize.type === 'nft') {
-                inventory.push({
-                    type: 'nft',
-                    rarity: prize.value,
-                    name: prize.name
-                });
-                showNotification(`Получен ${prize.name}!`, 'success');
-            } else if (prize.type === 'boost') {
-                activeBoosts.push({
-                    type: prize.value,
-                    name: prize.name,
-                    expires: Date.now() + 24 * 60 * 60 * 1000 // 24 часа
-                });
-                showNotification(`Активирован ${prize.name}!`, 'success');
-            } else if (prize.type === 'jackpot') {
-                balance += prize.value;
-                totalEarned += prize.value;
-                showNotification(`🎉 ДЖЕКПОТ! +⭐ ${prize.value}`, 'success');
-            }
-            
-            updateUI();
-        }
-
-        // Закрытие рулетки
-        function closeRoulette() {
-            document.getElementById('rouletteModal').classList.remove('active');
-        }
-
-        // Покупка звезд
-        function buyStars(amount) {
-            // В реальном приложении здесь будет интеграция с платежной системой
-            showNotification(`Покупка ${amount} звезд за $${getPrice(amount)}`, 'info');
-        }
-
-        // Получение цены
-        function getPrice(amount) {
-            const prices = {
-                100: 1.99,
-                500: 8.99,
-                1000: 15.99,
-                5000: 69.99
-            };
-            return prices[amount] || 0;
-        }
-
-        // Покупка буста
-        function buyBoost(type) {
-            const cost = 300; // Стоимость буста
-            
-            if (balance < cost) {
-                showNotification('Недостаточно звезд!', 'error');
-                return;
-            }
-            
-            balance -= cost;
-            
-            // Активация буста
-            activeBoosts.push({
-                type: type,
-                name: 'X2 Шанс на NFT',
-                expires: Date.now() + 24 * 60 * 60 * 1000 // 24 часа
-            });
-            
-            showNotification('Буст активирован на 24 часа!', 'success');
-            updateUI();
-        }
-
-        // Выполнение задания
-        function completeChannelTask() {
-            if (document.getElementById('channelTask').classList.contains('task-completed')) {
-                showNotification('Задание уже выполнено!', 'info');
-                return;
-            }
-            
-            // В реальном приложении здесь будет проверка подписки
-            balance += 50;
-            totalEarned += 50;
-            completedTasks++;
-            
-            document.getElementById('channelTask').classList.add('task-completed');
-            document.getElementById('channelTask').querySelector('.btn').textContent = 'Выполнено';
-            document.getElementById('channelTask').querySelector('.btn').disabled = true;
-            
-            showNotification('+⭐ 50 за подписку!', 'success');
-            updateUI();
-        }
-
-        // Приглашение друга
-        function shareWithFriend() {
-            // В реальном приложении здесь будет функционал шаринга
-            showNotification('Ссылка для приглашения скопирована!', 'info');
-        }
-
-        // Обновление инвентаря
-        function updateInventory() {
-            const nftContainer = document.getElementById('nftContainer');
-            
-            if (inventory.length === 0) {
-                nftContainer.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🎒</div>
-                        <div>Коллекции пусты</div>
-                        <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
-                            Крутите рулетку чтобы получить предметы
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-            
-            nftContainer.innerHTML = '<div class="nft-grid"></div>';
-            const nftGrid = nftContainer.querySelector('.nft-grid');
-            
-            inventory.forEach((item, index) => {
-                const nftCard = document.createElement('div');
-                nftCard.className = `nft-card ${item.rarity || ''}`;
-                
-                let icon = '⭐';
-                if (item.type === 'nft') {
-                    if (item.rarity === 'common') icon = '🔹';
-                    else if (item.rarity === 'rare') icon = '🔶';
-                    else if (item.rarity === 'epic') icon = '💜';
-                }
-                
-                nftCard.innerHTML = `
-                    <div class="nft-image">${icon}</div>
-                    <strong>${item.name}</strong>
-                    <div class="nft-price">${item.rarity ? item.rarity.toUpperCase() : ''}</div>
-                    <button class="btn btn-sell" onclick="sellItem(${index})">Продать</button>
-                `;
-                
-                nftGrid.appendChild(nftCard);
-            });
-        }
-
-        // Обновление бустов
-        function updateBoosts() {
-            const boostsContainer = document.getElementById('boostsContainer');
-            
-            // Очистка истекших бустов
-            activeBoosts = activeBoosts.filter(boost => boost.expires > Date.now());
-            
-            if (activeBoosts.length === 0) {
-                boostsContainer.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">⚡</div>
-                        <div>Бустов нет</div>
-                        <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
-                            Купите бусты в магазине
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-            
-            boostsContainer.innerHTML = '';
-            
-            activeBoosts.forEach((boost, index) => {
-                const boostItem = document.createElement('div');
-                boostItem.className = 'inventory-item boost-active';
-                
-                const timeLeft = Math.max(0, boost.expires - Date.now());
-                const hoursLeft = Math.floor(timeLeft / (60 * 60 * 1000));
-                const minutesLeft = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
-                
-                boostItem.innerHTML = `
-                    <strong>${boost.name}</strong>
-                    <div>Осталось: ${hoursLeft}ч ${minutesLeft}м</div>
-                `;
-                
-                boostsContainer.appendChild(boostItem);
-            });
-        }
-
-        // Продажа предмета
-        function sellItem(index) {
-            const item = inventory[index];
-            let price = 0;
-            
-            if (item.type === 'nft') {
-                if (item.rarity === 'common') price = 50;
-                else if (item.rarity === 'rare') price = 100;
-                else if (item.rarity === 'epic') price = 200;
-            }
-            
-            if (price > 0) {
-                balance += price;
-                inventory.splice(index, 1);
-                showNotification(`Предмет продан за ⭐ ${price}`, 'success');
-                updateUI();
-            }
-        }
-
-        // Показать уведомление
-        function showNotification(message, type) {
-            const balanceEarned = document.getElementById('balanceEarned');
-            balanceEarned.textContent = message;
-            balanceEarned.style.background = type === 'success' ? 'rgba(76, 175, 80, 0.9)' : 
-                                           type === 'error' ? 'rgba(244, 67, 54, 0.9)' : 
-                                           'rgba(33, 150, 243, 0.9)';
-            
-            balanceEarned.style.animation = 'none';
-            setTimeout(() => {
-                balanceEarned.style.animation = 'fadeUp 2s ease-out';
-            }, 10);
-        }
+        });
     </script>
 </body>
 </html>
