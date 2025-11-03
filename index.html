@@ -66,7 +66,7 @@
         }
 
         .btn {
-            background: linear-gradient(135deg, #2196f3, #1976d2);
+            background: linear-gradient(135deg, #4caf50, #45a049);
             color: white;
             border: none;
             padding: 12px 20px;
@@ -77,11 +77,13 @@
             transition: all 0.2s ease;
             width: 100%;
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .btn:active {
             transform: scale(0.95);
-            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.6);
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.6);
         }
 
         .btn:disabled {
@@ -91,23 +93,12 @@
             box-shadow: none;
         }
 
-        .btn-success {
-            background: linear-gradient(135deg, #4caf50, #45a049);
-        }
-
-        .btn-premium {
-            background: linear-gradient(135deg, #ff9800, #f57c00);
-        }
-
-        .btn-luxury {
-            background: linear-gradient(135deg, #9c27b0, #7b1fa2);
-        }
-
         .btn-sell {
             background: linear-gradient(135deg, #ff6b6b, #ee5a52);
             padding: 8px 15px;
             font-size: 12px;
             width: auto;
+            text-transform: none;
         }
 
         .bottom-menu {
@@ -232,7 +223,7 @@
 
         .horizontal-roulette {
             width: 100%;
-            height: 140px;
+            height: 160px;
             position: relative;
             overflow: hidden;
             border-radius: 12px;
@@ -271,10 +262,10 @@
         }
 
         .roulette-image {
-            width: 50px;
-            height: 50px;
+            width: 70px;
+            height: 70px;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 10px;
             margin-bottom: 8px;
             border: 2px solid rgba(255, 255, 255, 0.3);
         }
@@ -363,10 +354,10 @@
         }
 
         .item-image-real {
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             object-fit: cover;
-            border-radius: 10px;
+            border-radius: 12px;
             margin-bottom: 10px;
             border: 2px solid rgba(255, 255, 255, 0.3);
         }
@@ -406,6 +397,11 @@
             margin-bottom: 10px;
             font-size: 16px;
         }
+
+        .timer {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -418,7 +414,7 @@
     <div class="container">
         <div id="roulette-tab" class="tab-content active">
             <div class="roulette-container">
-                <div class="roulette-title">🎡 Telegram Roulette</div>
+                <div class="roulette-title">Telegram Roulette</div>
                 
                 <div class="roulette-type-selector">
                     <button class="roulette-type-btn active" onclick="switchRouletteType('free')">Free</button>
@@ -439,8 +435,9 @@
                         <h3>Free Spin</h3>
                         <div class="cooldown" id="freeCooldown">
                             <span class="available-now">Available now</span>
+                            <span id="freeTimer" class="timer" style="display: none;"></span>
                         </div>
-                        <button class="btn btn-success" id="freeSpinBtn" onclick="spinRoulette('free')">🎯 Spin</button>
+                        <button class="btn" id="freeSpinBtn" onclick="spinRoulette('free')">SPIN</button>
                     </div>
                 </div>
                 
@@ -456,7 +453,7 @@
                     <div class="section">
                         <h3>Premium Spin</h3>
                         <div class="spin-cost">Cost: ⭐ 200</div>
-                        <button class="btn btn-premium" id="premiumSpinBtn" onclick="spinRoulette('premium')">🎯 Spin</button>
+                        <button class="btn" id="premiumSpinBtn" onclick="spinRoulette('premium')">SPIN</button>
                     </div>
                 </div>
                 
@@ -472,7 +469,7 @@
                     <div class="section">
                         <h3>Luxury Spin</h3>
                         <div class="spin-cost">Cost: ⭐ 500</div>
-                        <button class="btn btn-luxury" id="luxurySpinBtn" onclick="spinRoulette('luxury')">🎯 Spin</button>
+                        <button class="btn" id="luxurySpinBtn" onclick="spinRoulette('luxury')">SPIN</button>
                     </div>
                 </div>
             </div>
@@ -480,7 +477,7 @@
 
         <div id="inventory-tab" class="tab-content">
             <div class="section">
-                <h2>🎒 My Inventory</h2>
+                <h2>My Inventory</h2>
                 <div id="inventoryContainer">
                     <div class="empty-state">
                         <div class="empty-icon">🎒</div>
@@ -561,10 +558,14 @@
             'Golden Ticket': 5000
         };
 
+        let freeSpinCooldown = 120; // 2 minutes in seconds
+        let freeSpinTimer = null;
+
         function initRoulettes() {
             initRoulette('free');
             initRoulette('premium');
             initRoulette('luxury');
+            checkFreeSpinCooldown();
         }
 
         function initRoulette(type) {
@@ -573,14 +574,12 @@
             
             const prizes = roulettePrizes[type];
             
-            // Увеличил количество дубликатов для более длинной анимации
             for (let i = 0; i < 8; i++) {
                 prizes.forEach((prize, index) => {
                     const item = document.createElement('div');
                     item.className = 'roulette-item-wheel';
                     item.style.background = prize.color;
                     
-                    // Показываем картинку если есть, иначе emoji
                     if (prize.image) {
                         item.innerHTML = `
                             <img src="${prize.image}" class="roulette-image" alt="${prize.name}">
@@ -598,18 +597,52 @@
             }
         }
 
+        function checkFreeSpinCooldown() {
+            const now = Math.floor(Date.now() / 1000);
+            const timeSinceLastSpin = now - userData.lastFreeSpin;
+            
+            if (timeSinceLastSpin < freeSpinCooldown) {
+                const timeLeft = freeSpinCooldown - timeSinceLastSpin;
+                startFreeSpinTimer(timeLeft);
+            } else {
+                document.getElementById('freeSpinBtn').disabled = false;
+                document.querySelector('#freeCooldown .available-now').style.display = 'block';
+                document.getElementById('freeTimer').style.display = 'none';
+            }
+        }
+
+        function startFreeSpinTimer(seconds) {
+            document.getElementById('freeSpinBtn').disabled = true;
+            document.querySelector('#freeCooldown .available-now').style.display = 'none';
+            document.getElementById('freeTimer').style.display = 'block';
+            
+            let timeLeft = seconds;
+            
+            freeSpinTimer = setInterval(() => {
+                timeLeft--;
+                
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById('freeTimer').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(freeSpinTimer);
+                    document.getElementById('freeSpinBtn').disabled = false;
+                    document.querySelector('#freeCooldown .available-now').style.display = 'block';
+                    document.getElementById('freeTimer').style.display = 'none';
+                }
+            }, 1000);
+        }
+
         function switchRouletteType(type) {
             userData.currentRouletteType = type;
             
-            // Hide all roulettes
             document.querySelectorAll('.roulette-section').forEach(section => {
                 section.style.display = 'none';
             });
             
-            // Show selected roulette
             document.getElementById(`${type}-roulette`).style.display = 'block';
             
-            // Update active button
             document.querySelectorAll('.roulette-type-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
@@ -624,7 +657,10 @@
                 return;
             }
 
-            if (cost > 0) {
+            if (type === 'free') {
+                userData.lastFreeSpin = Math.floor(Date.now() / 1000);
+                startFreeSpinTimer(freeSpinCooldown);
+            } else {
                 userData.balance -= cost;
                 updateBalance();
             }
@@ -635,45 +671,39 @@
                            type === 'premium' ? document.getElementById('premiumSpinBtn') : 
                            document.getElementById('luxurySpinBtn');
             
-            // Disable button during spin
             spinBtn.disabled = true;
             resultElement.textContent = 'Spinning...';
             resultElement.className = 'roulette-result';
 
             const prizes = roulettePrizes[type];
             
-            // Calculate target position first
             const itemWidth = 100;
             const totalItems = track.children.length;
             const itemsPerSet = prizes.length;
             
-            // Choose a random prize index
             const randomPrizeIndex = Math.floor(Math.random() * prizes.length);
             const prize = prizes[randomPrizeIndex];
             
-            // Calculate exact position to stop at the selected prize
             const middleSetIndex = Math.floor(totalItems / (2 * itemsPerSet));
             const targetIndex = middleSetIndex * itemsPerSet + randomPrizeIndex;
-            const targetPosition = -targetIndex * itemWidth + (itemWidth * 1); // Move 1 item back
+            const targetPosition = -targetIndex * itemWidth + (itemWidth * 1);
             
-            // Set initial position to show the beginning
             track.style.transition = 'none';
             track.style.transform = 'translateX(0)';
             
-            // Force reflow
             track.offsetHeight;
             
-            // Увеличил время анимации в 2 раза - с 4 до 8 секунд
             track.style.transition = 'transform 8s cubic-bezier(0.1, 0.8, 0.2, 1)';
             track.style.transform = `translateX(${targetPosition}px)`;
 
             setTimeout(() => {
-                // Show the actual won prize
-                resultElement.textContent = `You won: ${prize.name} - ⭐ ${prize.stars}`;
+                resultElement.textContent = `You win: ${prize.name} - ⭐ ${prize.stars}`;
                 resultElement.classList.add('win');
-                spinBtn.disabled = false;
+                
+                if (type !== 'free') {
+                    spinBtn.disabled = false;
+                }
 
-                // Award the prize
                 if (prize.type === 'stars') {
                     userData.balance += prize.stars;
                     userData.totalEarned += prize.stars;
@@ -689,7 +719,7 @@
 
                 updateBalance();
                 updateInventory();
-            }, 8000); // Увеличил таймаут до 8 секунд
+            }, 8000);
         }
 
         function updateBalance() {
@@ -719,12 +749,10 @@
                 const card = document.createElement('div');
                 card.className = 'inventory-item-card';
                 
-                // Add rarity class based on price
                 if (item.price >= 1500) card.classList.add('legendary');
                 else if (item.price >= 500) card.classList.add('epic');
                 else card.classList.add('rare');
                 
-                // Показываем картинку если есть, иначе emoji
                 if (item.image) {
                     card.innerHTML = `
                         <img src="${item.image}" class="item-image-real" alt="${item.name}">
