@@ -480,7 +480,7 @@
 <body>
     <!-- Контейнер для баланса и уведомлений -->
     <div class="balance-container">
-        <div id="balanceEarned"></div>
+        <div id="balanceEarned" class="balance-earned" style="display: none;"></div>
         <div class="top-balance">
             <div class="balance-amount">⭐ 1000</div>
         </div>
@@ -552,21 +552,21 @@
                         <span class="available-now">Доступно сейчас</span>
                         <span id="timer" style="display: none;"></span>
                     </div>
-                    <button class="btn btn-success" id="freeSpinBtn" onclick="spinRoulette(0)">Крутить бесплатно</button>
+                    <button class="btn btn-success" id="freeSpinBtn" onclick="spinRoulette('free')">Крутить бесплатно</button>
                 </div>
 
                 <div class="roulette-item">
                     <strong>Рулетка за 200 звезд</strong>
                     <div>Большие призы за звезды!</div>
                     <div class="price">Стоимость: ⭐ 200</div>
-                    <button class="btn" id="paidSpinBtn" onclick="spinRoulette(200)">Крутить за 200 ⭐</button>
+                    <button class="btn" id="paidSpinBtn" onclick="spinRoulette('normal')">Крутить за 200 ⭐</button>
                 </div>
 
                 <div class="roulette-item">
                     <strong>Премиум рулетка</strong>
                     <div>Эксклюзивные призы для чемпионов!</div>
                     <div class="price">Стоимость: ⭐ 500</div>
-                    <button class="btn btn-premium" id="premiumSpinBtn" onclick="spinRoulette(500)">Крутить за 500 ⭐</button>
+                    <button class="btn btn-premium" id="premiumSpinBtn" onclick="spinRoulette('premium')">Крутить за 500 ⭐</button>
                 </div>
             </div>
         </div>
@@ -678,50 +678,53 @@
             lastFreeSpin: 0
         };
 
-        // Призы для рулетки
-        const roulettePrizes = [
-            { type: 'stars', amount: 10, name: '10 звезд', icon: '⭐', color: '#FFD700' },
-            { type: 'stars', amount: 20, name: '20 звезд', icon: '⭐⭐', color: '#FFA500' },
-            { type: 'stars', amount: 50, name: '50 звезд', icon: '⭐⭐⭐', color: '#FF6347' },
-            { type: 'nft', rarity: 'common', name: 'Обычный NFT', icon: '📦', color: '#4CAF50' },
-            { type: 'stars', amount: 5, name: '5 звезд', icon: '⭐', color: '#87CEEB' },
-            { type: 'nft', rarity: 'rare', name: 'Редкий NFT', icon: '🎁', color: '#9C27B0' },
-            { type: 'stars', amount: 100, name: '100 звезд', icon: '💫', color: '#E91E63' },
-            { type: 'nft', rarity: 'epic', name: 'Эпический NFT', icon: '💎', color: '#FF9800' },
-            { type: 'stars', amount: 200, name: '200 звезд', icon: '✨', color: '#F44336' },
-            { type: 'nft', rarity: 'legendary', name: 'Легендарный NFT', icon: '👑', color: '#00BCD4' }
-        ];
+        // Призы для разных типов рулетки
+        const roulettePrizes = {
+            free: [
+                { type: 'nft', name: 'Lol Pop', icon: '🍭', stars: 300, color: '#FF69B4' },
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', stars: 250, color: '#FFD700' },
+                { type: 'stars', name: '200 звезд', icon: '⭐', stars: 200, color: '#4CAF50' },
+                { type: 'stars', name: '150 звезд', icon: '⭐', stars: 150, color: '#2196F3' },
+                { type: 'stars', name: '100 звезд', icon: '⭐', stars: 100, color: '#FF9800' },
+                { type: 'stars', name: '50 звезд', icon: '⭐', stars: 50, color: '#9C27B0' }
+            ],
+            normal: [
+                { type: 'nft', name: 'Astral Shard', icon: '🔮', stars: 750, color: '#00BCD4' },
+                { type: 'nft', name: 'Snoop Dog', icon: '🐶', stars: 450, color: '#795548' },
+                { type: 'nft', name: 'Lol Pop', icon: '🍭', stars: 300, color: '#FF69B4' },
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', stars: 250, color: '#FFD700' },
+                { type: 'stars', name: '100 звезд', icon: '⭐', stars: 100, color: '#FF9800' },
+                { type: 'stars', name: '50 звезд', icon: '⭐', stars: 50, color: '#9C27B0' }
+            ],
+            premium: [
+                { type: 'nft', name: 'Plush Pepe', icon: '🐸', stars: 2000, color: '#4CAF50' },
+                { type: 'nft', name: 'Durovs Cap', icon: '🧢', stars: 1500, color: '#2196F3' },
+                { type: 'nft', name: 'Astral Shard', icon: '🔮', stars: 750, color: '#00BCD4' },
+                { type: 'nft', name: 'Snoop Dog', icon: '🐶', stars: 450, color: '#795548' },
+                { type: 'stars', name: '250 звезд', icon: '⭐', stars: 250, color: '#FFD700' },
+                { type: 'stars', name: '100 звезд', icon: '⭐', stars: 100, color: '#FF9800' }
+            ]
+        };
 
         // Цены NFT для продажи
         const nftPrices = {
-            common: 50,
-            rare: 100,
-            epic: 250,
-            legendary: 500
+            'Plush Pepe': 2000,
+            'Durovs Cap': 1500,
+            'Astral Shard': 750,
+            'Snoop Dog': 450,
+            'Lol Pop': 300,
+            'Happy Birthday': 250
         };
 
         // Инициализация горизонтальной рулетки
         function initRoulette() {
-            const track = document.getElementById('rouletteTrack');
-            track.innerHTML = '';
-            
-            // Создаем много копий призов для бесконечного эффекта
-            for (let i = 0; i < 5; i++) {
-                roulettePrizes.forEach(prize => {
-                    const item = document.createElement('div');
-                    item.className = 'roulette-item-horizontal';
-                    item.style.background = prize.color;
-                    item.innerHTML = `
-                        <div class="roulette-icon">${prize.icon}</div>
-                        <div class="roulette-name">${prize.name}</div>
-                    `;
-                    track.appendChild(item);
-                });
-            }
+            // Рулетка будет инициализирована при каждом вращении
         }
 
         // Вращение рулетки
-        function spinRoulette(cost) {
+        function spinRoulette(type) {
+            const cost = type === 'free' ? 0 : type === 'normal' ? 200 : 500;
+            
             if (cost > 0 && userData.balance < cost) {
                 alert('Недостаточно звезд!');
                 return;
@@ -742,17 +745,34 @@
             prizeElement.className = 'roulette-prize';
             closeBtn.classList.remove('active');
 
-            // Случайный приз
-            const randomPrizeIndex = Math.floor(Math.random() * roulettePrizes.length);
-            const prize = roulettePrizes[randomPrizeIndex];
+            // Получаем призы для выбранного типа рулетки
+            const prizes = roulettePrizes[type];
             
+            // Случайный приз
+            const randomPrizeIndex = Math.floor(Math.random() * prizes.length);
+            const prize = prizes[randomPrizeIndex];
+            
+            // Очищаем и заполняем трек
+            track.innerHTML = '';
+            for (let i = 0; i < 8; i++) {
+                prizes.forEach(prizeItem => {
+                    const item = document.createElement('div');
+                    item.className = 'roulette-item-horizontal';
+                    item.style.background = prizeItem.color;
+                    item.innerHTML = `
+                        <div class="roulette-icon">${prizeItem.icon}</div>
+                        <div class="roulette-name">${prizeItem.name}</div>
+                    `;
+                    track.appendChild(item);
+                });
+            }
+
             // Анимация вращения с плавным замедлением
             const itemWidth = 100;
-            const totalItems = roulettePrizes.length * 5;
-            const targetPosition = -(randomPrizeIndex * itemWidth + 15 * itemWidth);
+            const targetPosition = -(randomPrizeIndex * itemWidth + 12 * itemWidth);
             
             let startTime = null;
-            const duration = 6000; // 6 секунд
+            const duration = 5000; // 5 секунд
             let animationFrame;
 
             function animate(currentTime) {
@@ -760,10 +780,17 @@
                 const elapsed = currentTime - startTime;
                 const progress = Math.min(elapsed / duration, 1);
                 
-                // Кривая замедления - начинаем быстро, заканчиваем медленно
-                const easeOut = 1 - Math.pow(1 - progress, 3);
+                // Кривая ускорения и замедления - быстро начинаем, медленно заканчиваем
+                let easeProgress;
+                if (progress < 0.3) {
+                    // Быстрое ускорение в начале
+                    easeProgress = progress * 3;
+                } else {
+                    // Плавное замедление в конце
+                    easeProgress = 0.9 + (progress - 0.3) * 0.1;
+                }
                 
-                const currentPosition = easeOut * targetPosition;
+                const currentPosition = easeProgress * targetPosition;
                 track.style.transform = `translateX(${currentPosition}px)`;
                 
                 if (progress < 1) {
@@ -772,22 +799,22 @@
                     // Финальная позиция
                     track.style.transform = `translateX(${targetPosition}px)`;
                     
-                    prizeElement.textContent = prize.name;
+                    prizeElement.textContent = `${prize.name} - ⭐ ${prize.stars}`;
                     prizeElement.classList.add('win');
                     closeBtn.classList.add('active');
 
                     // Выдача приза
                     if (prize.type === 'stars') {
-                        userData.balance += prize.amount;
-                        userData.totalEarned += prize.amount;
-                        showBalanceEarned(`+${prize.amount} ⭐`);
+                        userData.balance += prize.stars;
+                        userData.totalEarned += prize.stars;
+                        showBalanceEarned(`+${prize.stars} ⭐`);
                     } else if (prize.type === 'nft') {
                         userData.inventory.push({
                             id: Date.now(),
                             name: prize.name,
-                            rarity: prize.rarity,
                             icon: prize.icon,
-                            price: nftPrices[prize.rarity]
+                            stars: prize.stars,
+                            price: nftPrices[prize.name]
                         });
                         showBalanceEarned(`🎉 ${prize.name}!`);
                     }
@@ -847,12 +874,12 @@
             
             userData.inventory.forEach(item => {
                 const card = document.createElement('div');
-                card.className = `nft-card ${item.rarity}`;
+                card.className = 'nft-card';
                 card.innerHTML = `
                     <div class="nft-image">${item.icon}</div>
                     <strong>${item.name}</strong>
                     <div class="nft-price">Цена: ⭐ ${item.price}</div>
-                    <div style="font-size: 10px; margin-top: 5px; text-transform: capitalize;">${item.rarity}</div>
+                    <div style="font-size: 10px; margin-top: 5px;">⭐ ${item.stars}</div>
                     <button class="btn btn-sell" onclick="sellNFT(${item.id})">Продать</button>
                 `;
                 grid.appendChild(card);
@@ -908,7 +935,6 @@
 
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', function() {
-            initRoulette();
             updateBalance();
             updateStats();
             updateInventory();
