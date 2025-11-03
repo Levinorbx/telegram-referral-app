@@ -20,58 +20,59 @@
         }
 
         .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
             background: rgba(30, 30, 46, 0.95);
-            padding: 15px;
+            padding: 12px 15px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
         }
 
         .balance-container {
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .balance-amount {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             color: #ffd700;
-        }
-
-        .stars-add-animation {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: rgba(76, 175, 80, 0.9);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            animation: starsFly 1s ease-out forwards;
-            z-index: 1000;
-        }
-
-        @keyframes starsFly {
-            0% {
-                transform: translateX(-100px);
-                opacity: 0;
-            }
-            50% {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateX(-100px);
-                opacity: 0;
-            }
         }
 
         .container {
             max-width: 400px;
             margin: 0 auto;
-            padding: 15px;
-            padding-bottom: 70px;
+            padding: 70px 15px 70px 15px;
         }
 
         .section {
@@ -245,14 +246,6 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
-        .roulette-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #ffd700;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        }
-
         .horizontal-roulette {
             width: 100%;
             height: 160px;
@@ -405,14 +398,17 @@
         }
 
         .roulette-type-btn {
-            padding: 8px 15px;
-            border-radius: 10px;
+            padding: 12px 20px;
+            border-radius: 12px;
             background: rgba(40, 40, 60, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: #e0e0e0;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            flex: 1;
+            text-align: center;
         }
 
         .roulette-type-btn.active {
@@ -440,6 +436,10 @@
 </head>
 <body>
     <div class="header">
+        <div class="user-info">
+            <div class="user-avatar">U</div>
+            <div class="user-name">User</div>
+        </div>
         <div class="balance-container">
             <div class="balance-amount">⭐ 1000</div>
         </div>
@@ -448,8 +448,6 @@
     <div class="container">
         <div id="roulette-tab" class="tab-content active">
             <div class="roulette-container">
-                <div class="roulette-title">Roulette</div>
-                
                 <div class="roulette-type-selector">
                     <button class="roulette-type-btn active" id="freeTypeBtn" onclick="switchRouletteType('free')">Free</button>
                     <button class="roulette-type-btn" id="premiumTypeBtn" onclick="switchRouletteType('premium')">Premium</button>
@@ -555,9 +553,6 @@
                 { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#B0B0B0' },
                 { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FF9800' },
                 { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#FFD700' },
-                { type: 'stars', name: '150 Stars', icon: '⭐', image: 'stars.webp', stars: 150, color: '#FFD700' },
-                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FFD700' },
-                { type: 'stars', name: '50 Stars', icon: '⭐', image: 'stars.webp', stars: 50, color: '#FFD700' },
                 { type: 'nft', name: 'Vintage Cigar', icon: '🐶', image: 'cigar.webp', stars: 450, color: '#795548' },
                 { type: 'stars', name: '75 Stars', icon: '⭐', image: 'stars.webp', stars: 75, color: '#FFD700' }
             ],
@@ -567,7 +562,6 @@
                 { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#B0B0B0' },
                 { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FF9800' },
                 { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FFD700' },
-                { type: 'stars', name: '50 Stars', icon: '⭐', image: 'stars.webp', stars: 50, color: '#FFD700' },
                 { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: '#404040' },
                 { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#FFD700' }
             ],
@@ -577,7 +571,6 @@
                 { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: '#00BCD4' },
                 { type: 'nft', name: 'Vintage Cigar', icon: '🐶', image: 'cigar.webp', stars: 450, color: '#795548' },
                 { type: 'stars', name: '250 Stars', icon: '⭐', image: 'stars.webp', stars: 250, color: '#FFD700' },
-                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FFD700' },
                 { type: 'stars', name: '500 Stars', icon: '⭐', image: 'stars.webp', stars: 500, color: '#FFD700' }
             ]
         };
@@ -594,15 +587,17 @@
         let freeSpinCooldown = 120;
         let freeSpinTimer = null;
 
-        function showStarsAnimation(amount) {
-            const animation = document.createElement('div');
-            animation.className = 'stars-add-animation';
-            animation.textContent = `+${amount} ⭐`;
-            document.body.appendChild(animation);
-            
-            setTimeout(() => {
-                animation.remove();
-            }, 1000);
+        function initTelegramUser() {
+            if (window.Telegram && Telegram.WebApp) {
+                const user = Telegram.WebApp.initDataUnsafe.user;
+                if (user) {
+                    document.querySelector('.user-name').textContent = user.first_name || 'User';
+                    const avatar = document.querySelector('.user-avatar');
+                    if (user.username) {
+                        avatar.textContent = user.username.charAt(0).toUpperCase();
+                    }
+                }
+            }
         }
 
         function disableNavigation() {
@@ -776,7 +771,6 @@
                 if (prize.type === 'stars') {
                     userData.balance += prize.stars;
                     userData.totalEarned += prize.stars;
-                    showStarsAnimation(prize.stars);
                 } else if (prize.type === 'nft') {
                     userData.inventory.push({
                         id: Date.now(),
@@ -853,7 +847,6 @@
                 userData.balance += price;
                 userData.inventory.splice(itemIndex, 1);
                 
-                showStarsAnimation(price);
                 updateBalance();
                 updateInventory();
             }
@@ -876,6 +869,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            initTelegramUser();
             initRoulettes();
             updateBalance();
             updateInventory();
