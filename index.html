@@ -25,13 +25,14 @@
             left: 0;
             right: 0;
             background: rgba(30, 30, 46, 0.95);
-            padding: 12px 15px;
+            padding: 8px 15px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             z-index: 1000;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            height: 50px;
         }
 
         .user-info {
@@ -44,12 +45,9 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: white;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
         .user-name {
@@ -72,7 +70,7 @@
         .container {
             max-width: 400px;
             margin: 0 auto;
-            padding: 70px 15px 70px 15px;
+            padding: 60px 15px 70px 15px;
         }
 
         .section {
@@ -226,13 +224,15 @@
 
         .cooldown {
             color: #ff6b6b;
-            font-size: 12px;
+            font-size: 16px;
             margin-top: 5px;
+            font-weight: bold;
         }
 
         .available-now {
             color: #4caf50 !important;
             font-weight: bold;
+            font-size: 16px;
         }
 
         /* Horizontal Roulette Styles */
@@ -359,16 +359,28 @@
             border: 2px solid transparent;
         }
 
-        .inventory-item-card.rare {
-            border-color: #ffd700;
+        .inventory-item-card.candy-cane {
+            border-color: #B0B0B0;
         }
 
-        .inventory-item-card.epic {
-            border-color: #9c27b0;
+        .inventory-item-card.happy-birthday {
+            border-color: #FF69B4;
         }
 
-        .inventory-item-card.legendary {
-            border-color: #ff9800;
+        .inventory-item-card.vintage-cigar {
+            border-color: #795548;
+        }
+
+        .inventory-item-card.astral-shard {
+            border-color: #00BCD4;
+        }
+
+        .inventory-item-card.durovs-cap {
+            border-color: #404040;
+        }
+
+        .inventory-item-card.plush-pepe {
+            border-color: #2196F3;
         }
 
         .item-image {
@@ -413,7 +425,7 @@
 
         .roulette-type-btn.active {
             background: linear-gradient(135deg, #2196f3, #1976d2);
-            border-color: #2196f3;
+            border-color: #2196F3;
         }
 
         .roulette-type-btn.disabled {
@@ -431,14 +443,15 @@
         .timer {
             color: #ff6b6b;
             font-weight: bold;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="user-info">
-            <div class="user-avatar">U</div>
-            <div class="user-name">User</div>
+            <div class="user-avatar" id="userAvatar"></div>
+            <div class="user-name" id="userName">User</div>
         </div>
         <div class="balance-container">
             <div class="balance-amount">⭐ 1000</div>
@@ -551,7 +564,7 @@
         const roulettePrizes = {
             free: [
                 { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#B0B0B0' },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FF9800' },
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FF69B4' },
                 { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#FFD700' },
                 { type: 'nft', name: 'Vintage Cigar', icon: '🐶', image: 'cigar.webp', stars: 450, color: '#795548' },
                 { type: 'stars', name: '75 Stars', icon: '⭐', image: 'stars.webp', stars: 75, color: '#FFD700' }
@@ -560,7 +573,7 @@
                 { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: '#00BCD4' },
                 { type: 'nft', name: 'Vintage Cigar', icon: '🐶', image: 'cigar.webp', stars: 450, color: '#795548' },
                 { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#B0B0B0' },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FF9800' },
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FF69B4' },
                 { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FFD700' },
                 { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: '#404040' },
                 { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#FFD700' }
@@ -568,9 +581,9 @@
             luxury: [
                 { type: 'nft', name: 'Plush Pepe', icon: '🐸', image: 'pepe.webp', stars: 2000, color: '#2196F3' },
                 { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: '#404040' },
+                { type: 'stars', name: '250 Stars', icon: '⭐', image: 'stars.webp', stars: 250, color: '#FFD700' },
                 { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: '#00BCD4' },
                 { type: 'nft', name: 'Vintage Cigar', icon: '🐶', image: 'cigar.webp', stars: 450, color: '#795548' },
-                { type: 'stars', name: '250 Stars', icon: '⭐', image: 'stars.webp', stars: 250, color: '#FFD700' },
                 { type: 'stars', name: '500 Stars', icon: '⭐', image: 'stars.webp', stars: 500, color: '#FFD700' }
             ]
         };
@@ -591,10 +604,20 @@
             if (window.Telegram && Telegram.WebApp) {
                 const user = Telegram.WebApp.initDataUnsafe.user;
                 if (user) {
-                    document.querySelector('.user-name').textContent = user.first_name || 'User';
-                    const avatar = document.querySelector('.user-avatar');
-                    if (user.username) {
-                        avatar.textContent = user.username.charAt(0).toUpperCase();
+                    document.getElementById('userName').textContent = user.first_name || 'User';
+                    const avatar = document.getElementById('userAvatar');
+                    
+                    if (user.photo_url) {
+                        avatar.style.backgroundImage = `url(${user.photo_url})`;
+                    } else {
+                        // Если нет фото, показываем первую букву имени
+                        avatar.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                        avatar.style.display = 'flex';
+                        avatar.style.alignItems = 'center';
+                        avatar.style.justifyContent = 'center';
+                        avatar.style.color = 'white';
+                        avatar.style.fontWeight = 'bold';
+                        avatar.textContent = user.first_name ? user.first_name.charAt(0).toUpperCase() : 'U';
                     }
                 }
             }
@@ -721,14 +744,6 @@
             userData.isSpinning = true;
             disableNavigation();
 
-            if (type === 'free') {
-                userData.lastFreeSpin = Math.floor(Date.now() / 1000);
-                startFreeSpinTimer(freeSpinCooldown);
-            } else {
-                userData.balance -= cost;
-                updateBalance();
-            }
-
             const resultElement = document.getElementById(`${type}RouletteResult`);
             const track = document.getElementById(`${type}RouletteTrack`);
             const spinBtn = type === 'free' ? document.getElementById('freeSpinBtn') : 
@@ -784,6 +799,12 @@
                 updateBalance();
                 updateInventory();
                 
+                // Таймер появляется только после выпадения приза для фри спинов
+                if (type === 'free') {
+                    userData.lastFreeSpin = Math.floor(Date.now() / 1000);
+                    startFreeSpinTimer(freeSpinCooldown);
+                }
+                
                 userData.isSpinning = false;
                 enableNavigation();
             }, 8000);
@@ -814,7 +835,10 @@
             
             userData.inventory.forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'inventory-item-card';
+                
+                // Добавляем классы для разных цветов обводки
+                const className = item.name.toLowerCase().replace(/\s+/g, '-');
+                card.className = `inventory-item-card ${className}`;
                 
                 if (item.price >= 1500) card.classList.add('legendary');
                 else if (item.price >= 500) card.classList.add('epic');
