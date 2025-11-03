@@ -47,7 +47,6 @@
             border-radius: 50%;
             background-size: cover;
             background-position: center;
-            border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
         .user-name {
@@ -65,6 +64,17 @@
             font-size: 16px;
             font-weight: bold;
             color: #ffd700;
+            transition: all 0.3s ease;
+        }
+
+        .balance-changing {
+            animation: balancePulse 0.1s ease-in-out 3;
+        }
+
+        @keyframes balancePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         .container {
@@ -550,6 +560,25 @@
     </div>
 
     <script>
+        // Функции для работы с localStorage
+        function saveUserData() {
+            localStorage.setItem('giftForceUserData', JSON.stringify(userData));
+        }
+
+        function loadUserData() {
+            const saved = localStorage.getItem('giftForceUserData');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // Объединяем сохраненные данные с дефолтными (на случай добавления новых полей)
+                userData = {
+                    ...userData,
+                    ...parsed,
+                    // Сохраняем текущее состояние спина
+                    isSpinning: false
+                };
+            }
+        }
+
         let userData = {
             balance: 1000,
             completedTasks: 0,
@@ -710,8 +739,36 @@
                     document.getElementById('freeSpinBtn').disabled = false;
                     document.querySelector('#freeCooldown .available-now').style.display = 'block';
                     document.getElementById('freeTimer').style.display = 'none';
+                    saveUserData(); // Сохраняем когда таймер закончился
                 }
             }, 1000);
+        }
+
+        function animateBalanceChange(oldBalance, newBalance, duration = 1000) {
+            const balanceElement = document.querySelector('.balance-amount');
+            const startTime = Date.now();
+            const difference = newBalance - oldBalance;
+            
+            balanceElement.classList.add('balance-changing');
+            
+            function updateBalance() {
+                const currentTime = Date.now();
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const currentBalance = oldBalance + Math.floor(difference * progress);
+                balanceElement.textContent = `⭐ ${currentBalance}`;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateBalance);
+                } else {
+                    balanceElement.textContent = `⭐ ${newBalance}`;
+                    balanceElement.classList.remove('balance-changing');
+                    saveUserData(); // Сохраняем после завершения анимации
+                }
+            }
+            
+            updateBalance();
         }
 
         function switchRouletteType(type) {
@@ -743,6 +800,12 @@
 
             userData.isSpinning = true;
             disableNavigation();
+
+            // Сразу убираем "Available now" при начале спина
+            if (type === 'free') {
+                document.querySelector('#freeCooldown .available-now').style.display = 'none';
+                document.getElementById('freeTimer').style.display = 'none';
+            }
 
             const resultElement = document.getElementById(`${type}RouletteResult`);
             const track = document.getElementById(`${type}RouletteTrack`);
@@ -783,9 +846,13 @@
                     spinBtn.disabled = false;
                 }
 
+                const oldBalance = userData.balance;
+                
                 if (prize.type === 'stars') {
                     userData.balance += prize.stars;
                     userData.totalEarned += prize.stars;
+                    // Анимация добавления звезд
+                    animateBalanceChange(oldBalance, userData.balance);
                 } else if (prize.type === 'nft') {
                     userData.inventory.push({
                         id: Date.now(),
@@ -794,9 +861,10 @@
                         image: prize.image,
                         price: nftPrices[prize.name]
                     });
+                    saveUserData(); // Сохраняем сразу для NFT
+                    updateBalance();
                 }
 
-                updateBalance();
                 updateInventory();
                 
                 // Таймер появляется только после выпадения приза для фри спинов
@@ -807,6 +875,7 @@
                 
                 userData.isSpinning = false;
                 enableNavigation();
+                saveUserData(); // Сохраняем после завершения спина
             }, 8000);
         }
 
@@ -868,11 +937,14 @@
             if (itemIndex !== -1) {
                 const item = userData.inventory[itemIndex];
                 const price = item.price;
+                const oldBalance = userData.balance;
                 userData.balance += price;
                 userData.inventory.splice(itemIndex, 1);
                 
-                updateBalance();
+                // Анимация при продаже NFT
+                animateBalanceChange(oldBalance, userData.balance);
                 updateInventory();
+                saveUserData(); // Сохраняем после продажи
             }
         }
 
@@ -893,6 +965,9 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Загружаем сохраненные данные при запуске
+            loadUserData();
+            
             initTelegramUser();
             initRoulettes();
             updateBalance();
