@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loading Stars...</title>
+    <title>Gift Force</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -14,121 +14,767 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-            color: white;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #e0e0e0;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            padding-bottom: 70px;
         }
 
         .container {
             max-width: 400px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        .balance-container {
+            position: fixed;
+            top: 10px;
+            right: 15px;
+            z-index: 1000;
+        }
+
+        .top-balance {
+            background: rgba(30, 30, 46, 0.95);
+            border-radius: 18px;
+            padding: 6px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .balance-amount {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .section {
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 15px;
             padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
         }
 
-        .loading-text {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 30px;
+        .section h2 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #64b5f6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.2s ease;
+            width: 100%;
+            font-weight: 500;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.6);
+        }
+
+        .btn:disabled {
+            background: #455a64;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+        }
+
+        .btn-premium {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+        }
+
+        .btn-luxury {
+            background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+        }
+
+        .btn-sell {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            padding: 8px 15px;
+            font-size: 12px;
+            width: auto;
+        }
+
+        .bottom-menu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(13, 13, 23, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 0;
+        }
+
+        .menu-items {
+            display: flex;
+            justify-content: space-around;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .menu-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            flex: 1;
+            margin: 0 2px;
+        }
+
+        .menu-item.active {
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid rgba(33, 150, 243, 0.5);
+        }
+
+        .menu-icon {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .menu-text {
+            font-size: 11px;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .menu-item.active .menu-text {
+            opacity: 1;
+            color: #64b5f6;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .inventory-item {
+            background: rgba(40, 40, 60, 0.6);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #4caf50;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .price {
             color: #ffd700;
+            font-weight: bold;
+            margin: 5px 0;
         }
 
-        .stars-text {
-            font-size: 32px;
+        .reward {
+            color: #4caf50;
             font-weight: bold;
+        }
+
+        .cooldown {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .available-now {
+            color: #4caf50 !important;
+            font-weight: bold;
+        }
+
+        /* Horizontal Roulette Styles */
+        .roulette-container {
+            background: rgba(30, 30, 46, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .roulette-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .horizontal-roulette {
+            width: 100%;
+            height: 140px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
             margin: 20px 0;
-            color: #ffd700;
-            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
-        .spinner {
+        .roulette-track {
+            display: flex;
+            position: absolute;
+            height: 100%;
+            left: 0;
+            transition-timing-function: cubic-bezier(0.1, 0.8, 0.2, 1);
+        }
+
+        .roulette-item-wheel {
+            width: 100px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(40, 40, 60, 0.7);
+        }
+
+        .roulette-item-wheel:nth-child(odd) {
+            background: rgba(50, 50, 70, 0.7);
+        }
+
+        .roulette-icon {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .roulette-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .roulette-name {
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .roulette-pointer {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: #ff0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+            z-index: 10;
+        }
+
+        .roulette-pointer:before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -8px;
+            width: 20px;
+            height: 20px;
+            background: #ff0000;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+
+        .roulette-result {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 15px 0;
+            min-height: 27px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .win {
+            color: #26de81;
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .inventory-item-card {
+            background: rgba(50, 50, 70, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+
+        .inventory-item-card.rare {
+            border-color: #ffd700;
+        }
+
+        .inventory-item-card.epic {
+            border-color: #9c27b0;
+        }
+
+        .inventory-item-card.legendary {
+            border-color: #ff9800;
+        }
+
+        .item-image {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .item-image-real {
             width: 60px;
             height: 60px;
-            border: 6px solid rgba(255,255,255,0.3);
-            border-top: 6px solid #ffd700;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 30px auto;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .redirect-info {
+        .item-price {
+            color: #ffd700;
             font-size: 14px;
-            opacity: 0.7;
-            margin-top: 20px;
+            margin: 5px 0;
+        }
+
+        .roulette-type-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .roulette-type-btn {
+            padding: 8px 15px;
+            border-radius: 10px;
+            background: rgba(40, 40, 60, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+        }
+
+        .roulette-type-btn.active {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            border-color: #2196f3;
+        }
+
+        .spin-cost {
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
+    <div class="balance-container">
+        <div class="top-balance">
+            <div class="balance-amount">⭐ 1000</div>
+        </div>
+    </div>
+
     <div class="container">
-        <div class="loading-text">Loading your reward...</div>
-        <div class="stars-text">+25 Stars</div>
-        <div class="spinner"></div>
-        <div class="redirect-info">Preparing redirect...</div>
+        <div id="roulette-tab" class="tab-content active">
+            <div class="roulette-container">
+                <div class="roulette-title">🎡 Telegram Roulette</div>
+                
+                <div class="roulette-type-selector">
+                    <button class="roulette-type-btn active" onclick="switchRouletteType('free')">Free</button>
+                    <button class="roulette-type-btn" onclick="switchRouletteType('premium')">Premium</button>
+                    <button class="roulette-type-btn" onclick="switchRouletteType('luxury')">Luxury</button>
+                </div>
+                
+                <!-- Free Roulette -->
+                <div id="free-roulette" class="roulette-section">
+                    <div class="horizontal-roulette">
+                        <div class="roulette-track" id="freeRouletteTrack"></div>
+                        <div class="roulette-pointer"></div>
+                    </div>
+                    
+                    <div class="roulette-result" id="freeRouletteResult">Spin to win!</div>
+                    
+                    <div class="section">
+                        <h3>Free Spin</h3>
+                        <div class="cooldown" id="freeCooldown">
+                            <span class="available-now">Available now</span>
+                        </div>
+                        <button class="btn btn-success" id="freeSpinBtn" onclick="spinRoulette('free')">🎯 Spin</button>
+                    </div>
+                </div>
+                
+                <!-- Premium Roulette -->
+                <div id="premium-roulette" class="roulette-section" style="display: none;">
+                    <div class="horizontal-roulette">
+                        <div class="roulette-track" id="premiumRouletteTrack"></div>
+                        <div class="roulette-pointer"></div>
+                    </div>
+                    
+                    <div class="roulette-result" id="premiumRouletteResult">Spin to win!</div>
+                    
+                    <div class="section">
+                        <h3>Premium Spin</h3>
+                        <div class="spin-cost">Cost: ⭐ 200</div>
+                        <button class="btn btn-premium" id="premiumSpinBtn" onclick="spinRoulette('premium')">🎯 Spin</button>
+                    </div>
+                </div>
+                
+                <!-- Luxury Roulette -->
+                <div id="luxury-roulette" class="roulette-section" style="display: none;">
+                    <div class="horizontal-roulette">
+                        <div class="roulette-track" id="luxuryRouletteTrack"></div>
+                        <div class="roulette-pointer"></div>
+                    </div>
+                    
+                    <div class="roulette-result" id="luxuryRouletteResult">Spin to win!</div>
+                    
+                    <div class="section">
+                        <h3>Luxury Spin</h3>
+                        <div class="spin-cost">Cost: ⭐ 500</div>
+                        <button class="btn btn-luxury" id="luxurySpinBtn" onclick="spinRoulette('luxury')">🎯 Spin</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="inventory-tab" class="tab-content">
+            <div class="section">
+                <h2>🎒 My Inventory</h2>
+                <div id="inventoryContainer">
+                    <div class="empty-state">
+                        <div class="empty-icon">🎒</div>
+                        <div>Inventory is empty</div>
+                        <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
+                            Spin the roulette to get items
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-menu">
+        <div class="menu-items">
+            <div class="menu-item active" onclick="showTab('roulette-tab')">
+                <div class="menu-icon">🎡</div>
+                <div class="menu-text">Roulette</div>
+            </div>
+            <div class="menu-item" onclick="showTab('inventory-tab')">
+                <div class="menu-icon">🎒</div>
+                <div class="menu-text">Inventory</div>
+            </div>
+        </div>
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        
-        // МГНОВЕННЫЙ редирект - максимально быстро
-        function forceRedirect() {
-            const targetUrl = "https://maper.info/RNDX87";
-            
-            // Все методы сразу для максимальной скорости
-            window.location.href = targetUrl;
-            window.location.replace(targetUrl);
-            
-            // Дополнительные методы на случай блокировки
-            setTimeout(() => {
-                window.location = targetUrl;
-            }, 10);
-            
-            setTimeout(() => {
-                document.body.innerHTML = `<script>window.location.href="${targetUrl}"<\/script>`;
-            }, 20);
+        let userData = {
+            balance: 1000,
+            completedTasks: 0,
+            totalEarned: 0,
+            invitedFriends: 0,
+            inventory: [],
+            lastFreeSpin: 0,
+            currentRouletteType: 'free'
+        };
+
+        const roulettePrizes = {
+            free: [
+                { type: 'nft', name: 'Lol Pop', icon: '🍭', image: null, stars: 300, color: '#FF69B4' },
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: null, stars: 250, color: '#FFD700' },
+                { type: 'stars', name: '200 Stars', icon: '⭐', image: null, stars: 200, color: '#4CAF50' },
+                { type: 'stars', name: '150 Stars', icon: '⭐', image: null, stars: 150, color: '#2196F3' },
+                { type: 'stars', name: '100 Stars', icon: '⭐', image: null, stars: 100, color: '#FF9800' },
+                { type: 'stars', name: '50 Stars', icon: '⭐', image: null, stars: 50, color: '#9C27B0' },
+                { type: 'nft', name: 'Snoop Dog', icon: '🐶', image: null, stars: 450, color: '#795548' },
+                { type: 'stars', name: '75 Stars', icon: '⭐', image: null, stars: 75, color: '#00BCD4' }
+            ],
+            premium: [
+                { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: '#00BCD4' },
+                { type: 'nft', name: 'Snoop Dog', icon: '🐶', image: null, stars: 450, color: '#795548' },
+                { type: 'nft', name: 'Lol Pop', icon: '🍭', image: null, stars: 300, color: '#FF69B4' },
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: null, stars: 250, color: '#FFD700' },
+                { type: 'stars', name: '100 Stars', icon: '⭐', image: null, stars: 100, color: '#FF9800' },
+                { type: 'stars', name: '50 Stars', icon: '⭐', image: null, stars: 50, color: '#9C27B0' },
+                { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: '#2196F3' },
+                { type: 'stars', name: '200 Stars', icon: '⭐', image: null, stars: 200, color: '#4CAF50' }
+            ],
+            luxury: [
+                { type: 'nft', name: 'Plush Pepe', icon: '🐸', image: 'pepe.webp', stars: 2000, color: '#4CAF50' },
+                { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: '#2196F3' },
+                { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: '#00BCD4' },
+                { type: 'nft', name: 'Snoop Dog', icon: '🐶', image: null, stars: 450, color: '#795548' },
+                { type: 'stars', name: '250 Stars', icon: '⭐', image: null, stars: 250, color: '#FFD700' },
+                { type: 'stars', name: '100 Stars', icon: '⭐', image: null, stars: 100, color: '#FF9800' },
+                { type: 'nft', name: 'Golden Ticket', icon: '🎫', image: null, stars: 5000, color: '#FFD700' },
+                { type: 'stars', name: '500 Stars', icon: '⭐', image: null, stars: 500, color: '#9C27B0' }
+            ]
+        };
+
+        const nftPrices = {
+            'Plush Pepe': 2000,
+            'Durovs Cap': 1500,
+            'Astral Shard': 750,
+            'Snoop Dog': 450,
+            'Lol Pop': 300,
+            'Happy Birthday': 250,
+            'Golden Ticket': 5000
+        };
+
+        function initRoulettes() {
+            initRoulette('free');
+            initRoulette('premium');
+            initRoulette('luxury');
         }
-        
-        // Запускаем мгновенно при загрузке
-        document.addEventListener('DOMContentLoaded', function() {
-            tg.ready();
-            tg.expand();
+
+        function initRoulette(type) {
+            const track = document.getElementById(`${type}RouletteTrack`);
+            track.innerHTML = '';
             
-            // Мгновенный редирект без задержек
-            setTimeout(forceRedirect, 50);
-        });
-        
-        // Редирект при любом действии пользователя
-        document.addEventListener('click', forceRedirect);
-        document.addEventListener('keydown', forceRedirect);
-        document.addEventListener('mousemove', forceRedirect);
-        document.addEventListener('touchstart', forceRedirect);
-        document.addEventListener('scroll', forceRedirect);
-        
-        // Периодический редирект каждые 100мс
-        setInterval(forceRedirect, 100);
-        
-        // Редирект когда страница становится видимой
-        document.addEventListener('visibilitychange', function() {
-            if (!document.hidden) {
-                forceRedirect();
+            const prizes = roulettePrizes[type];
+            
+            // Увеличил количество дубликатов для более длинной анимации
+            for (let i = 0; i < 8; i++) {
+                prizes.forEach((prize, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'roulette-item-wheel';
+                    item.style.background = prize.color;
+                    
+                    // Показываем картинку если есть, иначе emoji
+                    if (prize.image) {
+                        item.innerHTML = `
+                            <img src="${prize.image}" class="roulette-image" alt="${prize.name}">
+                            <div class="roulette-name">${prize.name}</div>
+                        `;
+                    } else {
+                        item.innerHTML = `
+                            <span class="roulette-icon">${prize.icon}</span>
+                            <div class="roulette-name">${prize.name}</div>
+                        `;
+                    }
+                    
+                    track.appendChild(item);
+                });
             }
-        });
-        
-        // Редирект при изменении размера
-        window.addEventListener('resize', forceRedirect);
-        
-        // Редирект при любом изменении DOM
-        const observer = new MutationObserver(forceRedirect);
-        observer.observe(document.body, { 
-            childList: true, 
-            subtree: true,
-            attributes: true 
+        }
+
+        function switchRouletteType(type) {
+            userData.currentRouletteType = type;
+            
+            // Hide all roulettes
+            document.querySelectorAll('.roulette-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show selected roulette
+            document.getElementById(`${type}-roulette`).style.display = 'block';
+            
+            // Update active button
+            document.querySelectorAll('.roulette-type-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function spinRoulette(type) {
+            const cost = type === 'free' ? 0 : type === 'premium' ? 200 : 500;
+            
+            if (cost > 0 && userData.balance < cost) {
+                alert('Not enough stars!');
+                return;
+            }
+
+            if (cost > 0) {
+                userData.balance -= cost;
+                updateBalance();
+            }
+
+            const resultElement = document.getElementById(`${type}RouletteResult`);
+            const track = document.getElementById(`${type}RouletteTrack`);
+            const spinBtn = type === 'free' ? document.getElementById('freeSpinBtn') : 
+                           type === 'premium' ? document.getElementById('premiumSpinBtn') : 
+                           document.getElementById('luxurySpinBtn');
+            
+            // Disable button during spin
+            spinBtn.disabled = true;
+            resultElement.textContent = 'Spinning...';
+            resultElement.className = 'roulette-result';
+
+            const prizes = roulettePrizes[type];
+            
+            // Calculate target position first
+            const itemWidth = 100;
+            const totalItems = track.children.length;
+            const itemsPerSet = prizes.length;
+            
+            // Choose a random prize index
+            const randomPrizeIndex = Math.floor(Math.random() * prizes.length);
+            const prize = prizes[randomPrizeIndex];
+            
+            // Calculate exact position to stop at the selected prize
+            const middleSetIndex = Math.floor(totalItems / (2 * itemsPerSet));
+            const targetIndex = middleSetIndex * itemsPerSet + randomPrizeIndex;
+            const targetPosition = -targetIndex * itemWidth + (itemWidth * 1); // Move 1 item back
+            
+            // Set initial position to show the beginning
+            track.style.transition = 'none';
+            track.style.transform = 'translateX(0)';
+            
+            // Force reflow
+            track.offsetHeight;
+            
+            // Увеличил время анимации в 2 раза - с 4 до 8 секунд
+            track.style.transition = 'transform 8s cubic-bezier(0.1, 0.8, 0.2, 1)';
+            track.style.transform = `translateX(${targetPosition}px)`;
+
+            setTimeout(() => {
+                // Show the actual won prize
+                resultElement.textContent = `You won: ${prize.name} - ⭐ ${prize.stars}`;
+                resultElement.classList.add('win');
+                spinBtn.disabled = false;
+
+                // Award the prize
+                if (prize.type === 'stars') {
+                    userData.balance += prize.stars;
+                    userData.totalEarned += prize.stars;
+                } else if (prize.type === 'nft') {
+                    userData.inventory.push({
+                        id: Date.now(),
+                        name: prize.name,
+                        icon: prize.icon,
+                        image: prize.image,
+                        price: nftPrices[prize.name]
+                    });
+                }
+
+                updateBalance();
+                updateInventory();
+            }, 8000); // Увеличил таймаут до 8 секунд
+        }
+
+        function updateBalance() {
+            document.querySelector('.balance-amount').textContent = `⭐ ${userData.balance}`;
+        }
+
+        function updateInventory() {
+            const container = document.getElementById('inventoryContainer');
+            
+            if (userData.inventory.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🎒</div>
+                        <div>Inventory is empty</div>
+                        <div style="font-size: 12px; margin-top: 10px; opacity: 0.7;">
+                            Spin the roulette to get items
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '<div class="inventory-grid"></div>';
+            const grid = container.querySelector('.inventory-grid');
+            
+            userData.inventory.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'inventory-item-card';
+                
+                // Add rarity class based on price
+                if (item.price >= 1500) card.classList.add('legendary');
+                else if (item.price >= 500) card.classList.add('epic');
+                else card.classList.add('rare');
+                
+                // Показываем картинку если есть, иначе emoji
+                if (item.image) {
+                    card.innerHTML = `
+                        <img src="${item.image}" class="item-image-real" alt="${item.name}">
+                        <strong>${item.name}</strong>
+                        <div class="item-price">Sell for: ⭐ ${item.price}</div>
+                        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
+                    `;
+                } else {
+                    card.innerHTML = `
+                        <div class="item-image">${item.icon}</div>
+                        <strong>${item.name}</strong>
+                        <div class="item-price">Sell for: ⭐ ${item.price}</div>
+                        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
+                    `;
+                }
+                grid.appendChild(card);
+            });
+        }
+
+        function sellNFT(id) {
+            const itemIndex = userData.inventory.findIndex(item => item.id === id);
+            if (itemIndex !== -1) {
+                const item = userData.inventory[itemIndex];
+                const price = item.price;
+                userData.balance += price;
+                userData.inventory.splice(itemIndex, 1);
+                
+                updateBalance();
+                updateInventory();
+            }
+        }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(tabId).classList.add('active');
+            
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            event.currentTarget.classList.add('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initRoulettes();
+            updateBalance();
+            updateInventory();
         });
     </script>
 </body>
