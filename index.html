@@ -807,6 +807,13 @@
                 document.getElementById('freeTimer').style.display = 'none';
             }
 
+            // Списываем стоимость спина для премиум и люкс рулеток
+            if (cost > 0) {
+                const oldBalance = userData.balance;
+                userData.balance -= cost;
+                animateBalanceChange(oldBalance, userData.balance);
+            }
+
             const resultElement = document.getElementById(`${type}RouletteResult`);
             const track = document.getElementById(`${type}RouletteTrack`);
             const spinBtn = type === 'free' ? document.getElementById('freeSpinBtn') : 
