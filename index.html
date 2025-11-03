@@ -99,6 +99,12 @@
             font-size: 12px;
             width: auto;
             text-transform: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-sell:active {
+            transform: scale(0.9);
+            background: linear-gradient(135deg, #ff4757, #ff3838);
         }
 
         .bottom-menu {
@@ -267,7 +273,6 @@
             object-fit: cover;
             border-radius: 10px;
             margin-bottom: 8px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
         .roulette-name {
@@ -334,6 +339,26 @@
             padding: 15px;
             text-align: center;
             border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .inventory-item-card.sold {
+            animation: sellAnimation 0.6s ease-out forwards;
+        }
+
+        @keyframes sellAnimation {
+            0% { 
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
         }
 
         .inventory-item-card.rare {
@@ -359,7 +384,6 @@
             object-fit: cover;
             border-radius: 12px;
             margin-bottom: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
         .item-price {
@@ -517,34 +541,33 @@
 
         const roulettePrizes = {
             free: [
-                { type: 'nft', name: 'Lol Pop', icon: '🍭', image: null, stars: 300, color: '#FF69B4' },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: null, stars: 250, color: '#FFD700' },
-                { type: 'stars', name: '200 Stars', icon: '⭐', image: null, stars: 200, color: '#4CAF50' },
-                { type: 'stars', name: '150 Stars', icon: '⭐', image: null, stars: 150, color: '#2196F3' },
-                { type: 'stars', name: '100 Stars', icon: '⭐', image: null, stars: 100, color: '#FF9800' },
-                { type: 'stars', name: '50 Stars', icon: '⭐', image: null, stars: 50, color: '#9C27B0' },
-                { type: 'nft', name: 'Snoop Dog', icon: '🐶', image: null, stars: 450, color: '#795548' },
-                { type: 'stars', name: '75 Stars', icon: '⭐', image: null, stars: 75, color: '#00BCD4' }
+                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#FF69B4' },
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FFD700' },
+                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#4CAF50' },
+                { type: 'stars', name: '150 Stars', icon: '⭐', image: 'stars.webp', stars: 150, color: '#2196F3' },
+                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FF9800' },
+                { type: 'stars', name: '50 Stars', icon: '⭐', image: 'stars.webp', stars: 50, color: '#9C27B0' },
+                { type: 'nft', name: 'Vintage Cigar', icon: '🐶', image: 'cigar.webp', stars: 450, color: '#795548' },
+                { type: 'stars', name: '75 Stars', icon: '⭐', image: 'stars.webp', stars: 75, color: '#00BCD4' }
             ],
             premium: [
                 { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: '#00BCD4' },
-                { type: 'nft', name: 'Snoop Dog', icon: '🐶', image: null, stars: 450, color: '#795548' },
-                { type: 'nft', name: 'Lol Pop', icon: '🍭', image: null, stars: 300, color: '#FF69B4' },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: null, stars: 250, color: '#FFD700' },
-                { type: 'stars', name: '100 Stars', icon: '⭐', image: null, stars: 100, color: '#FF9800' },
-                { type: 'stars', name: '50 Stars', icon: '⭐', image: null, stars: 50, color: '#9C27B0' },
+                { type: 'nft', name: 'Vintage Cigar', icon: '🐶', image: 'cigar.webp', stars: 450, color: '#795548' },
+                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#FF69B4' },
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FFD700' },
+                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FF9800' },
+                { type: 'stars', name: '50 Stars', icon: '⭐', image: 'stars.webp', stars: 50, color: '#9C27B0' },
                 { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: '#2196F3' },
-                { type: 'stars', name: '200 Stars', icon: '⭐', image: null, stars: 200, color: '#4CAF50' }
+                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#4CAF50' }
             ],
             luxury: [
                 { type: 'nft', name: 'Plush Pepe', icon: '🐸', image: 'pepe.webp', stars: 2000, color: '#4CAF50' },
                 { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: '#2196F3' },
                 { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: '#00BCD4' },
-                { type: 'nft', name: 'Snoop Dog', icon: '🐶', image: null, stars: 450, color: '#795548' },
-                { type: 'stars', name: '250 Stars', icon: '⭐', image: null, stars: 250, color: '#FFD700' },
-                { type: 'stars', name: '100 Stars', icon: '⭐', image: null, stars: 100, color: '#FF9800' },
-                { type: 'nft', name: 'Golden Ticket', icon: '🎫', image: null, stars: 5000, color: '#FFD700' },
-                { type: 'stars', name: '500 Stars', icon: '⭐', image: null, stars: 500, color: '#9C27B0' }
+                { type: 'nft', name: 'Vintage Cigar', icon: '🐶', image: 'cigar.webp', stars: 450, color: '#795548' },
+                { type: 'stars', name: '250 Stars', icon: '⭐', image: 'stars.webp', stars: 250, color: '#FFD700' },
+                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FF9800' },
+                { type: 'stars', name: '500 Stars', icon: '⭐', image: 'stars.webp', stars: 500, color: '#9C27B0' }
             ]
         };
 
@@ -552,10 +575,9 @@
             'Plush Pepe': 2000,
             'Durovs Cap': 1500,
             'Astral Shard': 750,
-            'Snoop Dog': 450,
-            'Lol Pop': 300,
-            'Happy Birthday': 250,
-            'Golden Ticket': 5000
+            'Vintage Cigar': 450,
+            'Candy Cane': 300,
+            'Happy Birthday': 250
         };
 
         let freeSpinCooldown = 120; // 2 minutes in seconds
@@ -758,30 +780,37 @@
                         <img src="${item.image}" class="item-image-real" alt="${item.name}">
                         <strong>${item.name}</strong>
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
-                        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
+                        <button class="btn btn-sell" onclick="sellNFT(${item.id}, this)">Sell</button>
                     `;
                 } else {
                     card.innerHTML = `
                         <div class="item-image">${item.icon}</div>
                         <strong>${item.name}</strong>
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
-                        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
+                        <button class="btn btn-sell" onclick="sellNFT(${item.id}, this)">Sell</button>
                     `;
                 }
                 grid.appendChild(card);
             });
         }
 
-        function sellNFT(id) {
+        function sellNFT(id, button) {
             const itemIndex = userData.inventory.findIndex(item => item.id === id);
             if (itemIndex !== -1) {
                 const item = userData.inventory[itemIndex];
                 const price = item.price;
-                userData.balance += price;
-                userData.inventory.splice(itemIndex, 1);
                 
-                updateBalance();
-                updateInventory();
+                // Анимация продажи
+                const card = button.parentElement;
+                card.classList.add('sold');
+                
+                setTimeout(() => {
+                    userData.balance += price;
+                    userData.inventory.splice(itemIndex, 1);
+                    
+                    updateBalance();
+                    updateInventory();
+                }, 600); // Время анимации
             }
         }
 
