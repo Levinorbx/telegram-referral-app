@@ -769,20 +769,6 @@
             event.target.classList.add('active');
         }
 
-        function getWeightedRandomPrize(prizes) {
-            const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
-            let random = Math.random() * totalWeight;
-            
-            for (const prize of prizes) {
-                random -= prize.weight;
-                if (random <= 0) {
-                    return prize;
-                }
-            }
-            
-            return prizes[prizes.length - 1];
-        }
-
         function spinRoulette(type) {
             if (userData.isSpinning) return;
             
@@ -816,7 +802,20 @@
             resultElement.className = 'roulette-result';
 
             const prizes = roulettePrizes[type];
-            const prize = getWeightedRandomPrize(prizes);
+            
+            // СТАРАЯ РАБОЧАЯ ЛОГИКА ВЫБОРА ПРИЗА
+            const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
+            let random = Math.random() * totalWeight;
+            let prize = prizes[0];
+            
+            for (const p of prizes) {
+                random -= p.weight;
+                if (random <= 0) {
+                    prize = p;
+                    break;
+                }
+            }
+            
             const prizeIndex = prizes.findIndex(p => p.name === prize.name);
             
             const itemWidth = 100;
