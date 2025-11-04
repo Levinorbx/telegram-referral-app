@@ -134,6 +134,16 @@
             font-size: 12px;
             width: auto;
             text-transform: none;
+            flex: 1;
+        }
+
+        .btn-send {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            padding: 8px 15px;
+            font-size: 12px;
+            width: auto;
+            text-transform: none;
+            flex: 1;
         }
 
         .btn-claim {
@@ -355,25 +365,29 @@
             align-items: center;
             z-index: 2000;
             padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .win-screen.show {
+            opacity: 1;
         }
 
         .win-content {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            background: rgba(30, 30, 46, 0.95);
             border-radius: 20px;
             padding: 30px;
             text-align: center;
-            border: 3px solid #ffd700;
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
             max-width: 350px;
             width: 100%;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease;
         }
 
-        .win-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #ffd700;
-            margin-bottom: 20px;
-            text-transform: uppercase;
+        .win-screen.show .win-content {
+            transform: scale(1);
+            opacity: 1;
         }
 
         .win-prize {
@@ -395,7 +409,6 @@
             object-fit: cover;
             border-radius: 15px;
             margin: 15px auto;
-            border: 3px solid #ffd700;
         }
 
         .win-icon {
@@ -465,6 +478,12 @@
             color: #ffd700;
             font-size: 14px;
             margin: 5px 0;
+        }
+
+        .item-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
         }
 
         .roulette-type-selector {
@@ -605,7 +624,6 @@
     <!-- Win Screen -->
     <div class="win-screen" id="winScreen">
         <div class="win-content">
-            <div class="win-title">Congratulations!</div>
             <div id="winPrizeIcon" class="win-icon"></div>
             <img id="winPrizeImage" class="win-image" style="display: none;">
             <div id="winPrizeName" class="win-prize"></div>
@@ -655,9 +673,11 @@
             totalEarned: 0,
             invitedFriends: 0,
             inventory: [],
+            withdrawnNFTs: [],
             lastFreeSpin: 0,
             currentRouletteType: 'free',
-            isSpinning: false
+            isSpinning: false,
+            lastPrizeType: null
         };
 
         let currentPrize = null;
@@ -755,6 +775,7 @@
             
             const prizes = roulettePrizes[type];
             
+            // Оставляем порядок подарков как был (без перемешивания)
             for (let i = 0; i < 8; i++) {
                 prizes.forEach((prize, index) => {
                     const item = document.createElement('div');
@@ -861,17 +882,29 @@
         }
 
         function getWeightedRandomPrize(prizes) {
-            const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
+            let availablePrizes = [...prizes];
+            
+            // Если последний приз был звездами, убираем звезды из доступных призов
+            if (userData.lastPrizeType === 'stars') {
+                availablePrizes = availablePrizes.filter(prize => prize.type !== 'stars');
+            }
+            
+            // Если нет доступных призов (все были звездами), возвращаемся к исходному списку
+            if (availablePrizes.length === 0) {
+                availablePrizes = [...prizes];
+            }
+            
+            const totalWeight = availablePrizes.reduce((sum, prize) => sum + prize.weight, 0);
             let random = Math.random() * totalWeight;
             
-            for (const prize of prizes) {
+            for (const prize of availablePrizes) {
                 random -= prize.weight;
                 if (random <= 0) {
                     return prize;
                 }
             }
             
-            return prizes[prizes.length - 1];
+            return availablePrizes[availablePrizes.length - 1];
         }
 
         function showWinScreen(prize) {
@@ -897,11 +930,21 @@
             }
             
             winScreen.style.display = 'flex';
+            setTimeout(() => {
+                winScreen.classList.add('show');
+            }, 10);
+        }
+
+        function hideWinScreen() {
+            const winScreen = document.getElementById('winScreen');
+            winScreen.classList.remove('show');
+            setTimeout(() => {
+                winScreen.style.display = 'none';
+            }, 300);
         }
 
         function claimPrize() {
-            const winScreen = document.getElementById('winScreen');
-            winScreen.style.display = 'none';
+            hideWinScreen();
             
             const oldBalance = userData.balance;
             
@@ -922,6 +965,9 @@
                 updateBalance();
             }
 
+            // Сохраняем тип последнего приза
+            userData.lastPrizeType = currentPrize.type;
+            
             updateInventory();
             currentPrize = null;
             saveUserData();
@@ -964,7 +1010,7 @@
 
             const prizes = roulettePrizes[type];
             
-            // Используем взвешенный случайный выбор приза
+            // Используем взвешенный случайный выбор приза с ограничением
             const prize = getWeightedRandomPrize(prizes);
             const prizeIndex = prizes.findIndex(p => p.name === prize.name);
             
@@ -973,8 +1019,11 @@
             const itemsPerSet = prizes.length;
             
             const middleSetIndex = Math.floor(totalItems / (2 * itemsPerSet));
+            
+            // Стрелка только справа от центра (от 0 до +40px)
+            const randomOffset = Math.floor(Math.random() * 40);
             const targetIndex = middleSetIndex * itemsPerSet + prizeIndex;
-            const targetPosition = -targetIndex * itemWidth + (itemWidth * 1);
+            const targetPosition = -targetIndex * itemWidth + (itemWidth * 1) + randomOffset;
             
             track.style.transition = 'none';
             track.style.transform = 'translateX(0)';
@@ -1038,14 +1087,20 @@
                         <img src="${item.image}" class="item-image-real" alt="${item.name}">
                         <strong>${item.name}</strong>
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
-                        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
+                        <div class="item-buttons">
+                            <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
+                            <button class="btn btn-send" onclick="sendNFT(${item.id})">Send</button>
+                        </div>
                     `;
                 } else {
                     card.innerHTML = `
                         <div class="item-image">${item.icon}</div>
                         <strong>${item.name}</strong>
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
-                        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
+                        <div class="item-buttons">
+                            <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
+                            <button class="btn btn-send" onclick="sendNFT(${item.id})">Send</button>
+                        </div>
                     `;
                 }
                 grid.appendChild(card);
@@ -1065,6 +1120,41 @@
                 animateBalanceChange(oldBalance, userData.balance);
                 updateInventory();
                 saveUserData(); // Сохраняем после продажи
+            }
+        }
+
+        function sendNFT(id) {
+            const itemIndex = userData.inventory.findIndex(item => item.id === id);
+            if (itemIndex !== -1) {
+                const item = userData.inventory[itemIndex];
+                
+                // Перемещаем NFT в withdrawnNFTs
+                userData.withdrawnNFTs.push({
+                    id: item.id,
+                    name: item.name,
+                    icon: item.icon,
+                    image: item.image,
+                    withdrawnAt: new Date().toISOString()
+                });
+                
+                // Удаляем из инвентаря
+                userData.inventory.splice(itemIndex, 1);
+                
+                // Показываем уведомление
+                alert(`You have successfully withdrawn ${item.name}!`);
+                
+                // Сохраняем данные
+                updateInventory();
+                saveUserData();
+                
+                // Отправляем сообщение в бота (если доступен Telegram WebApp)
+                if (window.Telegram && Telegram.WebApp) {
+                    Telegram.WebApp.sendData(JSON.stringify({
+                        action: 'withdraw_nft',
+                        nft_name: item.name,
+                        nft_id: item.id
+                    }));
+                }
             }
         }
 
