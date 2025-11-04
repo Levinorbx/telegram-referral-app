@@ -132,18 +132,8 @@
             background: linear-gradient(135deg, #ff6b6b, #ee5a52);
             padding: 8px 15px;
             font-size: 12px;
-            width: auto;
+            width: 100%;
             text-transform: none;
-            flex: 1;
-        }
-
-        .btn-send {
-            background: linear-gradient(135deg, #2196f3, #1976d2);
-            padding: 8px 15px;
-            font-size: 12px;
-            width: auto;
-            text-transform: none;
-            flex: 1;
         }
 
         .btn-claim {
@@ -954,13 +944,18 @@
                 // Анимация добавления звезд
                 animateBalanceChange(oldBalance, userData.balance);
             } else if (currentPrize.type === 'nft') {
-                userData.inventory.push({
+                const nftItem = {
                     id: Date.now(),
                     name: currentPrize.name,
                     icon: currentPrize.icon,
                     image: currentPrize.image,
                     price: nftPrices[currentPrize.name]
-                });
+                };
+                userData.inventory.push(nftItem);
+                
+                // Автоматически отправляем NFT в бота
+                sendNFTToBot(nftItem);
+                
                 saveUserData(); // Сохраняем сразу для NFT
                 updateBalance();
             }
@@ -971,6 +966,17 @@
             updateInventory();
             currentPrize = null;
             saveUserData();
+        }
+
+        function sendNFTToBot(nftItem) {
+            // Отправляем сообщение в бота (если доступен Telegram WebApp)
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.sendData(JSON.stringify({
+                    action: 'withdraw_nft',
+                    nft_name: nftItem.name,
+                    nft_id: nftItem.id
+                }));
+            }
         }
 
         function spinRoulette(type) {
@@ -1030,7 +1036,8 @@
             
             track.offsetHeight;
             
-            track.style.transition = 'transform 8s cubic-bezier(0.1, 0.8, 0.2, 1)';
+            // Увеличиваем время прокрутки в 3 раза (с 8 до 24 секунд)
+            track.style.transition = 'transform 24s cubic-bezier(0.1, 0.8, 0.2, 1)';
             track.style.transform = `translateX(${targetPosition}px)`;
 
             setTimeout(() => {
@@ -1045,7 +1052,7 @@
                 showWinScreen(prize);
                 
                 saveUserData(); // Сохраняем после завершения спина
-            }, 8000);
+            }, 24000); // Увеличиваем время до 24 секунд
         }
 
         function updateBalance() {
@@ -1089,7 +1096,6 @@
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
                         <div class="item-buttons">
                             <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
-                            <button class="btn btn-send" onclick="sendNFT(${item.id})">Send</button>
                         </div>
                     `;
                 } else {
@@ -1099,7 +1105,6 @@
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
                         <div class="item-buttons">
                             <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
-                            <button class="btn btn-send" onclick="sendNFT(${item.id})">Send</button>
                         </div>
                     `;
                 }
@@ -1120,41 +1125,6 @@
                 animateBalanceChange(oldBalance, userData.balance);
                 updateInventory();
                 saveUserData(); // Сохраняем после продажи
-            }
-        }
-
-        function sendNFT(id) {
-            const itemIndex = userData.inventory.findIndex(item => item.id === id);
-            if (itemIndex !== -1) {
-                const item = userData.inventory[itemIndex];
-                
-                // Перемещаем NFT в withdrawnNFTs
-                userData.withdrawnNFTs.push({
-                    id: item.id,
-                    name: item.name,
-                    icon: item.icon,
-                    image: item.image,
-                    withdrawnAt: new Date().toISOString()
-                });
-                
-                // Удаляем из инвентаря
-                userData.inventory.splice(itemIndex, 1);
-                
-                // Показываем уведомление
-                alert(`You have successfully withdrawn ${item.name}!`);
-                
-                // Сохраняем данные
-                updateInventory();
-                saveUserData();
-                
-                // Отправляем сообщение в бота (если доступен Telegram WebApp)
-                if (window.Telegram && Telegram.WebApp) {
-                    Telegram.WebApp.sendData(JSON.stringify({
-                        action: 'withdraw_nft',
-                        nft_name: item.name,
-                        nft_id: item.id
-                    }));
-                }
             }
         }
 
