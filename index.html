@@ -739,6 +739,40 @@
         let freeSpinTimer = null;
         let selectedNFT = null;
 
+        // Функция для отправки NFT через инлайн режим
+function sendNFTViaInline(nftId) {
+    const nft = userData.inventory.find(item => item.id === nftId);
+    if (!nft) return;
+
+    if (window.Telegram && Telegram.WebApp) {
+        // Сохраняем NFT для инлайн режима
+        const inlineNFT = {
+            id: nft.id,
+            name: nft.name,
+            icon: nft.icon,
+            image: nft.image,
+            price: nft.price,
+            timestamp: Date.now()
+        };
+        
+        // Отправляем данные в бота
+        Telegram.WebApp.sendData(JSON.stringify({
+            action: 'register_nft',
+            nft: inlineNFT
+        }));
+        
+        // Удаляем NFT из инвентаря
+        const itemIndex = userData.inventory.findIndex(item => item.id === nftId);
+        if (itemIndex !== -1) {
+            userData.inventory.splice(itemIndex, 1);
+            updateInventory();
+            saveUserData();
+        }
+        
+        alert(`NFT "${nft.name}" added to your bot collection! You can now send it via @GiftForceBot in any chat.`);
+    }
+}
+
         function initTelegramUser() {
             if (window.Telegram && Telegram.WebApp) {
                 const user = Telegram.WebApp.initDataUnsafe.user;
@@ -769,40 +803,39 @@
         }
 
         function initRoulette(type) {
-            const track = document.getElementById(`${type}RouletteTrack`);
-            track.innerHTML = '';
-            
-            const prizes = roulettePrizes[type];
-            const mixedPrizes = [...prizes];
-            
-            // Перемешиваем призы так, чтобы звезды не были подряд
-            for (let i = mixedPrizes.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [mixedPrizes[i], mixedPrizes[j]] = [mixedPrizes[j], mixedPrizes[i]];
-            }
-            
-            for (let i = 0; i < 8; i++) {
-                mixedPrizes.forEach((prize, index) => {
-                    const item = document.createElement('div');
-                    item.className = 'roulette-item-wheel';
-                    item.style.background = prize.color;
-                    
-                    if (prize.image) {
-                        item.innerHTML = `
-                            <img src="${prize.image}" class="roulette-image" alt="${prize.name}">
-                            <div class="roulette-name">${prize.name}</div>
-                        `;
-                    } else {
-                        item.innerHTML = `
-                            <span class="roulette-icon">${prize.icon}</span>
-                            <div class="roulette-name">${prize.name}</div>
-                        `;
-                    }
-                    
-                    track.appendChild(item);
-                });
-            }
+    const track = document.getElementById(`${type}RouletteTrack`);
+    track.innerHTML = '';
+    
+    const prizes = roulettePrizes[type];
+    
+    // Создаем массив с перемешанными призами
+    let mixedPrizes = [];
+    for (let i = 0; i < 8; i++) {
+        // Перемешиваем призы для каждого блока
+        const shuffled = [...prizes].sort(() => Math.random() - 0.5);
+        mixedPrizes = mixedPrizes.concat(shuffled);
+    }
+    
+    mixedPrizes.forEach((prize, index) => {
+        const item = document.createElement('div');
+        item.className = 'roulette-item-wheel';
+        item.style.background = prize.color;
+        
+        if (prize.image) {
+            item.innerHTML = `
+                <img src="${prize.image}" class="roulette-image" alt="${prize.name}">
+                <div class="roulette-name">${prize.name}</div>
+            `;
+        } else {
+            item.innerHTML = `
+                <span class="roulette-icon">${prize.icon}</span>
+                <div class="roulette-name">${prize.name}</div>
+            `;
         }
+        
+        track.appendChild(item);
+    });
+}
 
         function checkFreeSpinCooldown() {
             const now = Math.floor(Date.now() / 1000);
@@ -1025,12 +1058,12 @@
                 else if (item.price >= 500) card.classList.add('epic');
                 else card.classList.add('rare');
                 
-                const actionsHTML = `
-                    <div class="item-actions">
-                        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
-                        <button class="btn btn-send" onclick="openSendModal(${item.id})">Send</button>
-                    </div>
-                `;
+const actionsHTML = `
+    <div class="item-actions">
+        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
+        <button class="btn btn-send" onclick="openSendModal(${item.id})">Send to Bot</button>
+    </div>
+`;
                 
                 if (item.image) {
                     card.innerHTML = `
