@@ -1099,14 +1099,27 @@ const actionsHTML = `
             }
         }
 
-        function openSendModal(nftId) {
-            selectedNFT = userData.inventory.find(item => item.id === nftId);
-            if (selectedNFT) {
-                document.getElementById('modalMessage').textContent = 
-                    `Send "${selectedNFT.name}" to chat? This will remove it from your inventory.`;
-                document.getElementById('sendModal').style.display = 'block';
-            }
-        }
+// Обновленная функция открытия модального окна
+function openSendModal(nftId) {
+    selectedNFT = userData.inventory.find(item => item.id === nftId);
+    if (selectedNFT) {
+        document.getElementById('modalMessage').innerHTML = 
+            `Send <strong>"${selectedNFT.name}"</strong> to bot collection?<br><br>
+            After sending, you can share it in any chat via @GiftForceBot`;
+        document.getElementById('sendModal').style.display = 'block';
+    }
+}
+
+// Обновленная функция подтверждения отправки
+function confirmSend() {
+    if (!selectedNFT) {
+        closeModal();
+        return;
+    }
+    
+    sendNFTViaInline(selectedNFT.id);
+    closeModal();
+}
 
         function closeModal() {
             document.getElementById('sendModal').style.display = 'none';
