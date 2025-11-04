@@ -283,11 +283,12 @@
             align-items: center;
             justify-content: center;
             padding: 10px;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            border-right: 2px solid #000000;
         }
 
-        .roulette-item-wheel:nth-child(odd) {
-            background: rgba(50, 50, 70, 0.7);
+        .roulette-item-wheel:last-child {
+            border-right: none;
         }
 
         .roulette-icon {
@@ -592,28 +593,28 @@
 
         const roulettePrizes = {
             free: [
-                { type: 'stars', name: '50 Stars', icon: '⭐', image: 'stars.webp', stars: 50, color: '#FFD700', weight: 40 },
-                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FFD700', weight: 25 },
-                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#FFD700', weight: 15 },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FF69B4', weight: 10 },
-                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#B0B0B0', weight: 7 },
-                { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: '#795548', weight: 3 }
+                { type: 'stars', name: '50 Stars', icon: '⭐', image: 'stars.webp', stars: 50, color: 'linear-gradient(135deg, #FFD700, #FFA500)', weight: 40 },
+                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: 'linear-gradient(135deg, #FFD700, #FF8C00)', weight: 25 },
+                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: 'linear-gradient(135deg, #FFD700, #FF6347)', weight: 15 },
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: 'linear-gradient(135deg, #FF69B4, #FF1493)', weight: 10 },
+                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: 'linear-gradient(135deg, #B0B0B0, #808080)', weight: 7 },
+                { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: 'linear-gradient(135deg, #795548, #5D4037)', weight: 3 }
             ],
             premium: [
-                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FFD700', weight: 40 },
-                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#FFD700', weight: 25 },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FF69B4', weight: 15 },
-                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#B0B0B0', weight: 10 },
-                { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: '#795548', weight: 7 },
-                { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: '#00BCD4', weight: 3 }
+                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: 'linear-gradient(135deg, #FFD700, #FFA500)', weight: 40 },
+                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: 'linear-gradient(135deg, #FFD700, #FF8C00)', weight: 25 },
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: 'linear-gradient(135deg, #FF69B4, #FF1493)', weight: 15 },
+                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: 'linear-gradient(135deg, #B0B0B0, #808080)', weight: 10 },
+                { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: 'linear-gradient(135deg, #795548, #5D4037)', weight: 7 },
+                { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: 'linear-gradient(135deg, #00BCD4, #0097A7)', weight: 3 }
             ],
             luxury: [
-                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#FFD700', weight: 40 },
-                { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: '#795548', weight: 25 },
-                { type: 'stars', name: '500 Stars', icon: '⭐', image: 'stars.webp', stars: 500, color: '#FFD700', weight: 15 },
-                { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: '#00BCD4', weight: 10 },
-                { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: '#404040', weight: 7 },
-                { type: 'nft', name: 'Plush Pepe', icon: '🐸', image: 'pepe.webp', stars: 2000, color: '#2196F3', weight: 3 }
+                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: 'linear-gradient(135deg, #FFD700, #FFA500)', weight: 40 },
+                { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: 'linear-gradient(135deg, #795548, #5D4037)', weight: 25 },
+                { type: 'stars', name: '500 Stars', icon: '⭐', image: 'stars.webp', stars: 500, color: 'linear-gradient(135deg, #FFD700, #FF8C00)', weight: 15 },
+                { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: 'linear-gradient(135deg, #00BCD4, #0097A7)', weight: 10 },
+                { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: 'linear-gradient(135deg, #404040, #212121)', weight: 7 },
+                { type: 'nft', name: 'Plush Pepe', icon: '🐸', image: 'pepe.webp', stars: 2000, color: 'linear-gradient(135deg, #2196F3, #1976D2)', weight: 3 }
             ]
         };
 
