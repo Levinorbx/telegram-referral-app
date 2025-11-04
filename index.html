@@ -136,6 +136,14 @@
             text-transform: none;
         }
 
+        .btn-give {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            padding: 8px 15px;
+            font-size: 12px;
+            width: 100%;
+            text-transform: none;
+        }
+
         .btn-claim {
             background: linear-gradient(135deg, #4caf50, #45a049);
             padding: 15px 30px;
@@ -474,6 +482,7 @@
             display: flex;
             gap: 8px;
             margin-top: 10px;
+            flex-direction: column;
         }
 
         .roulette-type-selector {
@@ -525,6 +534,66 @@
             font-size: 16px;
             font-weight: bold;
             margin-bottom: 10px;
+        }
+
+        .give-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .give-modal.show {
+            opacity: 1;
+        }
+
+        .give-content {
+            background: rgba(30, 30, 46, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 350px;
+            width: 100%;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .give-modal.show .give-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .give-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid #2196f3;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .give-input::placeholder {
+            color: #aaa;
+        }
+
+        .give-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
         }
     </style>
 </head>
@@ -624,6 +693,19 @@
         </div>
     </div>
 
+    <!-- Give Modal -->
+    <div class="give-modal" id="giveModal">
+        <div class="give-content">
+            <h3>Give NFT</h3>
+            <p>Enter user ID to send this NFT:</p>
+            <input type="text" class="give-input" id="giveUserId" placeholder="Enter user ID...">
+            <div class="give-buttons">
+                <button class="btn btn-sell" onclick="cancelGive()">Cancel</button>
+                <button class="btn btn-give" onclick="confirmGive()">Send</button>
+            </div>
+        </div>
+    </div>
+
     <div class="bottom-menu">
         <div class="menu-items">
             <div class="menu-item active" id="rouletteMenuItem" onclick="showTab('roulette-tab')">
@@ -671,6 +753,7 @@
         };
 
         let currentPrize = null;
+        let currentGiveNFT = null;
 
         const roulettePrizes = {
             free: [
@@ -752,6 +835,15 @@
             });
         }
 
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
         function initRoulettes() {
             initRoulette('free');
             initRoulette('premium');
@@ -763,7 +855,10 @@
             const track = document.getElementById(`${type}RouletteTrack`);
             track.innerHTML = '';
             
-            const prizes = roulettePrizes[type];
+            let prizes = roulettePrizes[type];
+            
+            // Перемешиваем призы каждый раз при инициализации
+            prizes = shuffleArray(prizes);
             
             // Оставляем порядок подарков как был (без перемешивания)
             for (let i = 0; i < 8; i++) {
@@ -944,18 +1039,13 @@
                 // Анимация добавления звезд
                 animateBalanceChange(oldBalance, userData.balance);
             } else if (currentPrize.type === 'nft') {
-                const nftItem = {
+                userData.inventory.push({
                     id: Date.now(),
                     name: currentPrize.name,
                     icon: currentPrize.icon,
                     image: currentPrize.image,
                     price: nftPrices[currentPrize.name]
-                };
-                userData.inventory.push(nftItem);
-                
-                // Автоматически отправляем NFT в бота
-                sendNFTToBot(nftItem);
-                
+                });
                 saveUserData(); // Сохраняем сразу для NFT
                 updateBalance();
             }
@@ -966,17 +1056,6 @@
             updateInventory();
             currentPrize = null;
             saveUserData();
-        }
-
-        function sendNFTToBot(nftItem) {
-            // Отправляем сообщение в бота (если доступен Telegram WebApp)
-            if (window.Telegram && Telegram.WebApp) {
-                Telegram.WebApp.sendData(JSON.stringify({
-                    action: 'withdraw_nft',
-                    nft_name: nftItem.name,
-                    nft_id: nftItem.id
-                }));
-            }
         }
 
         function spinRoulette(type) {
@@ -1036,8 +1115,10 @@
             
             track.offsetHeight;
             
-            // Увеличиваем время прокрутки в 3 раза (с 8 до 24 секунд)
-            track.style.transition = 'transform 24s cubic-bezier(0.1, 0.8, 0.2, 1)';
+            // Случайное время от 5 до 15 секунд
+            const spinDuration = 5000 + Math.random() * 10000; // от 5 до 15 секунд
+            
+            track.style.transition = `transform ${spinDuration}ms cubic-bezier(0.1, 0.8, 0.2, 1)`;
             track.style.transform = `translateX(${targetPosition}px)`;
 
             setTimeout(() => {
@@ -1052,7 +1133,7 @@
                 showWinScreen(prize);
                 
                 saveUserData(); // Сохраняем после завершения спина
-            }, 24000); // Увеличиваем время до 24 секунд
+            }, spinDuration);
         }
 
         function updateBalance() {
@@ -1096,6 +1177,7 @@
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
                         <div class="item-buttons">
                             <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
+                            <button class="btn btn-give" onclick="giveNFT(${item.id})">Give</button>
                         </div>
                     `;
                 } else {
@@ -1105,6 +1187,7 @@
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
                         <div class="item-buttons">
                             <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
+                            <button class="btn btn-give" onclick="giveNFT(${item.id})">Give</button>
                         </div>
                     `;
                 }
@@ -1126,6 +1209,77 @@
                 updateInventory();
                 saveUserData(); // Сохраняем после продажи
             }
+        }
+
+        function giveNFT(id) {
+            const itemIndex = userData.inventory.findIndex(item => item.id === id);
+            if (itemIndex !== -1) {
+                currentGiveNFT = userData.inventory[itemIndex];
+                showGiveModal();
+            }
+        }
+
+        function showGiveModal() {
+            const modal = document.getElementById('giveModal');
+            const input = document.getElementById('giveUserId');
+            input.value = '';
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
+
+        function hideGiveModal() {
+            const modal = document.getElementById('giveModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        function cancelGive() {
+            hideGiveModal();
+            currentGiveNFT = null;
+        }
+
+        function confirmGive() {
+            const userId = document.getElementById('giveUserId').value.trim();
+            
+            if (!userId) {
+                alert('Please enter user ID');
+                return;
+            }
+
+            if (!/^\d+$/.test(userId)) {
+                alert('Please enter a valid user ID (numbers only)');
+                return;
+            }
+
+            // Удаляем NFT из инвентаря
+            const itemIndex = userData.inventory.findIndex(item => item.id === currentGiveNFT.id);
+            if (itemIndex !== -1) {
+                userData.inventory.splice(itemIndex, 1);
+                
+                // Отправляем NFT через бота
+                if (window.Telegram && Telegram.WebApp) {
+                    Telegram.WebApp.sendData(JSON.stringify({
+                        action: 'give_nft',
+                        nft_name: currentGiveNFT.name,
+                        nft_id: currentGiveNFT.id,
+                        to_user_id: userId
+                    }));
+                }
+                
+                // Показываем уведомление
+                alert(`You have successfully sent ${currentGiveNFT.name} to user ${userId}!`);
+                
+                // Обновляем инвентарь
+                updateInventory();
+                saveUserData();
+            }
+            
+            hideGiveModal();
+            currentGiveNFT = null;
         }
 
         function showTab(tabId) {
