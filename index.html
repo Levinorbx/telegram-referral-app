@@ -247,7 +247,7 @@
 
         /* Horizontal Roulette Styles */
         .roulette-container {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: rgba(30, 30, 46, 0.95);
             border-radius: 20px;
             padding: 20px;
             text-align: center;
@@ -263,8 +263,9 @@
             overflow: hidden;
             border-radius: 12px;
             margin: 20px 0;
-            background: rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #0c0c0c 0%, #1e1e2e 50%, #0f0f1a 100%);
             border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.7);
         }
 
         .roulette-track {
@@ -284,15 +285,35 @@
             justify-content: center;
             padding: 10px;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .roulette-item-wheel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            z-index: 1;
         }
 
         .roulette-item-wheel:nth-child(odd) {
-            background: rgba(50, 50, 70, 0.7);
+            background: linear-gradient(135deg, rgba(50, 50, 70, 0.9) 0%, rgba(40, 40, 60, 0.7) 100%);
+        }
+
+        .roulette-item-wheel:nth-child(even) {
+            background: linear-gradient(135deg, rgba(60, 60, 80, 0.9) 0%, rgba(50, 50, 70, 0.7) 100%);
         }
 
         .roulette-icon {
             font-size: 30px;
             margin-bottom: 8px;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
 
         .roulette-image {
@@ -301,6 +322,9 @@
             object-fit: cover;
             border-radius: 10px;
             margin-bottom: 8px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
 
         .roulette-name {
@@ -308,6 +332,9 @@
             font-weight: bold;
             text-align: center;
             line-height: 1.2;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
 
         .roulette-pointer {
@@ -677,12 +704,14 @@
             checkFreeSpinCooldown();
         }
 
+        // Функция для перемешивания массива случайным образом
         function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
             }
-            return array;
+            return newArray;
         }
 
         function initRoulette(type) {
@@ -693,24 +722,21 @@
             
             // Создаем случайный порядок призов для каждого набора
             for (let i = 0; i < 8; i++) {
-                const shuffledPrizes = shuffleArray([...prizes]);
+                // Перемешиваем призы для каждого набора
+                const shuffledPrizes = shuffleArray(prizes);
                 
                 shuffledPrizes.forEach((prize, index) => {
                     const item = document.createElement('div');
                     item.className = 'roulette-item-wheel';
                     
-                    // Красивые градиенты для каждого слота
-                    const gradients = [
-                        'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                        'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-                        'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-                        'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-                        'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'
-                    ];
+                    // Создаем уникальный градиент для каждого слота
+                    const hue = Math.floor(Math.random() * 360);
+                    const saturation = 40 + Math.floor(Math.random() * 30);
+                    const lightness = 30 + Math.floor(Math.random() * 20);
                     
-                    const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
-                    item.style.background = randomGradient;
+                    item.style.background = `linear-gradient(135deg, 
+                        hsl(${hue}, ${saturation}%, ${lightness}%) 0%, 
+                        hsl(${hue}, ${saturation}%, ${lightness-10}%) 100%)`;
                     
                     if (prize.image) {
                         item.innerHTML = `
@@ -858,7 +884,7 @@
             const track = document.getElementById(`${type}RouletteTrack`);
             const spinBtn = type === 'free' ? document.getElementById('freeSpinBtn') : 
                            type === 'premium' ? document.getElementById('premiumSpinBtn') : 
-                           document.getElementById('luxurySpinBtn`);
+                           document.getElementById('luxurySpinBtn');
             
             spinBtn.disabled = true;
             resultElement.textContent = 'Spinning...';
@@ -924,6 +950,11 @@
                 userData.isSpinning = false;
                 enableNavigation();
                 saveUserData(); // Сохраняем после завершения спина
+                
+                // Перемешиваем слоты после спина для следующего раза
+                setTimeout(() => {
+                    initRoulette(type);
+                }, 1000);
             }, 8000);
         }
 
