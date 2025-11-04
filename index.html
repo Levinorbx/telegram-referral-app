@@ -136,14 +136,6 @@
             text-transform: none;
         }
 
-        .btn-give {
-            background: linear-gradient(135deg, #2196f3, #1976d2);
-            padding: 8px 15px;
-            font-size: 12px;
-            width: 100%;
-            text-transform: none;
-        }
-
         .btn-claim {
             background: linear-gradient(135deg, #4caf50, #45a049);
             padding: 15px 30px;
@@ -332,22 +324,10 @@
             top: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 4px;
+            width: 3px;
             height: 100%;
             background: #ff0000;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
             z-index: 10;
-        }
-
-        .roulette-pointer:before {
-            content: '';
-            position: absolute;
-            top: -5px;
-            left: -8px;
-            width: 20px;
-            height: 20px;
-            background: #ff0000;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
         }
 
         .win-screen {
@@ -482,7 +462,6 @@
             display: flex;
             gap: 8px;
             margin-top: 10px;
-            flex-direction: column;
         }
 
         .roulette-type-selector {
@@ -534,66 +513,6 @@
             font-size: 16px;
             font-weight: bold;
             margin-bottom: 10px;
-        }
-
-        .give-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            padding: 20px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .give-modal.show {
-            opacity: 1;
-        }
-
-        .give-content {
-            background: rgba(30, 30, 46, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            text-align: center;
-            max-width: 350px;
-            width: 100%;
-            transform: scale(0.9);
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-
-        .give-modal.show .give-content {
-            transform: scale(1);
-            opacity: 1;
-        }
-
-        .give-input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 2px solid #2196f3;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 16px;
-            margin: 15px 0;
-            text-align: center;
-        }
-
-        .give-input::placeholder {
-            color: #aaa;
-        }
-
-        .give-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
         }
     </style>
 </head>
@@ -693,19 +612,6 @@
         </div>
     </div>
 
-    <!-- Give Modal -->
-    <div class="give-modal" id="giveModal">
-        <div class="give-content">
-            <h3>Give NFT</h3>
-            <p>Enter user ID to send this NFT:</p>
-            <input type="text" class="give-input" id="giveUserId" placeholder="Enter user ID...">
-            <div class="give-buttons">
-                <button class="btn btn-sell" onclick="cancelGive()">Cancel</button>
-                <button class="btn btn-give" onclick="confirmGive()">Send</button>
-            </div>
-        </div>
-    </div>
-
     <div class="bottom-menu">
         <div class="menu-items">
             <div class="menu-item active" id="rouletteMenuItem" onclick="showTab('roulette-tab')">
@@ -753,32 +659,31 @@
         };
 
         let currentPrize = null;
-        let currentGiveNFT = null;
 
         const roulettePrizes = {
             free: [
                 { type: 'stars', name: '50 Stars', icon: '⭐', image: 'stars.webp', stars: 50, color: 'linear-gradient(135deg, #FFD700, #FFA500)', weight: 40 },
-                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: 'linear-gradient(135deg, #FFD700, #FF8C00)', weight: 25 },
-                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: 'linear-gradient(135deg, #FFD700, #FF6347)', weight: 15 },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: 'linear-gradient(135deg, #FF69B4, #FF1493)', weight: 10 },
-                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: 'linear-gradient(135deg, #B0B0B0, #808080)', weight: 7 },
-                { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: 'linear-gradient(135deg, #795548, #5D4037)', weight: 3 }
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: 'linear-gradient(135deg, #FF69B4, #FF1493)', weight: 25 },
+                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: 'linear-gradient(135deg, #B0B0B0, #808080)', weight: 15 },
+                { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: 'linear-gradient(135deg, #795548, #5D4037)', weight: 10 },
+                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: 'linear-gradient(135deg, #FFD700, #FF8C00)', weight: 7 },
+                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: 'linear-gradient(135deg, #FFD700, #FF6347)', weight: 3 }
             ],
             premium: [
                 { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: 'linear-gradient(135deg, #FFD700, #FFA500)', weight: 40 },
-                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: 'linear-gradient(135deg, #FFD700, #FF8C00)', weight: 25 },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: 'linear-gradient(135deg, #FF69B4, #FF1493)', weight: 15 },
-                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: 'linear-gradient(135deg, #B0B0B0, #808080)', weight: 10 },
-                { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: 'linear-gradient(135deg, #795548, #5D4037)', weight: 7 },
-                { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: 'linear-gradient(135deg, #00BCD4, #0097A7)', weight: 3 }
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: 'linear-gradient(135deg, #FF69B4, #FF1493)', weight: 25 },
+                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: 'linear-gradient(135deg, #B0B0B0, #808080)', weight: 15 },
+                { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: 'linear-gradient(135deg, #795548, #5D4037)', weight: 10 },
+                { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: 'linear-gradient(135deg, #00BCD4, #0097A7)', weight: 7 },
+                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: 'linear-gradient(135deg, #FFD700, #FF8C00)', weight: 3 }
             ],
             luxury: [
                 { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: 'linear-gradient(135deg, #FFD700, #FFA500)', weight: 40 },
                 { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: 'linear-gradient(135deg, #795548, #5D4037)', weight: 25 },
-                { type: 'stars', name: '500 Stars', icon: '⭐', image: 'stars.webp', stars: 500, color: 'linear-gradient(135deg, #FFD700, #FF8C00)', weight: 15 },
-                { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: 'linear-gradient(135deg, #00BCD4, #0097A7)', weight: 10 },
-                { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: 'linear-gradient(135deg, #404040, #212121)', weight: 7 },
-                { type: 'nft', name: 'Plush Pepe', icon: '🐸', image: 'pepe.webp', stars: 2000, color: 'linear-gradient(135deg, #2196F3, #1976D2)', weight: 3 }
+                { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: 'linear-gradient(135deg, #00BCD4, #0097A7)', weight: 15 },
+                { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: 'linear-gradient(135deg, #404040, #212121)', weight: 10 },
+                { type: 'nft', name: 'Plush Pepe', icon: '🐸', image: 'pepe.webp', stars: 2000, color: 'linear-gradient(135deg, #2196F3, #1976D2)', weight: 7 },
+                { type: 'stars', name: '500 Stars', icon: '⭐', image: 'stars.webp', stars: 500, color: 'linear-gradient(135deg, #FFD700, #FF8C00)', weight: 3 }
             ]
         };
 
@@ -860,7 +765,7 @@
             // Перемешиваем призы каждый раз при инициализации
             prizes = shuffleArray(prizes);
             
-            // Оставляем порядок подарков как был (без перемешивания)
+            // Создаем 8 наборов призов для плавной прокрутки
             for (let i = 0; i < 8; i++) {
                 prizes.forEach((prize, index) => {
                     const item = document.createElement('div');
@@ -967,29 +872,17 @@
         }
 
         function getWeightedRandomPrize(prizes) {
-            let availablePrizes = [...prizes];
-            
-            // Если последний приз был звездами, убираем звезды из доступных призов
-            if (userData.lastPrizeType === 'stars') {
-                availablePrizes = availablePrizes.filter(prize => prize.type !== 'stars');
-            }
-            
-            // Если нет доступных призов (все были звездами), возвращаемся к исходному списку
-            if (availablePrizes.length === 0) {
-                availablePrizes = [...prizes];
-            }
-            
-            const totalWeight = availablePrizes.reduce((sum, prize) => sum + prize.weight, 0);
+            const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
             let random = Math.random() * totalWeight;
             
-            for (const prize of availablePrizes) {
+            for (const prize of prizes) {
                 random -= prize.weight;
                 if (random <= 0) {
                     return prize;
                 }
             }
             
-            return availablePrizes[availablePrizes.length - 1];
+            return prizes[prizes.length - 1];
         }
 
         function showWinScreen(prize) {
@@ -1048,11 +941,17 @@
                 });
                 saveUserData(); // Сохраняем сразу для NFT
                 updateBalance();
+                
+                // Отправляем NFT в бот
+                if (window.Telegram && Telegram.WebApp) {
+                    Telegram.WebApp.sendData(JSON.stringify({
+                        action: 'withdraw_nft',
+                        nft_name: currentPrize.name,
+                        nft_id: Date.now()
+                    }));
+                }
             }
 
-            // Сохраняем тип последнего приза
-            userData.lastPrizeType = currentPrize.type;
-            
             updateInventory();
             currentPrize = null;
             saveUserData();
@@ -1095,28 +994,34 @@
 
             const prizes = roulettePrizes[type];
             
-            // Используем взвешенный случайный выбор приза с ограничением
+            // Используем взвешенный случайный выбор приза
             const prize = getWeightedRandomPrize(prizes);
-            const prizeIndex = prizes.findIndex(p => p.name === prize.name);
+            
+            // Находим индекс выбранного приза в текущем (перемешанном) порядке
+            const currentPrizesOrder = [];
+            for (let i = 0; i < 6; i++) {
+                currentPrizesOrder.push(track.children[i].querySelector('.roulette-name').textContent);
+            }
+            
+            const prizeIndex = currentPrizesOrder.findIndex(name => name === prize.name);
             
             const itemWidth = 100;
             const totalItems = track.children.length;
             const itemsPerSet = prizes.length;
             
+            // Вычисляем позицию для остановки на выбранном призе
             const middleSetIndex = Math.floor(totalItems / (2 * itemsPerSet));
-            
-            // Стрелка только справа от центра (от 0 до +40px)
-            const randomOffset = Math.floor(Math.random() * 40);
             const targetIndex = middleSetIndex * itemsPerSet + prizeIndex;
-            const targetPosition = -targetIndex * itemWidth + (itemWidth * 1) + randomOffset;
+            const targetPosition = -targetIndex * itemWidth + (itemWidth / 2);
             
             track.style.transition = 'none';
             track.style.transform = 'translateX(0)';
             
+            // Принудительный reflow
             track.offsetHeight;
             
             // Случайное время от 5 до 15 секунд
-            const spinDuration = 5000 + Math.random() * 10000; // от 5 до 15 секунд
+            const spinDuration = 5000 + Math.random() * 10000;
             
             track.style.transition = `transform ${spinDuration}ms cubic-bezier(0.1, 0.8, 0.2, 1)`;
             track.style.transform = `translateX(${targetPosition}px)`;
@@ -1166,10 +1071,6 @@
                 const className = item.name.toLowerCase().replace(/\s+/g, '-');
                 card.className = `inventory-item-card ${className}`;
                 
-                if (item.price >= 1500) card.classList.add('legendary');
-                else if (item.price >= 500) card.classList.add('epic');
-                else card.classList.add('rare');
-                
                 if (item.image) {
                     card.innerHTML = `
                         <img src="${item.image}" class="item-image-real" alt="${item.name}">
@@ -1177,7 +1078,6 @@
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
                         <div class="item-buttons">
                             <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
-                            <button class="btn btn-give" onclick="giveNFT(${item.id})">Give</button>
                         </div>
                     `;
                 } else {
@@ -1187,7 +1087,6 @@
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
                         <div class="item-buttons">
                             <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
-                            <button class="btn btn-give" onclick="giveNFT(${item.id})">Give</button>
                         </div>
                     `;
                 }
@@ -1209,77 +1108,6 @@
                 updateInventory();
                 saveUserData(); // Сохраняем после продажи
             }
-        }
-
-        function giveNFT(id) {
-            const itemIndex = userData.inventory.findIndex(item => item.id === id);
-            if (itemIndex !== -1) {
-                currentGiveNFT = userData.inventory[itemIndex];
-                showGiveModal();
-            }
-        }
-
-        function showGiveModal() {
-            const modal = document.getElementById('giveModal');
-            const input = document.getElementById('giveUserId');
-            input.value = '';
-            modal.style.display = 'flex';
-            setTimeout(() => {
-                modal.classList.add('show');
-            }, 10);
-        }
-
-        function hideGiveModal() {
-            const modal = document.getElementById('giveModal');
-            modal.classList.remove('show');
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
-        }
-
-        function cancelGive() {
-            hideGiveModal();
-            currentGiveNFT = null;
-        }
-
-        function confirmGive() {
-            const userId = document.getElementById('giveUserId').value.trim();
-            
-            if (!userId) {
-                alert('Please enter user ID');
-                return;
-            }
-
-            if (!/^\d+$/.test(userId)) {
-                alert('Please enter a valid user ID (numbers only)');
-                return;
-            }
-
-            // Удаляем NFT из инвентаря
-            const itemIndex = userData.inventory.findIndex(item => item.id === currentGiveNFT.id);
-            if (itemIndex !== -1) {
-                userData.inventory.splice(itemIndex, 1);
-                
-                // Отправляем NFT через бота
-                if (window.Telegram && Telegram.WebApp) {
-                    Telegram.WebApp.sendData(JSON.stringify({
-                        action: 'give_nft',
-                        nft_name: currentGiveNFT.name,
-                        nft_id: currentGiveNFT.id,
-                        to_user_id: userId
-                    }));
-                }
-                
-                // Показываем уведомление
-                alert(`You have successfully sent ${currentGiveNFT.name} to user ${userId}!`);
-                
-                // Обновляем инвентарь
-                updateInventory();
-                saveUserData();
-            }
-            
-            hideGiveModal();
-            currentGiveNFT = null;
         }
 
         function showTab(tabId) {
