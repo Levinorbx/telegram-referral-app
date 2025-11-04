@@ -128,22 +128,19 @@
             box-shadow: none;
         }
 
-        .btn-sell {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-            padding: 8px 15px;
+        .btn-small {
+            padding: 8px 12px;
             font-size: 12px;
             width: auto;
-            text-transform: none;
             margin: 2px;
+        }
+
+        .btn-sell {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
         }
 
         .btn-send {
             background: linear-gradient(135deg, #2196f3, #1976d2);
-            padding: 8px 15px;
-            font-size: 12px;
-            width: auto;
-            text-transform: none;
-            margin: 2px;
         }
 
         .bottom-menu {
@@ -264,30 +261,6 @@
             margin-bottom: 20px;
             border: 2px solid rgba(255, 215, 0, 0.3);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .roulette-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, 
-                rgba(255,215,0,0.1) 0%, 
-                rgba(255,69,0,0.1) 25%, 
-                rgba(75,0,130,0.1) 50%, 
-                rgba(0,191,255,0.1) 75%, 
-                rgba(50,205,50,0.1) 100%);
-            z-index: -1;
-            animation: gradientShift 8s ease-in-out infinite;
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.1) rotate(180deg); }
         }
 
         .horizontal-roulette {
@@ -318,15 +291,10 @@
             justify-content: center;
             padding: 10px;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
         }
 
         .roulette-item-wheel:nth-child(odd) {
             background: rgba(50, 50, 70, 0.7);
-        }
-
-        .roulette-item-wheel:nth-child(even) {
-            background: rgba(40, 40, 60, 0.7);
         }
 
         .roulette-icon {
@@ -406,7 +374,6 @@
             padding: 15px;
             text-align: center;
             border: 2px solid transparent;
-            position: relative;
         }
 
         .inventory-item-card.candy-cane {
@@ -740,38 +707,38 @@
         let selectedNFT = null;
 
         // Функция для отправки NFT через инлайн режим
-function sendNFTViaInline(nftId) {
-    const nft = userData.inventory.find(item => item.id === nftId);
-    if (!nft) return;
+        function sendNFTViaInline(nftId) {
+            const nft = userData.inventory.find(item => item.id === nftId);
+            if (!nft) return;
 
-    if (window.Telegram && Telegram.WebApp) {
-        // Сохраняем NFT для инлайн режима
-        const inlineNFT = {
-            id: nft.id,
-            name: nft.name,
-            icon: nft.icon,
-            image: nft.image,
-            price: nft.price,
-            timestamp: Date.now()
-        };
-        
-        // Отправляем данные в бота
-        Telegram.WebApp.sendData(JSON.stringify({
-            action: 'register_nft',
-            nft: inlineNFT
-        }));
-        
-        // Удаляем NFT из инвентаря
-        const itemIndex = userData.inventory.findIndex(item => item.id === nftId);
-        if (itemIndex !== -1) {
-            userData.inventory.splice(itemIndex, 1);
-            updateInventory();
-            saveUserData();
+            if (window.Telegram && Telegram.WebApp) {
+                // Сохраняем NFT для инлайн режима
+                const inlineNFT = {
+                    id: nft.id,
+                    name: nft.name,
+                    icon: nft.icon,
+                    image: nft.image,
+                    price: nft.price,
+                    timestamp: Date.now()
+                };
+                
+                // Отправляем данные в бота
+                Telegram.WebApp.sendData(JSON.stringify({
+                    action: 'register_nft',
+                    nft: inlineNFT
+                }));
+                
+                // Удаляем NFT из инвентаря
+                const itemIndex = userData.inventory.findIndex(item => item.id === nftId);
+                if (itemIndex !== -1) {
+                    userData.inventory.splice(itemIndex, 1);
+                    updateInventory();
+                    saveUserData();
+                }
+                
+                alert(`NFT "${nft.name}" added to your bot collection! You can now send it via @GiftForceBot in any chat.`);
+            }
         }
-        
-        alert(`NFT "${nft.name}" added to your bot collection! You can now send it via @GiftForceBot in any chat.`);
-    }
-}
 
         function initTelegramUser() {
             if (window.Telegram && Telegram.WebApp) {
@@ -795,6 +762,24 @@ function sendNFTViaInline(nftId) {
             }
         }
 
+        function disableNavigation() {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.add('disabled');
+            });
+            document.querySelectorAll('.roulette-type-btn').forEach(btn => {
+                btn.classList.add('disabled');
+            });
+        }
+
+        function enableNavigation() {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('disabled');
+            });
+            document.querySelectorAll('.roulette-type-btn').forEach(btn => {
+                btn.classList.remove('disabled');
+            });
+        }
+
         function initRoulettes() {
             initRoulette('free');
             initRoulette('premium');
@@ -803,39 +788,55 @@ function sendNFTViaInline(nftId) {
         }
 
         function initRoulette(type) {
-    const track = document.getElementById(`${type}RouletteTrack`);
-    track.innerHTML = '';
-    
-    const prizes = roulettePrizes[type];
-    
-    // Создаем массив с перемешанными призами
-    let mixedPrizes = [];
-    for (let i = 0; i < 8; i++) {
-        // Перемешиваем призы для каждого блока
-        const shuffled = [...prizes].sort(() => Math.random() - 0.5);
-        mixedPrizes = mixedPrizes.concat(shuffled);
-    }
-    
-    mixedPrizes.forEach((prize, index) => {
-        const item = document.createElement('div');
-        item.className = 'roulette-item-wheel';
-        item.style.background = prize.color;
-        
-        if (prize.image) {
-            item.innerHTML = `
-                <img src="${prize.image}" class="roulette-image" alt="${prize.name}">
-                <div class="roulette-name">${prize.name}</div>
-            `;
-        } else {
-            item.innerHTML = `
-                <span class="roulette-icon">${prize.icon}</span>
-                <div class="roulette-name">${prize.name}</div>
-            `;
+            const track = document.getElementById(`${type}RouletteTrack`);
+            track.innerHTML = '';
+            
+            const prizes = roulettePrizes[type];
+            
+            // Создаем порядок где звезды не идут подряд
+            let arrangedPrizes = [];
+            let starPrizes = prizes.filter(p => p.type === 'stars');
+            let nftPrizes = prizes.filter(p => p.type === 'nft');
+            
+            // Распределяем призы так чтобы звезды не были подряд
+            let starIndex = 0;
+            let nftIndex = 0;
+            
+            for (let i = 0; i < prizes.length; i++) {
+                if (i % 2 === 0 && nftIndex < nftPrizes.length) {
+                    arrangedPrizes.push(nftPrizes[nftIndex]);
+                    nftIndex++;
+                } else if (starIndex < starPrizes.length) {
+                    arrangedPrizes.push(starPrizes[starIndex]);
+                    starIndex++;
+                } else if (nftIndex < nftPrizes.length) {
+                    arrangedPrizes.push(nftPrizes[nftIndex]);
+                    nftIndex++;
+                }
+            }
+            
+            for (let i = 0; i < 8; i++) {
+                arrangedPrizes.forEach((prize, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'roulette-item-wheel';
+                    item.style.background = prize.color;
+                    
+                    if (prize.image) {
+                        item.innerHTML = `
+                            <img src="${prize.image}" class="roulette-image" alt="${prize.name}">
+                            <div class="roulette-name">${prize.name}</div>
+                        `;
+                    } else {
+                        item.innerHTML = `
+                            <span class="roulette-icon">${prize.icon}</span>
+                            <div class="roulette-name">${prize.name}</div>
+                        `;
+                    }
+                    
+                    track.appendChild(item);
+                });
+            }
         }
-        
-        track.appendChild(item);
-    });
-}
 
         function checkFreeSpinCooldown() {
             const now = Math.floor(Date.now() / 1000);
@@ -1054,16 +1055,12 @@ function sendNFTViaInline(nftId) {
                 const className = item.name.toLowerCase().replace(/\s+/g, '-');
                 card.className = `inventory-item-card ${className}`;
                 
-                if (item.price >= 1500) card.classList.add('legendary');
-                else if (item.price >= 500) card.classList.add('epic');
-                else card.classList.add('rare');
-                
-const actionsHTML = `
-    <div class="item-actions">
-        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
-        <button class="btn btn-send" onclick="openSendModal(${item.id})">Send to Bot</button>
-    </div>
-`;
+                const actionsHTML = `
+                    <div class="item-actions">
+                        <button class="btn-small btn-sell" onclick="sellNFT(${item.id})">Sell</button>
+                        <button class="btn-small btn-send" onclick="openSendModal(${item.id})">Send</button>
+                    </div>
+                `;
                 
                 if (item.image) {
                     card.innerHTML = `
@@ -1099,27 +1096,15 @@ const actionsHTML = `
             }
         }
 
-// Обновленная функция открытия модального окна
-function openSendModal(nftId) {
-    selectedNFT = userData.inventory.find(item => item.id === nftId);
-    if (selectedNFT) {
-        document.getElementById('modalMessage').innerHTML = 
-            `Send <strong>"${selectedNFT.name}"</strong> to bot collection?<br><br>
-            After sending, you can share it in any chat via @GiftForceBot`;
-        document.getElementById('sendModal').style.display = 'block';
-    }
-}
-
-// Обновленная функция подтверждения отправки
-function confirmSend() {
-    if (!selectedNFT) {
-        closeModal();
-        return;
-    }
-    
-    sendNFTViaInline(selectedNFT.id);
-    closeModal();
-}
+        function openSendModal(nftId) {
+            selectedNFT = userData.inventory.find(item => item.id === nftId);
+            if (selectedNFT) {
+                document.getElementById('modalMessage').innerHTML = 
+                    `Send <strong>"${selectedNFT.name}"</strong> to bot collection?<br><br>
+                    After sending, you can share it in any chat via @GiftForceBot`;
+                document.getElementById('sendModal').style.display = 'block';
+            }
+        }
 
         function closeModal() {
             document.getElementById('sendModal').style.display = 'none';
@@ -1131,30 +1116,9 @@ function confirmSend() {
                 closeModal();
                 return;
             }
-
-            // Отправка NFT через Telegram Web App
-            if (window.Telegram && Telegram.WebApp) {
-                const message = `🎁 *Gift Force NFT*\n\n🏷️ *${selectedNFT.name}*\n💫 Value: ⭐ ${selectedNFT.price}\n\n_Sent via @GiftForceBot_`;
-                
-                // Отправляем сообщение в чат
-                Telegram.WebApp.sendData(JSON.stringify({
-                    action: 'send_nft',
-                    nft_name: selectedNFT.name,
-                    nft_price: selectedNFT.price,
-                    message: message
-                }));
-            }
-
-            // Удаляем NFT из инвентаря
-            const itemIndex = userData.inventory.findIndex(item => item.id === selectedNFT.id);
-            if (itemIndex !== -1) {
-                userData.inventory.splice(itemIndex, 1);
-                updateInventory();
-                saveUserData();
-            }
-
+            
+            sendNFTViaInline(selectedNFT.id);
             closeModal();
-            alert(`NFT "${selectedNFT.name}" sent to chat!`);
         }
 
         function showTab(tabId) {
@@ -1171,24 +1135,6 @@ function confirmSend() {
             });
             
             event.currentTarget.classList.add('active');
-        }
-
-        function disableNavigation() {
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.add('disabled');
-            });
-            document.querySelectorAll('.roulette-type-btn').forEach(btn => {
-                btn.classList.add('disabled');
-            });
-        }
-
-        function enableNavigation() {
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('disabled');
-            });
-            document.querySelectorAll('.roulette-type-btn').forEach(btn => {
-                btn.classList.remove('disabled');
-            });
         }
 
         document.addEventListener('DOMContentLoaded', function() {
