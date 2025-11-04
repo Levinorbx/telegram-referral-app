@@ -134,6 +134,16 @@
             font-size: 12px;
             width: auto;
             text-transform: none;
+            margin: 2px;
+        }
+
+        .btn-send {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            padding: 8px 15px;
+            font-size: 12px;
+            width: auto;
+            text-transform: none;
+            margin: 2px;
         }
 
         .bottom-menu {
@@ -254,6 +264,30 @@
             margin-bottom: 20px;
             border: 2px solid rgba(255, 215, 0, 0.3);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .roulette-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(255,215,0,0.1) 0%, 
+                rgba(255,69,0,0.1) 25%, 
+                rgba(75,0,130,0.1) 50%, 
+                rgba(0,191,255,0.1) 75%, 
+                rgba(50,205,50,0.1) 100%);
+            z-index: -1;
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
         }
 
         .horizontal-roulette {
@@ -284,10 +318,15 @@
             justify-content: center;
             padding: 10px;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
         }
 
         .roulette-item-wheel:nth-child(odd) {
             background: rgba(50, 50, 70, 0.7);
+        }
+
+        .roulette-item-wheel:nth-child(even) {
+            background: rgba(40, 40, 60, 0.7);
         }
 
         .roulette-icon {
@@ -367,6 +406,7 @@
             padding: 15px;
             text-align: center;
             border: 2px solid transparent;
+            position: relative;
         }
 
         .inventory-item-card.candy-cane {
@@ -454,6 +494,65 @@
             color: #ff6b6b;
             font-weight: bold;
             font-size: 16px;
+        }
+
+        .item-actions {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(30, 30, 46, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            max-width: 300px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .modal-btn.confirm {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+        }
+
+        .modal-btn.cancel {
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
         }
     </style>
 </head>
@@ -559,6 +658,18 @@
         </div>
     </div>
 
+    <!-- Modal for NFT sending -->
+    <div class="modal" id="sendModal">
+        <div class="modal-content">
+            <h3>Send NFT</h3>
+            <p id="modalMessage">Are you sure you want to send this NFT?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn confirm" onclick="confirmSend()">Send</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Функции для работы с localStorage
         function saveUserData() {
@@ -569,11 +680,9 @@
             const saved = localStorage.getItem('giftForceUserData');
             if (saved) {
                 const parsed = JSON.parse(saved);
-                // Объединяем сохраненные данные с дефолтными (на случай добавления новых полей)
                 userData = {
                     ...userData,
                     ...parsed,
-                    // Сохраняем текущее состояние спина
                     isSpinning: false
                 };
             }
@@ -592,28 +701,28 @@
 
         const roulettePrizes = {
             free: [
-                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#B0B0B0' },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FF69B4' },
-                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#FFD700' },
-                { type: 'nft', name: 'Vintage Cigar', icon: '🐶', image: 'cigar.webp', stars: 450, color: '#795548' },
-                { type: 'stars', name: '75 Stars', icon: '⭐', image: 'stars.webp', stars: 75, color: '#FFD700' }
+                { type: 'stars', name: '50 Stars', icon: '⭐', image: 'stars.webp', stars: 50, color: '#FFD700', weight: 40 },
+                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FFD700', weight: 25 },
+                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#FFD700', weight: 15 },
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FF69B4', weight: 10 },
+                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#B0B0B0', weight: 7 },
+                { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: '#795548', weight: 3 }
             ],
             premium: [
-                { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: '#00BCD4' },
-                { type: 'nft', name: 'Vintage Cigar', icon: '🐶', image: 'cigar.webp', stars: 450, color: '#795548' },
-                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#B0B0B0' },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FF69B4' },
-                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FFD700' },
-                { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: '#404040' },
-                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#FFD700' }
+                { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: '#FFD700', weight: 40 },
+                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#FFD700', weight: 25 },
+                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: '#FF69B4', weight: 15 },
+                { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: '#B0B0B0', weight: 10 },
+                { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: '#795548', weight: 7 },
+                { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: '#00BCD4', weight: 3 }
             ],
             luxury: [
-                { type: 'nft', name: 'Plush Pepe', icon: '🐸', image: 'pepe.webp', stars: 2000, color: '#2196F3' },
-                { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: '#404040' },
-                { type: 'stars', name: '250 Stars', icon: '⭐', image: 'stars.webp', stars: 250, color: '#FFD700' },
-                { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: '#00BCD4' },
-                { type: 'nft', name: 'Vintage Cigar', icon: '🐶', image: 'cigar.webp', stars: 450, color: '#795548' },
-                { type: 'stars', name: '500 Stars', icon: '⭐', image: 'stars.webp', stars: 500, color: '#FFD700' }
+                { type: 'stars', name: '200 Stars', icon: '⭐', image: 'stars.webp', stars: 200, color: '#FFD700', weight: 40 },
+                { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: '#795548', weight: 25 },
+                { type: 'stars', name: '500 Stars', icon: '⭐', image: 'stars.webp', stars: 500, color: '#FFD700', weight: 15 },
+                { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: '#00BCD4', weight: 10 },
+                { type: 'nft', name: 'Durovs Cap', icon: '🧢', image: 'cap.webp', stars: 1500, color: '#404040', weight: 7 },
+                { type: 'nft', name: 'Plush Pepe', icon: '🐸', image: 'pepe.webp', stars: 2000, color: '#2196F3', weight: 3 }
             ]
         };
 
@@ -628,6 +737,7 @@
 
         let freeSpinCooldown = 120;
         let freeSpinTimer = null;
+        let selectedNFT = null;
 
         function initTelegramUser() {
             if (window.Telegram && Telegram.WebApp) {
@@ -639,7 +749,6 @@
                     if (user.photo_url) {
                         avatar.style.backgroundImage = `url(${user.photo_url})`;
                     } else {
-                        // Если нет фото, показываем первую букву имени
                         avatar.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
                         avatar.style.display = 'flex';
                         avatar.style.alignItems = 'center';
@@ -650,24 +759,6 @@
                     }
                 }
             }
-        }
-
-        function disableNavigation() {
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.add('disabled');
-            });
-            document.querySelectorAll('.roulette-type-btn').forEach(btn => {
-                btn.classList.add('disabled');
-            });
-        }
-
-        function enableNavigation() {
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('disabled');
-            });
-            document.querySelectorAll('.roulette-type-btn').forEach(btn => {
-                btn.classList.remove('disabled');
-            });
         }
 
         function initRoulettes() {
@@ -682,9 +773,16 @@
             track.innerHTML = '';
             
             const prizes = roulettePrizes[type];
+            const mixedPrizes = [...prizes];
+            
+            // Перемешиваем призы так, чтобы звезды не были подряд
+            for (let i = mixedPrizes.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [mixedPrizes[i], mixedPrizes[j]] = [mixedPrizes[j], mixedPrizes[i]];
+            }
             
             for (let i = 0; i < 8; i++) {
-                prizes.forEach((prize, index) => {
+                mixedPrizes.forEach((prize, index) => {
                     const item = document.createElement('div');
                     item.className = 'roulette-item-wheel';
                     item.style.background = prize.color;
@@ -739,7 +837,7 @@
                     document.getElementById('freeSpinBtn').disabled = false;
                     document.querySelector('#freeCooldown .available-now').style.display = 'block';
                     document.getElementById('freeTimer').style.display = 'none';
-                    saveUserData(); // Сохраняем когда таймер закончился
+                    saveUserData();
                 }
             }, 1000);
         }
@@ -764,7 +862,7 @@
                 } else {
                     balanceElement.textContent = `⭐ ${newBalance}`;
                     balanceElement.classList.remove('balance-changing');
-                    saveUserData(); // Сохраняем после завершения анимации
+                    saveUserData();
                 }
             }
             
@@ -788,6 +886,20 @@
             event.target.classList.add('active');
         }
 
+        function getWeightedRandomPrize(prizes) {
+            const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
+            let random = Math.random() * totalWeight;
+            
+            for (const prize of prizes) {
+                random -= prize.weight;
+                if (random <= 0) {
+                    return prize;
+                }
+            }
+            
+            return prizes[prizes.length - 1];
+        }
+
         function spinRoulette(type) {
             if (userData.isSpinning) return;
             
@@ -801,13 +913,11 @@
             userData.isSpinning = true;
             disableNavigation();
 
-            // Сразу убираем "Available now" при начале спина
             if (type === 'free') {
                 document.querySelector('#freeCooldown .available-now').style.display = 'none';
                 document.getElementById('freeTimer').style.display = 'none';
             }
 
-            // Списываем стоимость спина для премиум и люкс рулеток
             if (cost > 0) {
                 const oldBalance = userData.balance;
                 userData.balance -= cost;
@@ -825,16 +935,15 @@
             resultElement.className = 'roulette-result';
 
             const prizes = roulettePrizes[type];
+            const prize = getWeightedRandomPrize(prizes);
+            const prizeIndex = prizes.findIndex(p => p.name === prize.name);
             
             const itemWidth = 100;
             const totalItems = track.children.length;
             const itemsPerSet = prizes.length;
             
-            const randomPrizeIndex = Math.floor(Math.random() * prizes.length);
-            const prize = prizes[randomPrizeIndex];
-            
             const middleSetIndex = Math.floor(totalItems / (2 * itemsPerSet));
-            const targetIndex = middleSetIndex * itemsPerSet + randomPrizeIndex;
+            const targetIndex = middleSetIndex * itemsPerSet + prizeIndex;
             const targetPosition = -targetIndex * itemWidth + (itemWidth * 1);
             
             track.style.transition = 'none';
@@ -858,7 +967,6 @@
                 if (prize.type === 'stars') {
                     userData.balance += prize.stars;
                     userData.totalEarned += prize.stars;
-                    // Анимация добавления звезд
                     animateBalanceChange(oldBalance, userData.balance);
                 } else if (prize.type === 'nft') {
                     userData.inventory.push({
@@ -868,13 +976,12 @@
                         image: prize.image,
                         price: nftPrices[prize.name]
                     });
-                    saveUserData(); // Сохраняем сразу для NFT
+                    saveUserData();
                     updateBalance();
                 }
 
                 updateInventory();
                 
-                // Таймер появляется только после выпадения приза для фри спинов
                 if (type === 'free') {
                     userData.lastFreeSpin = Math.floor(Date.now() / 1000);
                     startFreeSpinTimer(freeSpinCooldown);
@@ -882,7 +989,7 @@
                 
                 userData.isSpinning = false;
                 enableNavigation();
-                saveUserData(); // Сохраняем после завершения спина
+                saveUserData();
             }, 8000);
         }
 
@@ -911,8 +1018,6 @@
             
             userData.inventory.forEach(item => {
                 const card = document.createElement('div');
-                
-                // Добавляем классы для разных цветов обводки
                 const className = item.name.toLowerCase().replace(/\s+/g, '-');
                 card.className = `inventory-item-card ${className}`;
                 
@@ -920,19 +1025,26 @@
                 else if (item.price >= 500) card.classList.add('epic');
                 else card.classList.add('rare');
                 
+                const actionsHTML = `
+                    <div class="item-actions">
+                        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
+                        <button class="btn btn-send" onclick="openSendModal(${item.id})">Send</button>
+                    </div>
+                `;
+                
                 if (item.image) {
                     card.innerHTML = `
                         <img src="${item.image}" class="item-image-real" alt="${item.name}">
                         <strong>${item.name}</strong>
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
-                        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
+                        ${actionsHTML}
                     `;
                 } else {
                     card.innerHTML = `
                         <div class="item-image">${item.icon}</div>
                         <strong>${item.name}</strong>
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
-                        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
+                        ${actionsHTML}
                     `;
                 }
                 grid.appendChild(card);
@@ -948,11 +1060,55 @@
                 userData.balance += price;
                 userData.inventory.splice(itemIndex, 1);
                 
-                // Анимация при продаже NFT
                 animateBalanceChange(oldBalance, userData.balance);
                 updateInventory();
-                saveUserData(); // Сохраняем после продажи
+                saveUserData();
             }
+        }
+
+        function openSendModal(nftId) {
+            selectedNFT = userData.inventory.find(item => item.id === nftId);
+            if (selectedNFT) {
+                document.getElementById('modalMessage').textContent = 
+                    `Send "${selectedNFT.name}" to chat? This will remove it from your inventory.`;
+                document.getElementById('sendModal').style.display = 'block';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('sendModal').style.display = 'none';
+            selectedNFT = null;
+        }
+
+        function confirmSend() {
+            if (!selectedNFT) {
+                closeModal();
+                return;
+            }
+
+            // Отправка NFT через Telegram Web App
+            if (window.Telegram && Telegram.WebApp) {
+                const message = `🎁 *Gift Force NFT*\n\n🏷️ *${selectedNFT.name}*\n💫 Value: ⭐ ${selectedNFT.price}\n\n_Sent via @GiftForceBot_`;
+                
+                // Отправляем сообщение в чат
+                Telegram.WebApp.sendData(JSON.stringify({
+                    action: 'send_nft',
+                    nft_name: selectedNFT.name,
+                    nft_price: selectedNFT.price,
+                    message: message
+                }));
+            }
+
+            // Удаляем NFT из инвентаря
+            const itemIndex = userData.inventory.findIndex(item => item.id === selectedNFT.id);
+            if (itemIndex !== -1) {
+                userData.inventory.splice(itemIndex, 1);
+                updateInventory();
+                saveUserData();
+            }
+
+            closeModal();
+            alert(`NFT "${selectedNFT.name}" sent to chat!`);
         }
 
         function showTab(tabId) {
@@ -971,10 +1127,26 @@
             event.currentTarget.classList.add('active');
         }
 
+        function disableNavigation() {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.add('disabled');
+            });
+            document.querySelectorAll('.roulette-type-btn').forEach(btn => {
+                btn.classList.add('disabled');
+            });
+        }
+
+        function enableNavigation() {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('disabled');
+            });
+            document.querySelectorAll('.roulette-type-btn').forEach(btn => {
+                btn.classList.remove('disabled');
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Загружаем сохраненные данные при запуске
             loadUserData();
-            
             initTelegramUser();
             initRoulettes();
             updateBalance();
