@@ -265,7 +265,6 @@
             margin: 20px 0;
             background: linear-gradient(135deg, #0c0c0c 0%, #1e1e2e 50%, #0f0f1a 100%);
             border: 2px solid rgba(255, 255, 255, 0.1);
-            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.7);
         }
 
         .roulette-track {
@@ -285,35 +284,15 @@
             justify-content: center;
             padding: 10px;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .roulette-item-wheel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
-            z-index: 1;
         }
 
         .roulette-item-wheel:nth-child(odd) {
-            background: linear-gradient(135deg, rgba(50, 50, 70, 0.9) 0%, rgba(40, 40, 60, 0.7) 100%);
-        }
-
-        .roulette-item-wheel:nth-child(even) {
-            background: linear-gradient(135deg, rgba(60, 60, 80, 0.9) 0%, rgba(50, 50, 70, 0.7) 100%);
+            background: rgba(50, 50, 70, 0.7);
         }
 
         .roulette-icon {
             font-size: 30px;
             margin-bottom: 8px;
-            position: relative;
-            z-index: 2;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
 
         .roulette-image {
@@ -322,9 +301,6 @@
             object-fit: cover;
             border-radius: 10px;
             margin-bottom: 8px;
-            position: relative;
-            z-index: 2;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
 
         .roulette-name {
@@ -332,9 +308,6 @@
             font-weight: bold;
             text-align: center;
             line-height: 1.2;
-            position: relative;
-            z-index: 2;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
 
         .roulette-pointer {
@@ -704,39 +677,17 @@
             checkFreeSpinCooldown();
         }
 
-        // Функция для перемешивания массива случайным образом
-        function shuffleArray(array) {
-            const newArray = [...array];
-            for (let i = newArray.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-            }
-            return newArray;
-        }
-
         function initRoulette(type) {
             const track = document.getElementById(`${type}RouletteTrack`);
             track.innerHTML = '';
             
             const prizes = roulettePrizes[type];
             
-            // Создаем случайный порядок призов для каждого набора
             for (let i = 0; i < 8; i++) {
-                // Перемешиваем призы для каждого набора
-                const shuffledPrizes = shuffleArray(prizes);
-                
-                shuffledPrizes.forEach((prize, index) => {
+                prizes.forEach((prize, index) => {
                     const item = document.createElement('div');
                     item.className = 'roulette-item-wheel';
-                    
-                    // Создаем уникальный градиент для каждого слота
-                    const hue = Math.floor(Math.random() * 360);
-                    const saturation = 40 + Math.floor(Math.random() * 30);
-                    const lightness = 30 + Math.floor(Math.random() * 20);
-                    
-                    item.style.background = `linear-gradient(135deg, 
-                        hsl(${hue}, ${saturation}%, ${lightness}%) 0%, 
-                        hsl(${hue}, ${saturation}%, ${lightness-10}%) 100%)`;
+                    item.style.background = prize.color;
                     
                     if (prize.image) {
                         item.innerHTML = `
@@ -835,9 +786,6 @@
                 btn.classList.remove('active');
             });
             event.target.classList.add('active');
-            
-            // Перемешиваем слоты при переключении типа рулетки
-            initRoulette(type);
         }
 
         function getWeightedRandomPrize(prizes) {
@@ -950,11 +898,6 @@
                 userData.isSpinning = false;
                 enableNavigation();
                 saveUserData(); // Сохраняем после завершения спина
-                
-                // Перемешиваем слоты после спина для следующего раза
-                setTimeout(() => {
-                    initRoulette(type);
-                }, 1000);
             }, 8000);
         }
 
