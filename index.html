@@ -783,6 +783,23 @@ function sendNFTViaInline(nftId) {
             }
         }
 
+        // Функция для отладки WebApp
+function initWebApp() {
+    if (window.Telegram && Telegram.WebApp) {
+        console.log("Telegram WebApp initialized");
+        console.log("WebApp version:", Telegram.WebApp.version);
+        console.log("Platform:", Telegram.WebApp.platform);
+        console.log("InitData:", Telegram.WebApp.initData);
+        console.log("InitDataUnsafe:", Telegram.WebApp.initDataUnsafe);
+        
+        // Включаем кнопку отправки
+        Telegram.WebApp.ready();
+        console.log("WebApp is ready");
+    } else {
+        console.log("Not in Telegram environment");
+    }
+}
+
         function disableNavigation() {
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.classList.add('disabled');
@@ -1158,13 +1175,14 @@ function sendNFTViaInline(nftId) {
             event.currentTarget.classList.add('active');
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            loadUserData();
-            initTelegramUser();
-            initRoulettes();
-            updateBalance();
-            updateInventory();
-        });
+document.addEventListener('DOMContentLoaded', function() {
+    loadUserData();
+    initTelegramUser();
+    initWebApp(); // Добавляем эту строку
+    initRoulettes();
+    updateBalance();
+    updateInventory();
+});
     </script>
 </body>
 </html>
