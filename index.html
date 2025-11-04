@@ -419,7 +419,7 @@
             border-color: #B0B0B0;
         }
 
-        .inventory-item-card.happy-birthday {
+        .inventory-item-card.b-day-candle {
             border-color: #FF69B4;
         }
 
@@ -663,7 +663,7 @@
         const roulettePrizes = {
             free: [
                 { type: 'stars', name: '50 Stars', icon: '⭐', image: 'stars.webp', stars: 50, color: 'linear-gradient(135deg, #FFD700, #FFA500)', weight: 40 },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: 'linear-gradient(135deg, #FF69B4, #FF1493)', weight: 25 },
+                { type: 'nft', name: 'B-Day Candle', icon: '🎂', image: 'happy.webp', stars: 250, color: 'linear-gradient(135deg, #FF69B4, #FF1493)', weight: 25 },
                 { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: 'linear-gradient(135deg, #B0B0B0, #808080)', weight: 15 },
                 { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: 'linear-gradient(135deg, #795548, #5D4037)', weight: 10 },
                 { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: 'linear-gradient(135deg, #FFD700, #FF8C00)', weight: 7 },
@@ -671,7 +671,7 @@
             ],
             premium: [
                 { type: 'stars', name: '100 Stars', icon: '⭐', image: 'stars.webp', stars: 100, color: 'linear-gradient(135deg, #FFD700, #FFA500)', weight: 40 },
-                { type: 'nft', name: 'Happy Birthday', icon: '🎂', image: 'happy.webp', stars: 250, color: 'linear-gradient(135deg, #FF69B4, #FF1493)', weight: 25 },
+                { type: 'nft', name: 'B-Day Candle', icon: '🎂', image: 'happy.webp', stars: 250, color: 'linear-gradient(135deg, #FF69B4, #FF1493)', weight: 25 },
                 { type: 'nft', name: 'Candy Cane', icon: '🍭', image: 'candy.webp', stars: 300, color: 'linear-gradient(135deg, #B0B0B0, #808080)', weight: 15 },
                 { type: 'nft', name: 'Vintage Cigar', icon: '🚬', image: 'cigar.webp', stars: 450, color: 'linear-gradient(135deg, #795548, #5D4037)', weight: 10 },
                 { type: 'nft', name: 'Astral Shard', icon: '🔮', image: 'astral.webp', stars: 750, color: 'linear-gradient(135deg, #00BCD4, #0097A7)', weight: 7 },
@@ -693,7 +693,7 @@
             'Astral Shard': 750,
             'Vintage Cigar': 450,
             'Candy Cane': 300,
-            'Happy Birthday': 250
+            'B-Day Candle': 250
         };
 
         let freeSpinCooldown = 120; // 2 minutes
@@ -1009,10 +1009,13 @@
             const totalItems = track.children.length;
             const itemsPerSet = prizes.length;
             
-            // Вычисляем позицию для остановки на выбранном призе
+            // Вычисляем позицию для остановки - случайная позиция внутри выбранного приза
             const middleSetIndex = Math.floor(totalItems / (2 * itemsPerSet));
             const targetIndex = middleSetIndex * itemsPerSet + prizeIndex;
-            const targetPosition = -targetIndex * itemWidth + (itemWidth / 2);
+            
+            // Случайное смещение внутри приза (от 10% до 90% ширины приза)
+            const randomOffset = itemWidth * (0.1 + Math.random() * 0.8);
+            const targetPosition = -targetIndex * itemWidth + randomOffset;
             
             track.style.transition = 'none';
             track.style.transform = 'translateX(0)';
