@@ -635,11 +635,9 @@
             const saved = localStorage.getItem('giftForceUserData');
             if (saved) {
                 const parsed = JSON.parse(saved);
-                // Объединяем сохраненные данные с дефолтными (на случай добавления новых полей)
                 userData = {
                     ...userData,
                     ...parsed,
-                    // Сохраняем текущее состояние спина
                     isSpinning: false
                 };
             }
@@ -696,7 +694,7 @@
             'Day Candle': 250
         };
 
-        let freeSpinCooldown = 120; // 2 minutes
+        let freeSpinCooldown = 120;
         let freeSpinTimer = null;
 
         function initTelegramUser() {
@@ -709,7 +707,6 @@
                     if (user.photo_url) {
                         avatar.style.backgroundImage = `url(${user.photo_url})`;
                     } else {
-                        // Если нет фото, показываем первую букву имени
                         avatar.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
                         avatar.style.display = 'flex';
                         avatar.style.alignItems = 'center';
@@ -761,11 +758,8 @@
             track.innerHTML = '';
             
             let prizes = roulettePrizes[type];
-            
-            // Перемешиваем призы каждый раз при инициализации
             prizes = shuffleArray(prizes);
             
-            // Создаем 8 наборов призов для плавной прокрутки
             for (let i = 0; i < 8; i++) {
                 prizes.forEach((prize, index) => {
                     const item = document.createElement('div');
@@ -822,7 +816,7 @@
                     document.getElementById('freeSpinBtn').disabled = false;
                     document.querySelector('#freeCooldown .available-now').style.display = 'block';
                     document.getElementById('freeTimer').style.display = 'none';
-                    saveUserData(); // Сохраняем когда таймер закончился
+                    saveUserData();
                 }
             }, 1000);
         }
@@ -847,7 +841,7 @@
                 } else {
                     balanceElement.textContent = `⭐ ${newBalance}`;
                     balanceElement.classList.remove('balance-changing');
-                    saveUserData(); // Сохраняем после завершения анимации
+                    saveUserData();
                 }
             }
             
@@ -929,7 +923,6 @@
             if (currentPrize.type === 'stars') {
                 userData.balance += currentPrize.stars;
                 userData.totalEarned += currentPrize.stars;
-                // Анимация добавления звезд
                 animateBalanceChange(oldBalance, userData.balance);
             } else if (currentPrize.type === 'nft') {
                 userData.inventory.push({
@@ -939,10 +932,9 @@
                     image: currentPrize.image,
                     price: nftPrices[currentPrize.name]
                 });
-                saveUserData(); // Сохраняем сразу для NFT
+                saveUserData();
                 updateBalance();
                 
-                // Отправляем NFT в бот
                 if (window.Telegram && Telegram.WebApp) {
                     Telegram.WebApp.sendData(JSON.stringify({
                         action: 'withdraw_nft',
@@ -958,93 +950,83 @@
         }
 
         function spinRoulette(type) {
-    if (userData.isSpinning) return;
-    
-    const cost = type === 'free' ? 0 : type === 'premium' ? 200 : 500;
-    
-    if (cost > 0 && userData.balance < cost) {
-        alert('Not enough stars!');
-        return;
-    }
+            if (userData.isSpinning) return;
+            
+            const cost = type === 'free' ? 0 : type === 'premium' ? 200 : 500;
+            
+            if (cost > 0 && userData.balance < cost) {
+                alert('Not enough stars!');
+                return;
+            }
 
-    userData.isSpinning = true;
-    disableNavigation();
+            userData.isSpinning = true;
+            disableNavigation();
 
-    // Сразу убираем "Available now" при начале спина и запускаем таймер
-    if (type === 'free') {
-        document.querySelector('#freeCooldown .available-now').style.display = 'none';
-        document.getElementById('freeTimer').style.display = 'block';
-        userData.lastFreeSpin = Math.floor(Date.now() / 1000);
-        startFreeSpinTimer(freeSpinCooldown);
-    }
+            if (type === 'free') {
+                document.querySelector('#freeCooldown .available-now').style.display = 'none';
+                document.getElementById('freeTimer').style.display = 'block';
+                userData.lastFreeSpin = Math.floor(Date.now() / 1000);
+                startFreeSpinTimer(freeSpinCooldown);
+            }
 
-    // Списываем стоимость спина для премиум и люкс рулеток
-    if (cost > 0) {
-        const oldBalance = userData.balance;
-        userData.balance -= cost;
-        animateBalanceChange(oldBalance, userData.balance);
-    }
+            if (cost > 0) {
+                const oldBalance = userData.balance;
+                userData.balance -= cost;
+                animateBalanceChange(oldBalance, userData.balance);
+            }
 
-    const track = document.getElementById(`${type}RouletteTrack`);
-    const spinBtn = type === 'free' ? document.getElementById('freeSpinBtn') : 
-                   type === 'premium' ? document.getElementById('premiumSpinBtn') : 
-                   document.getElementById('luxurySpinBtn');
-    
-    spinBtn.disabled = true;
+            const track = document.getElementById(`${type}RouletteTrack`);
+            const spinBtn = type === 'free' ? document.getElementById('freeSpinBtn') : 
+                           type === 'premium' ? document.getElementById('premiumSpinBtn') : 
+                           document.getElementById('luxurySpinBtn');
+            
+            spinBtn.disabled = true;
 
-    const prizes = roulettePrizes[type];
-    
-    // Используем взвешенный случайный выбор приза
-    const prize = getWeightedRandomPrize(prizes);
-    
-    // Находим индекс выбранного приза в текущем (перемешанном) порядке
-    const currentPrizesOrder = [];
-    for (let i = 0; i < 6; i++) {
-        currentPrizesOrder.push(track.children[i].querySelector('.roulette-name').textContent);
-    }
-    
-    const prizeIndex = currentPrizesOrder.findIndex(name => name === prize.name);
-    
-    const itemWidth = 100;
-    const totalItems = track.children.length;
-    const itemsPerSet = prizes.length;
-    
-    // ВЫЧИСЛЯЕМ ПОЗИЦИЮ ТОЧНО В ЦЕНТРЕ ПРИЗА
-    // Берем центральный набор призов
-    const centerSetStart = Math.floor(totalItems / 2) - Math.floor(itemsPerSet / 2);
-    // Позиция начала нашего приза в центральном наборе
-    const prizeStartPosition = centerSetStart + prizeIndex;
-    // Центр приза = начало приза + половина ширины
-    const targetPosition = -prizeStartPosition * itemWidth - (itemWidth / 2);
-    
-    console.log('Prize:', prize.name, 'Index:', prizeIndex, 'Target position:', targetPosition);
-    
-    track.style.transition = 'none';
-    track.style.transform = 'translateX(0)';
-    
-    // Принудительный reflow
-    track.offsetHeight;
-    
-    // Случайное время от 5 до 15 секунд
-    const spinDuration = 5000 + Math.random() * 10000;
-    
-    track.style.transition = `transform ${spinDuration}ms cubic-bezier(0.1, 0.8, 0.2, 1)`;
-    track.style.transform = `translateX(${targetPosition}px)`;
+            const prizes = roulettePrizes[type];
+            const prize = getWeightedRandomPrize(prizes);
+            
+            // Получаем текущий порядок призов
+            const currentPrizesOrder = [];
+            for (let i = 0; i < 6; i++) {
+                currentPrizesOrder.push(track.children[i].querySelector('.roulette-name').textContent);
+            }
+            
+            const prizeIndex = currentPrizesOrder.findIndex(name => name === prize.name);
+            
+            const itemWidth = 100;
+            const totalItems = track.children.length;
+            const itemsPerSet = 6;
+            
+            // ПРОСТОЙ И ПРАВИЛЬНЫЙ РАСЧЕТ:
+            // Центральный набор начинается с позиции, где стрелка будет указывать на первый приз
+            const centerSetStart = Math.floor(totalItems / 2) - 3;
+            // Позиция нашего приза в центральном наборе
+            const prizePosition = centerSetStart + prizeIndex;
+            // Центр приза = начало приза + половина ширины
+            const targetPosition = -prizePosition * itemWidth - (itemWidth / 2);
+            
+            track.style.transition = 'none';
+            track.style.transform = 'translateX(0)';
+            
+            track.offsetHeight;
+            
+            const spinDuration = 5000 + Math.random() * 10000;
+            
+            track.style.transition = `transform ${spinDuration}ms cubic-bezier(0.1, 0.8, 0.2, 1)`;
+            track.style.transform = `translateX(${targetPosition}px)`;
 
-    setTimeout(() => {
-        if (type !== 'free') {
-            spinBtn.disabled = false;
+            setTimeout(() => {
+                if (type !== 'free') {
+                    spinBtn.disabled = false;
+                }
+                
+                userData.isSpinning = false;
+                enableNavigation();
+                
+                showWinScreen(prize);
+                saveUserData();
+            }, spinDuration);
         }
-        
-        userData.isSpinning = false;
-        enableNavigation();
-        
-        // Показываем экран победы
-        showWinScreen(prize);
-        
-        saveUserData(); // Сохраняем после завершения спина
-    }, spinDuration);
-}
 
         function updateBalance() {
             document.querySelector('.balance-amount').textContent = `⭐ ${userData.balance}`;
@@ -1071,8 +1053,6 @@
             
             userData.inventory.forEach(item => {
                 const card = document.createElement('div');
-                
-                // Добавляем классы для разных цветов обводки
                 const className = item.name.toLowerCase().replace(/\s+/g, '-');
                 card.className = `inventory-item-card ${className}`;
                 
@@ -1108,10 +1088,9 @@
                 userData.balance += price;
                 userData.inventory.splice(itemIndex, 1);
                 
-                // Анимация при продаже NFT
                 animateBalanceChange(oldBalance, userData.balance);
                 updateInventory();
-                saveUserData(); // Сохраняем после продажи
+                saveUserData();
             }
         }
 
@@ -1132,9 +1111,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Загружаем сохраненные данные при запуске
             loadUserData();
-            
             initTelegramUser();
             initRoulettes();
             updateBalance();
