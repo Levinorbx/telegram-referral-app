@@ -64,6 +64,17 @@
             font-size: 16px;
             font-weight: bold;
             color: #ffd700;
+            transition: all 0.3s ease;
+        }
+
+        .balance-changing {
+            animation: balancePulse 0.1s ease-in-out 3;
+        }
+
+        @keyframes balancePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         .container {
@@ -78,6 +89,7 @@
             padding: 20px;
             margin-bottom: 15px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
         }
 
         .section h2 {
@@ -106,28 +118,22 @@
 
         .btn:active {
             transform: scale(0.95);
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.6);
         }
 
         .btn:disabled {
             background: #455a64;
             cursor: not-allowed;
             transform: none;
-        }
-
-        .btn-small {
-            background: linear-gradient(135deg, #2196f3, #1976d2);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-size: 12px;
-            cursor: pointer;
-            margin: 2px;
-            transition: all 0.2s ease;
+            box-shadow: none;
         }
 
         .btn-sell {
             background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            padding: 8px 15px;
+            font-size: 12px;
+            width: auto;
+            text-transform: none;
         }
 
         .bottom-menu {
@@ -136,6 +142,7 @@
             left: 0;
             right: 0;
             background: rgba(13, 13, 23, 0.95);
+            backdrop-filter: blur(20px);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding: 12px 0;
         }
@@ -166,6 +173,10 @@
             opacity: 1;
         }
 
+        .menu-item.disabled {
+            pointer-events: none;
+        }
+
         .menu-icon {
             font-size: 18px;
             margin-bottom: 4px;
@@ -174,9 +185,11 @@
         .menu-text {
             font-size: 11px;
             font-weight: 500;
+            opacity: 0.8;
         }
 
         .menu-item.active .menu-text {
+            opacity: 1;
             color: #64b5f6;
         }
 
@@ -186,6 +199,14 @@
 
         .tab-content.active {
             display: block;
+        }
+
+        .inventory-item {
+            background: rgba(40, 40, 60, 0.6);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #4caf50;
         }
 
         .empty-state {
@@ -198,6 +219,17 @@
             font-size: 48px;
             margin-bottom: 15px;
             opacity: 0.5;
+        }
+
+        .price {
+            color: #ffd700;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .reward {
+            color: #4caf50;
+            font-weight: bold;
         }
 
         .cooldown {
@@ -213,6 +245,7 @@
             font-size: 16px;
         }
 
+        /* Horizontal Roulette Styles */
         .roulette-container {
             background: rgba(30, 30, 46, 0.95);
             border-radius: 20px;
@@ -220,6 +253,7 @@
             text-align: center;
             margin-bottom: 20px;
             border: 2px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         .horizontal-roulette {
@@ -288,6 +322,17 @@
             z-index: 10;
         }
 
+        .roulette-pointer:before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -8px;
+            width: 20px;
+            height: 20px;
+            background: #ff0000;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+
         .roulette-result {
             font-size: 18px;
             font-weight: bold;
@@ -300,6 +345,13 @@
 
         .win {
             color: #26de81;
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
         .inventory-grid {
@@ -314,6 +366,31 @@
             border-radius: 10px;
             padding: 15px;
             text-align: center;
+            border: 2px solid transparent;
+        }
+
+        .inventory-item-card.candy-cane {
+            border-color: #B0B0B0;
+        }
+
+        .inventory-item-card.happy-birthday {
+            border-color: #FF69B4;
+        }
+
+        .inventory-item-card.vintage-cigar {
+            border-color: #795548;
+        }
+
+        .inventory-item-card.astral-shard {
+            border-color: #00BCD4;
+        }
+
+        .inventory-item-card.durovs-cap {
+            border-color: #404040;
+        }
+
+        .inventory-item-card.plush-pepe {
+            border-color: #2196F3;
         }
 
         .item-image {
@@ -361,6 +438,11 @@
             border-color: #2196F3;
         }
 
+        .roulette-type-btn.disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
         .spin-cost {
             color: #ffd700;
             font-weight: bold;
@@ -372,64 +454,6 @@
             color: #ff6b6b;
             font-weight: bold;
             font-size: 16px;
-        }
-
-        .item-actions {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            margin-top: 8px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 2000;
-        }
-
-        .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(30, 30, 46, 0.95);
-            padding: 20px;
-            border-radius: 15px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            max-width: 300px;
-            width: 90%;
-            text-align: center;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            justify-content: center;
-        }
-
-        .modal-btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            flex: 1;
-        }
-
-        .modal-btn.confirm {
-            background: linear-gradient(135deg, #4caf50, #45a049);
-            color: white;
-        }
-
-        .modal-btn.cancel {
-            background: rgba(255, 255, 255, 0.1);
-            color: #e0e0e0;
         }
     </style>
 </head>
@@ -453,6 +477,7 @@
                     <button class="roulette-type-btn" id="luxuryTypeBtn" onclick="switchRouletteType('luxury')">Luxury</button>
                 </div>
                 
+                <!-- Free Roulette -->
                 <div id="free-roulette" class="roulette-section">
                     <div class="horizontal-roulette">
                         <div class="roulette-track" id="freeRouletteTrack"></div>
@@ -471,6 +496,7 @@
                     </div>
                 </div>
                 
+                <!-- Premium Roulette -->
                 <div id="premium-roulette" class="roulette-section" style="display: none;">
                     <div class="horizontal-roulette">
                         <div class="roulette-track" id="premiumRouletteTrack"></div>
@@ -486,6 +512,7 @@
                     </div>
                 </div>
                 
+                <!-- Luxury Roulette -->
                 <div id="luxury-roulette" class="roulette-section" style="display: none;">
                     <div class="horizontal-roulette">
                         <div class="roulette-track" id="luxuryRouletteTrack"></div>
@@ -532,18 +559,8 @@
         </div>
     </div>
 
-    <div class="modal" id="sendModal">
-        <div class="modal-content">
-            <h3>Send NFT</h3>
-            <p id="modalMessage">Are you sure you want to send this NFT?</p>
-            <div class="modal-buttons">
-                <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
-                <button class="modal-btn confirm" onclick="confirmSend()">Send</button>
-            </div>
-        </div>
-    </div>
-
     <script>
+        // Функции для работы с localStorage
         function saveUserData() {
             localStorage.setItem('giftForceUserData', JSON.stringify(userData));
         }
@@ -552,9 +569,11 @@
             const saved = localStorage.getItem('giftForceUserData');
             if (saved) {
                 const parsed = JSON.parse(saved);
+                // Объединяем сохраненные данные с дефолтными (на случай добавления новых полей)
                 userData = {
                     ...userData,
                     ...parsed,
+                    // Сохраняем текущее состояние спина
                     isSpinning: false
                 };
             }
@@ -562,6 +581,9 @@
 
         let userData = {
             balance: 1000,
+            completedTasks: 0,
+            totalEarned: 0,
+            invitedFriends: 0,
             inventory: [],
             lastFreeSpin: 0,
             currentRouletteType: 'free',
@@ -606,59 +628,11 @@
 
         let freeSpinCooldown = 120;
         let freeSpinTimer = null;
-        let selectedNFT = null;
-
-        function sendNFTViaInline(nftId) {
-            const nft = userData.inventory.find(item => item.id === nftId);
-            if (!nft) return;
-
-            if (window.Telegram && Telegram.WebApp) {
-                const nftData = {
-                    action: 'register_nft',
-                    nft: {
-                        id: nft.id,
-                        name: nft.name,
-                        icon: nft.icon,
-                        image: nft.image,
-                        price: nft.price,
-                        timestamp: Date.now()
-                    }
-                };
-                
-                Telegram.WebApp.sendData(JSON.stringify(nftData));
-                
-                const nft = userData.inventory.find(item => item.id === nftId);
-            if (!nft) return;
-
-            if (window.Telegram && Telegram.WebApp) {
-                const nftData = {
-                    action: 'register_nft',
-                    nft: {
-                        id: nft.id,
-                        name: nft.name,
-                        icon: nft.icon,
-                        image: nft.image,
-                        price: nft.price,
-                        timestamp: Date.now()
-                    }
-                };
-                
-                Telegram.WebApp.sendData(JSON.stringify(nftData));
-                
-                const itemIndex = userData.inventory.findIndex(item => item.id === nftId);
-                if (itemIndex !== -1) {
-                    userData.inventory.splice(itemIndex, 1);
-                    updateInventory();
-                    saveUserData();
-                }
-                
-                alert(`✅ NFT "${nft.name}" sent to bot!\n\nYou can now share it by typing:\n@GiftForceBot`);
-            }
-        }
 
         function initTelegramUser() {
             if (window.Telegram && Telegram.WebApp) {
                 const user = Telegram.WebApp.initDataUnsafe.user;
+  
                 if (user) {
                     document.getElementById('userName').textContent = user.first_name || 'User';
                     const avatar = document.getElementById('userAvatar');
@@ -666,6 +640,7 @@
                     if (user.photo_url) {
                         avatar.style.backgroundImage = `url(${user.photo_url})`;
                     } else {
+                        // Если нет фото, показываем первую букву имени
                         avatar.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
                         avatar.style.display = 'flex';
                         avatar.style.alignItems = 'center';
@@ -676,6 +651,24 @@
                     }
                 }
             }
+        }
+
+        function disableNavigation() {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.add('disabled');
+            });
+            document.querySelectorAll('.roulette-type-btn').forEach(btn => {
+                btn.classList.add('disabled');
+            });
+        }
+
+        function enableNavigation() {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('disabled');
+            });
+            document.querySelectorAll('.roulette-type-btn').forEach(btn => {
+                btn.classList.remove('disabled');
+            });
         }
 
         function initRoulettes() {
@@ -747,9 +740,36 @@
                     document.getElementById('freeSpinBtn').disabled = false;
                     document.querySelector('#freeCooldown .available-now').style.display = 'block';
                     document.getElementById('freeTimer').style.display = 'none';
-                    saveUserData();
+                    saveUserData(); // Сохраняем когда таймер закончился
                 }
             }, 1000);
+        }
+
+        function animateBalanceChange(oldBalance, newBalance, duration = 1000) {
+            const balanceElement = document.querySelector('.balance-amount');
+            const startTime = Date.now();
+            const difference = newBalance - oldBalance;
+            
+            balanceElement.classList.add('balance-changing');
+            
+            function updateBalance() {
+                const currentTime = Date.now();
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const currentBalance = oldBalance + Math.floor(difference * progress);
+                balanceElement.textContent = `⭐ ${currentBalance}`;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateBalance);
+                } else {
+                    balanceElement.textContent = `⭐ ${newBalance}`;
+                    balanceElement.classList.remove('balance-changing');
+                    saveUserData(); // Сохраняем после завершения анимации
+                }
+            }
+            
+            updateBalance();
         }
 
         function switchRouletteType(type) {
@@ -769,6 +789,20 @@
             event.target.classList.add('active');
         }
 
+        function getWeightedRandomPrize(prizes) {
+            const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
+            let random = Math.random() * totalWeight;
+            
+            for (const prize of prizes) {
+                random -= prize.weight;
+                if (random <= 0) {
+                    return prize;
+                }
+            }
+            
+            return prizes[prizes.length - 1];
+        }
+
         function spinRoulette(type) {
             if (userData.isSpinning) return;
             
@@ -780,15 +814,19 @@
             }
 
             userData.isSpinning = true;
+            disableNavigation();
 
+            // Сразу убираем "Available now" при начале спина
             if (type === 'free') {
                 document.querySelector('#freeCooldown .available-now').style.display = 'none';
                 document.getElementById('freeTimer').style.display = 'none';
             }
 
+            // Списываем стоимость спина для премиум и люкс рулеток
             if (cost > 0) {
+                const oldBalance = userData.balance;
                 userData.balance -= cost;
-                updateBalance();
+                animateBalanceChange(oldBalance, userData.balance);
             }
 
             const resultElement = document.getElementById(`${type}RouletteResult`);
@@ -803,19 +841,8 @@
 
             const prizes = roulettePrizes[type];
             
-            // СТАРАЯ РАБОЧАЯ ЛОГИКА ВЫБОРА ПРИЗА
-            const totalWeight = prizes.reduce((sum, prize) => sum + prize.weight, 0);
-            let random = Math.random() * totalWeight;
-            let prize = prizes[0];
-            
-            for (const p of prizes) {
-                random -= p.weight;
-                if (random <= 0) {
-                    prize = p;
-                    break;
-                }
-            }
-            
+            // Используем взвешенный случайный выбор приза
+            const prize = getWeightedRandomPrize(prizes);
             const prizeIndex = prizes.findIndex(p => p.name === prize.name);
             
             const itemWidth = 100;
@@ -842,9 +869,13 @@
                     spinBtn.disabled = false;
                 }
 
+                const oldBalance = userData.balance;
+                
                 if (prize.type === 'stars') {
                     userData.balance += prize.stars;
-                    updateBalance();
+                    userData.totalEarned += prize.stars;
+                    // Анимация добавления звезд
+                    animateBalanceChange(oldBalance, userData.balance);
                 } else if (prize.type === 'nft') {
                     userData.inventory.push({
                         id: Date.now(),
@@ -853,18 +884,21 @@
                         image: prize.image,
                         price: nftPrices[prize.name]
                     });
-                    updateInventory();
+                    saveUserData(); // Сохраняем сразу для NFT
+                    updateBalance();
                 }
 
                 updateInventory();
                 
+                // Таймер появляется только после выпадения приза для фри спинов
                 if (type === 'free') {
                     userData.lastFreeSpin = Math.floor(Date.now() / 1000);
                     startFreeSpinTimer(freeSpinCooldown);
                 }
                 
                 userData.isSpinning = false;
-                saveUserData();
+                enableNavigation();
+                saveUserData(); // Сохраняем после завершения спина
             }, 8000);
         }
 
@@ -893,28 +927,28 @@
             
             userData.inventory.forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'inventory-item-card';
                 
-                const actionsHTML = `
-                    <div class="item-actions">
-                        <button class="btn-small btn-sell" onclick="sellNFT(${item.id})">Sell</button>
-                        <button class="btn-small" onclick="openSendModal(${item.id})">Send</button>
-                    </div>
-                `;
+                // Добавляем классы для разных цветов обводки
+                const className = item.name.toLowerCase().replace(/\s+/g, '-');
+                card.className = `inventory-item-card ${className}`;
+                
+                if (item.price >= 1500) card.classList.add('legendary');
+                else if (item.price >= 500) card.classList.add('epic');
+                else card.classList.add('rare');
                 
                 if (item.image) {
                     card.innerHTML = `
                         <img src="${item.image}" class="item-image-real" alt="${item.name}">
                         <strong>${item.name}</strong>
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
-                        ${actionsHTML}
+                        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
                     `;
                 } else {
                     card.innerHTML = `
                         <div class="item-image">${item.icon}</div>
                         <strong>${item.name}</strong>
                         <div class="item-price">Sell for: ⭐ ${item.price}</div>
-                        ${actionsHTML}
+                        <button class="btn btn-sell" onclick="sellNFT(${item.id})">Sell</button>
                     `;
                 }
                 grid.appendChild(card);
@@ -925,36 +959,16 @@
             const itemIndex = userData.inventory.findIndex(item => item.id === id);
             if (itemIndex !== -1) {
                 const item = userData.inventory[itemIndex];
-                userData.balance += item.price;
+                const price = item.price;
+                const oldBalance = userData.balance;
+                userData.balance += price;
                 userData.inventory.splice(itemIndex, 1);
-                updateBalance();
+                
+                // Анимация при продаже NFT
+                animateBalanceChange(oldBalance, userData.balance);
                 updateInventory();
-                saveUserData();
+                saveUserData(); // Сохраняем после продажи
             }
-        }
-
-        function openSendModal(nftId) {
-            selectedNFT = userData.inventory.find(item => item.id === nftId);
-            if (selectedNFT) {
-                document.getElementById('modalMessage').innerHTML = 
-                    `Send <strong>"${selectedNFT.name}"</strong> to bot collection?`;
-                document.getElementById('sendModal').style.display = 'block';
-            }
-        }
-
-        function closeModal() {
-            document.getElementById('sendModal').style.display = 'none';
-            selectedNFT = null;
-        }
-
-        function confirmSend() {
-            if (!selectedNFT) {
-                closeModal();
-                return;
-            }
-            
-            sendNFTViaInline(selectedNFT.id);
-            closeModal();
         }
 
         function showTab(tabId) {
@@ -974,12 +988,14 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Загружаем сохраненные данные при запуске
             loadUserData();
+            
             initTelegramUser();
             initRoulettes();
             updateBalance();
             updateInventory();
         });
     </script>
-</body>
+</body
 </html>
