@@ -136,6 +136,14 @@
             text-transform: none;
         }
 
+        .btn-claim {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px;
+        }
+
         .bottom-menu {
             position: fixed;
             bottom: 0;
@@ -334,25 +342,71 @@
             clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
         }
 
-        .roulette-result {
-            font-size: 18px;
+        .win-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .win-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            border: 3px solid #ffd700;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5);
+            max-width: 350px;
+            width: 100%;
+        }
+
+        .win-title {
+            font-size: 24px;
             font-weight: bold;
-            margin: 15px 0;
-            min-height: 27px;
-            padding: 10px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-transform: uppercase;
         }
 
-        .win {
+        .win-prize {
+            font-size: 28px;
+            font-weight: bold;
             color: #26de81;
-            animation: pulse 0.5s ease-in-out;
+            margin: 15px 0;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .win-stars {
+            font-size: 20px;
+            color: #ffd700;
+            margin: 10px 0;
+        }
+
+        .win-image {
+            width: 120px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin: 15px auto;
+            border: 3px solid #ffd700;
+        }
+
+        .win-icon {
+            font-size: 80px;
+            margin: 15px 0;
+        }
+
+        .win-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
         }
 
         .inventory-grid {
@@ -455,6 +509,13 @@
             color: #ff6b6b;
             font-weight: bold;
             font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .cooldown-info {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -485,11 +546,9 @@
                         <div class="roulette-pointer"></div>
                     </div>
                     
-                    <div class="roulette-result" id="freeRouletteResult">Spin to win!</div>
-                    
                     <div class="section">
                         <h3>Free Spin</h3>
-                        <div class="cooldown" id="freeCooldown">
+                        <div class="cooldown-info" id="freeCooldown">
                             <span class="available-now">Available now</span>
                             <span id="freeTimer" class="timer" style="display: none;"></span>
                         </div>
@@ -504,8 +563,6 @@
                         <div class="roulette-pointer"></div>
                     </div>
                     
-                    <div class="roulette-result" id="premiumRouletteResult">Spin to win!</div>
-                    
                     <div class="section">
                         <h3>Premium Spin</h3>
                         <div class="spin-cost">Cost: ⭐ 200</div>
@@ -519,8 +576,6 @@
                         <div class="roulette-track" id="luxuryRouletteTrack"></div>
                         <div class="roulette-pointer"></div>
                     </div>
-                    
-                    <div class="roulette-result" id="luxuryRouletteResult">Spin to win!</div>
                     
                     <div class="section">
                         <h3>Luxury Spin</h3>
@@ -543,6 +598,20 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Win Screen -->
+    <div class="win-screen" id="winScreen">
+        <div class="win-content">
+            <div class="win-title">Congratulations!</div>
+            <div id="winPrizeIcon" class="win-icon"></div>
+            <img id="winPrizeImage" class="win-image" style="display: none;">
+            <div id="winPrizeName" class="win-prize"></div>
+            <div id="winPrizeStars" class="win-stars"></div>
+            <div class="win-buttons">
+                <button class="btn btn-claim" onclick="claimPrize()">CLAIM</button>
             </div>
         </div>
     </div>
@@ -591,6 +660,8 @@
             isSpinning: false
         };
 
+        let currentPrize = null;
+
         const roulettePrizes = {
             free: [
                 { type: 'stars', name: '50 Stars', icon: '⭐', image: 'stars.webp', stars: 50, color: 'linear-gradient(135deg, #FFD700, #FFA500)', weight: 40 },
@@ -627,7 +698,7 @@
             'Happy Birthday': 250
         };
 
-        let freeSpinCooldown = 120;
+        let freeSpinCooldown = 120; // 2 minutes
         let freeSpinTimer = null;
 
         function initTelegramUser() {
@@ -803,6 +874,59 @@
             return prizes[prizes.length - 1];
         }
 
+        function showWinScreen(prize) {
+            currentPrize = prize;
+            const winScreen = document.getElementById('winScreen');
+            const winPrizeName = document.getElementById('winPrizeName');
+            const winPrizeStars = document.getElementById('winPrizeStars');
+            const winPrizeIcon = document.getElementById('winPrizeIcon');
+            const winPrizeImage = document.getElementById('winPrizeImage');
+            
+            winPrizeName.textContent = prize.name;
+            winPrizeStars.textContent = `Value: ⭐ ${prize.stars}`;
+            
+            if (prize.image) {
+                winPrizeIcon.style.display = 'none';
+                winPrizeImage.style.display = 'block';
+                winPrizeImage.src = prize.image;
+                winPrizeImage.alt = prize.name;
+            } else {
+                winPrizeIcon.style.display = 'block';
+                winPrizeImage.style.display = 'none';
+                winPrizeIcon.textContent = prize.icon;
+            }
+            
+            winScreen.style.display = 'flex';
+        }
+
+        function claimPrize() {
+            const winScreen = document.getElementById('winScreen');
+            winScreen.style.display = 'none';
+            
+            const oldBalance = userData.balance;
+            
+            if (currentPrize.type === 'stars') {
+                userData.balance += currentPrize.stars;
+                userData.totalEarned += currentPrize.stars;
+                // Анимация добавления звезд
+                animateBalanceChange(oldBalance, userData.balance);
+            } else if (currentPrize.type === 'nft') {
+                userData.inventory.push({
+                    id: Date.now(),
+                    name: currentPrize.name,
+                    icon: currentPrize.icon,
+                    image: currentPrize.image,
+                    price: nftPrices[currentPrize.name]
+                });
+                saveUserData(); // Сохраняем сразу для NFT
+                updateBalance();
+            }
+
+            updateInventory();
+            currentPrize = null;
+            saveUserData();
+        }
+
         function spinRoulette(type) {
             if (userData.isSpinning) return;
             
@@ -816,10 +940,12 @@
             userData.isSpinning = true;
             disableNavigation();
 
-            // Сразу убираем "Available now" при начале спина
+            // Сразу убираем "Available now" при начале спина и запускаем таймер
             if (type === 'free') {
                 document.querySelector('#freeCooldown .available-now').style.display = 'none';
-                document.getElementById('freeTimer').style.display = 'none';
+                document.getElementById('freeTimer').style.display = 'block';
+                userData.lastFreeSpin = Math.floor(Date.now() / 1000);
+                startFreeSpinTimer(freeSpinCooldown);
             }
 
             // Списываем стоимость спина для премиум и люкс рулеток
@@ -829,15 +955,12 @@
                 animateBalanceChange(oldBalance, userData.balance);
             }
 
-            const resultElement = document.getElementById(`${type}RouletteResult`);
             const track = document.getElementById(`${type}RouletteTrack`);
             const spinBtn = type === 'free' ? document.getElementById('freeSpinBtn') : 
                            type === 'premium' ? document.getElementById('premiumSpinBtn') : 
                            document.getElementById('luxurySpinBtn');
             
             spinBtn.disabled = true;
-            resultElement.textContent = 'Spinning...';
-            resultElement.className = 'roulette-result';
 
             const prizes = roulettePrizes[type];
             
@@ -862,42 +985,16 @@
             track.style.transform = `translateX(${targetPosition}px)`;
 
             setTimeout(() => {
-                resultElement.textContent = `You win: ${prize.name} - ⭐ ${prize.stars}`;
-                resultElement.classList.add('win');
-                
                 if (type !== 'free') {
                     spinBtn.disabled = false;
-                }
-
-                const oldBalance = userData.balance;
-                
-                if (prize.type === 'stars') {
-                    userData.balance += prize.stars;
-                    userData.totalEarned += prize.stars;
-                    // Анимация добавления звезд
-                    animateBalanceChange(oldBalance, userData.balance);
-                } else if (prize.type === 'nft') {
-                    userData.inventory.push({
-                        id: Date.now(),
-                        name: prize.name,
-                        icon: prize.icon,
-                        image: prize.image,
-                        price: nftPrices[prize.name]
-                    });
-                    saveUserData(); // Сохраняем сразу для NFT
-                    updateBalance();
-                }
-
-                updateInventory();
-                
-                // Таймер появляется только после выпадения приза для фри спинов
-                if (type === 'free') {
-                    userData.lastFreeSpin = Math.floor(Date.now() / 1000);
-                    startFreeSpinTimer(freeSpinCooldown);
                 }
                 
                 userData.isSpinning = false;
                 enableNavigation();
+                
+                // Показываем экран победы
+                showWinScreen(prize);
+                
                 saveUserData(); // Сохраняем после завершения спина
             }, 8000);
         }
